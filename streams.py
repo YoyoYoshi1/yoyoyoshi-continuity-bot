@@ -150,22 +150,16 @@ def make_stream_message(server, stream):
     server_key = server.get("server", "")
 
     if server_key == "mk64":
-        route_line = "MK64 Switch route is active:"
-    elif server_key == "awrev":
-        route_line = "awRev route is active:"
-    elif server_key == "yoyoyoshi":
-        route_line = "YoyoYoshi route is active:"
+        intro = f"🟢 **{streamer}** is live in MK64!"
     else:
-        route_line = "Continuity route is active:"
+        intro = f"🟢 **{streamer}** is now live!"
 
-    message = (
-        f"🟢 **{streamer}** is live with **{game}**!\n\n"
-    )
+    message = f"{intro}\n\n**{game}**"
 
     if title:
-        message += f"**{title}**\n\n"
+        message += f"\n\n{title}"
 
-    message += f"{route_line}\n{url}"
+    message += f"\n\n{url}"
 
     return message
 
