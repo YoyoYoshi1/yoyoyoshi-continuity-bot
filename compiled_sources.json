@@ -1,0 +1,1060 @@
+[
+  {
+    "id": "awrev_syzygy_hawke_guide",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "guide",
+    "game": "Advance Wars: Dual Strike",
+    "title": "Syzygy's AWDS Hawke Guide",
+    "url": "https://awrev.com/guides/guide.php?id=13",
+    "aliases": [
+      "hawke",
+      "hawke guide",
+      "syzygy hawke",
+      "awds hawke",
+      "black storm"
+    ],
+    "tags": [
+      "advance wars",
+      "advance wars dual strike",
+      "awds",
+      "hawke",
+      "black hole",
+      "syzygy",
+      "tier analysis",
+      "matchups",
+      "strategy"
+    ],
+    "description": "Classic 2006 Hawke analysis covering Black Storm, OHKO math, and matchup theory.",
+    "author": "Syzygy",
+    "era": "2006",
+    "source_type": "static"
+  },
+  {
+    "id": "awrev_battalion_wars_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "walkthrough",
+    "game": "Battalion Wars",
+    "title": "Battalion Wars Walkthrough",
+    "url": "https://awrev.com/bwwalkthrough.php",
+    "aliases": [
+      "bw",
+      "battalion wars",
+      "bw walkthrough",
+      "da_nut walkthrough"
+    ],
+    "tags": [
+      "battalion wars",
+      "walkthrough",
+      "missions",
+      "strategy",
+      "restoration",
+      "da_nut"
+    ],
+    "description": "Restored Battalion Wars walkthrough with updated mission navigation and formatting.",
+    "author": "Da_Nut",
+    "era": "2000s restored",
+    "source_type": "static"
+  },
+  {
+    "id": "mk64_switch_hub",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "hub",
+    "game": "Mario Kart 64",
+    "title": "MK64 Switch Hub",
+    "url": "https://yoyoyoshihub.neocities.org/mk64",
+    "aliases": [
+      "mk64",
+      "mk64 hub",
+      "mario kart 64",
+      "switch hub",
+      "mk64 switch"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub",
+      "shortcuts",
+      "records",
+      "routing",
+      "yoyoyoshi"
+    ],
+    "description": "Main Mario Kart 64 Switch hub with records, guides, routing, and community continuity resources.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  },
+  {
+    "id": "awrev_awrev",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "hub",
+    "game": "",
+    "title": "awRev",
+    "url": "https://awrev.com",
+    "aliases": [
+      "awrev",
+      "advance wars revolution",
+      "aw revolution"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "battalion wars",
+      "guides",
+      "maps",
+      "community"
+    ],
+    "description": "Main awRev hub for Advance Wars, Battalion Wars, guides, maps, archives, and community resources.",
+    "author": "",
+    "era": "2000s-modern",
+    "source_type": "static"
+  },
+  {
+    "id": "awrev_frontpage",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Frontpage",
+    "url": "https://awrev.com/default.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Frontpage",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_login",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Login",
+    "url": "https://awrev.com/account/login.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Login",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_register",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Register",
+    "url": "https://awrev.com/account/register.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Register",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_design_maps",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Design Maps",
+    "url": "https://awrev.com/designmaps",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Design Maps",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_guides",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Guides",
+    "url": "https://awrev.com/guides",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Guides",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_fanfiction",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Fanfiction",
+    "url": "https://awrev.com/fanfiction",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Fanfiction",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_discord",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Discord",
+    "url": "https://discord.gg/gD47SgrKgV",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Discord",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_latest_site_updates",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Latest Site Updates",
+    "url": "https://awrev.com/news.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Latest Site Updates",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_about",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "About",
+    "url": "https://awrev.com/about.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: About",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_staff",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Staff",
+    "url": "https://awrev.com/staff.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Staff",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_wiki",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Wiki",
+    "url": "https://awrev.com/awrev_wiki/doku.php?id=start",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Wiki",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_disclaimer",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Disclaimer",
+    "url": "https://awrev.com/disclaimer.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Disclaimer",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_youtube_channel",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "YouTube Channel",
+    "url": "https://www.youtube.com/@YoyoYoshi1",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: YouTube Channel",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_twitch_channel",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Twitch Channel",
+    "url": "https://www.twitch.tv/yoyoyoshi1",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Twitch Channel",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_yoyoyoshi_hub",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "YoyoYoshi Hub",
+    "url": "https://yoyoyoshihub.neocities.org",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: YoyoYoshi Hub",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_advance_wars",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Advance Wars",
+    "url": "https://awrev.com/aw",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Advance Wars",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_normal_campaign_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Normal Campaign Walkthrough",
+    "url": "https://awrev.com/aw1normalcampaign.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Normal Campaign Walkthrough",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_advance_campaign_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Advance Campaign Walkthrough",
+    "url": "https://awrev.com/aw1advancecampaign.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Advance Campaign Walkthrough",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_armies",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Armies",
+    "url": "https://awrev.com/aw1armies.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Armies",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_field_training",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Field Training",
+    "url": "https://awrev.com/aw1fieldtraining.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Field Training",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_ranks",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Ranks",
+    "url": "https://awrev.com/aw1ranks.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Ranks",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_aw2_black_hole_rising",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "AW2: Black Hole Rising",
+    "url": "https://awrev.com/aw2",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: AW2: Black Hole Rising",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_normal_campaign_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Normal Campaign Walkthrough",
+    "url": "https://awrev.com/aw2normalcampaign.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Normal Campaign Walkthrough",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_hard_campaign_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Hard Campaign Walkthrough",
+    "url": "https://awrev.com/aw2hardcampaign.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Hard Campaign Walkthrough",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_armies",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Armies",
+    "url": "https://awrev.com/aw2armies.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Armies",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_aw_dual_strike",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "AW: Dual Strike",
+    "url": "https://awrev.com/awds",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: AW: Dual Strike",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "awrev_normal_campaign_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "page",
+    "game": "",
+    "title": "Normal Campaign Walkthrough",
+    "url": "https://awrev.com/awdsnormalcampaign.php",
+    "aliases": [
+      "awrev"
+    ],
+    "tags": [
+      "advance wars",
+      "awrev",
+      "community"
+    ],
+    "description": "awRev page: Normal Campaign Walkthrough",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_advance_wars_platform_awrev",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Advance Wars platform (awRev)",
+    "url": "https://www.awrev.com",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Advance Wars platform (awRev)",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_mario_kart_64_switch_multiplayer_hub",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Mario Kart 64 Switch multiplayer hub",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/index.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Mario Kart 64 Switch multiplayer hub",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_mksc_time_trials_hub",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "MKSC Time Trials Hub",
+    "url": "https://yoyoyoshihub.neocities.org/mksc/index.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: MKSC Time Trials Hub",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_video_playlists",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Video Playlists",
+    "url": "https://yoyoyoshihub.neocities.org/youtube-playlists.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Video Playlists",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_fanfiction_hub",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Fanfiction Hub",
+    "url": "https://yoyoyoshihub.neocities.org/fanfiction/index.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Fanfiction Hub",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_read_full_history_and_timeline",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Read full history and timeline",
+    "url": "https://yoyoyoshihub.neocities.org/history.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Read full history and timeline",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_view_all_current_updates",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "View all current updates",
+    "url": "https://yoyoyoshihub.neocities.org/updates.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: View all current updates",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_browse_the_preserved_old_updates_archive",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Browse the preserved old updates archive",
+    "url": "https://yoyoyoshihub.neocities.org/oldupdates.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Browse the preserved old updates archive",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_gamefaqs_guides",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "GameFAQs Guides",
+    "url": "https://gamefaqs.gamespot.com/community/YoyoYoshi/contributions/faqs",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: GameFAQs Guides",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_video_game_progress_records",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "Video Game Progress & Records",
+    "url": "https://yoyoyoshihub.neocities.org/video-game-progress.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: Video Game Progress & Records",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "hub_wwii_death_in_europe_guide",
+    "server": "hub",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "",
+    "title": "WWII: Death in Europe Guide",
+    "url": "https://yoyoyoshihub.neocities.org/wwii-death-in-europe.html",
+    "aliases": [
+      "yoyoyoshi hub"
+    ],
+    "tags": [
+      "yoyoyoshi",
+      "hub",
+      "continuity"
+    ],
+    "description": "YoyoYoshi Hub page: WWII: Death in Europe Guide",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "mk64_mk64_switch_discord",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "Mario Kart 64",
+    "title": "MK64 Switch Discord",
+    "url": "https://discord.gg/hebCNMbKme",
+    "aliases": [
+      "mk64",
+      "mario kart 64"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub"
+    ],
+    "description": "MK64 Hub page: MK64 Switch Discord",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "mk64_yoyoyoshi_hub",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "Mario Kart 64",
+    "title": "YoyoYoshi Hub",
+    "url": "https://yoyoyoshihub.neocities.org/index.html",
+    "aliases": [
+      "mk64",
+      "mario kart 64"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub"
+    ],
+    "description": "MK64 Hub page: YoyoYoshi Hub",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "mk64_discord_history",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "Mario Kart 64",
+    "title": "Discord History",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/history.html",
+    "aliases": [
+      "mk64",
+      "mario kart 64"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub"
+    ],
+    "description": "MK64 Hub page: Discord History",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "mk64_tournaments",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "Mario Kart 64",
+    "title": "Tournaments",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/tournaments.html",
+    "aliases": [
+      "mk64",
+      "mario kart 64"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub"
+    ],
+    "description": "MK64 Hub page: Tournaments",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "mk64_media_and_archives",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "page",
+    "game": "Mario Kart 64",
+    "title": "Media and Archives",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/media.html",
+    "aliases": [
+      "mk64",
+      "mario kart 64"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub"
+    ],
+    "description": "MK64 Hub page: Media and Archives",
+    "author": "",
+    "era": "",
+    "source_type": "dynamic"
+  },
+  {
+    "id": "video_yoyoyoshi_youtube_playlists",
+    "server": "video",
+    "site": "YouTube",
+    "type": "playlist_index",
+    "game": "",
+    "title": "YoyoYoshi YouTube Playlists",
+    "url": "https://www.youtube.com/@YoyoYoshi1/playlists",
+    "aliases": [
+      "playlist",
+      "playlists",
+      "youtube playlist",
+      "youtube playlists",
+      "video playlist",
+      "video playlists"
+    ],
+    "tags": [
+      "youtube",
+      "video",
+      "videos",
+      "playlist",
+      "playlists",
+      "advance wars",
+      "mk64",
+      "walkthroughs"
+    ],
+    "description": "YoyoYoshi YouTube playlist hub for organized video series and long-form continuity.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  }
+]

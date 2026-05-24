@@ -1,0 +1,63 @@
+{
+  "servers": [
+    {
+      "server": "mk64",
+      "discord_guild": "MK64 Nintendo Switch Discord",
+      "announcement_channel_id": 123456789012345678,
+      "dedupe_minutes": 180,
+      "game_rules": [
+        {
+          "match_type": "exact",
+          "game": "Mario Kart 64",
+          "allowed_streamers": [
+            "yoyoyoshi1",
+            "graessge",
+            "spacedcowboy13",
+            "twiztidgumby6",
+            "fx6400",
+            "denvarsc"
+          ]
+        }
+      ]
+    },
+
+    {
+      "server": "awrev",
+      "discord_guild": "awRev Discord",
+      "announcement_channel_id": 234567890123456789,
+      "dedupe_minutes": 180,
+      "game_rules": [
+        {
+          "match_type": "startswith",
+          "game": "Advance Wars",
+          "allowed_streamers": [
+            "yoyoyoshi1"
+          ]
+        },
+        {
+          "match_type": "startswith",
+          "game": "Battalion Wars",
+          "allowed_streamers": [
+            "yoyoyoshi1"
+          ]
+        }
+      ]
+    },
+
+    {
+      "server": "yoyoyoshi",
+      "discord_guild": "YoyoYoshi Discord",
+      "announcement_channel_id": 345678901234567890,
+      "dedupe_minutes": 180,
+      "game_rules": [
+        {
+          "match_type": "any",
+          "game": "*",
+          "allowed_streamers": [
+            "yoyoyoshi1"
+          ]
+        }
+      ]
+    }
+  ]
+}
