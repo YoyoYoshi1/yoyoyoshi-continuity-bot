@@ -4,11 +4,13 @@ import json
 import random
 import requests
 import discord
+import statistics
 
 from bs4 import BeautifulSoup
 from discord import app_commands
 from dotenv import load_dotenv
 from urllib.parse import urljoin
+from collections import defaultdict
 
 from streams import start_stream_tracker
 
@@ -21,6 +23,7 @@ load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID_RAW = os.getenv("DISCORD_GUILD_ID")
+MK64_VS_CHANNEL_ID_RAW = os.getenv("MK64_VS_CHANNEL_ID", "997416976051871854")
 
 if not TOKEN:
     raise RuntimeError("Missing DISCORD_TOKEN in .env")
@@ -29,7 +32,247 @@ if not GUILD_ID_RAW:
     raise RuntimeError("Missing DISCORD_GUILD_ID in .env")
 
 GUILD_ID = int(GUILD_ID_RAW)
+MK64_VS_CHANNEL_ID = int(MK64_VS_CHANNEL_ID_RAW)
 MY_GUILD = discord.Object(id=GUILD_ID)
+
+
+# -----------------------------
+# MK64 VS parser config/storage
+# -----------------------------
+
+K_FACTOR = 32
+MIN_MATCHES = 5
+MAX_SCORE = 60
+DATA_FILE = "vs_data.json"
+
+matches = []
+ratings = defaultdict(lambda: 1000)
+player_stats = defaultdict(lambda: {
+    "matches": 0,
+    "points": 0
+})
+last_message_id = None
+
+ALIASES = {
+    "jesse": "spacedcowboy",
+    "jessek": "spacedcowboy",
+    "spaced": "spacedcowboy",
+    "socal": "juggernaut",
+    "coolex": "thecoolex",
+    "fuzzy": "fuzz",
+    "booth": "noakevbo",
+    "palatus": "patalus",
+    "pat": "patalus",
+    "espagetti": "espaghetti",
+    "yoyo": "yoyoyoshi",
+    "bobby": "yoyoyoshi"
+}
+
+
+def normalize_name(name):
+    name = name.lower().strip()
+    name = re.sub(r"[^a-z0-9_]", "", name)
+    return ALIASES.get(name, name)
+
+
+VS_PATTERN = r"^@?([A-Za-z0-9_\-]{2,})\s+(\d+)$"
+
+
+def parse_vs_message(content):
+    lines = content.split("\n")
+    scores = {}
+
+    for line in lines:
+        line = line.strip()
+        match = re.match(VS_PATTERN, line)
+
+        if match:
+            name, score = match.groups()
+            score = int(score)
+
+            if score > MAX_SCORE:
+                print("⚠️ SKIPPING BAD SCORE:", name, score)
+                continue
+
+            clean = normalize_name(name)
+            scores[clean] = score
+
+    if len(scores) < 2:
+        return None
+
+    placements = sorted(scores.items(), key=lambda x: -x[1])
+
+    return {
+        "scores": scores,
+        "placements": placements
+    }
+
+
+def expected_score(r1, r2):
+    return 1 / (1 + 10 ** ((r2 - r1) / 400))
+
+
+def update_ratings(match):
+    players = [p for p, _ in match["placements"]]
+
+    if len(players) < 2:
+        return
+
+    for i, p1 in enumerate(players):
+        r1 = ratings[p1]
+        total_delta = 0
+
+        for j, p2 in enumerate(players):
+            if i == j:
+                continue
+
+            r2 = ratings[p2]
+            actual = 1 if i < j else 0
+            expected = expected_score(r1, r2)
+            total_delta += actual - expected
+
+        ratings[p1] += K_FACTOR * (total_delta / (len(players) - 1))
+
+
+def adjusted_rating(player):
+    base = ratings[player]
+    games = player_stats[player]["matches"]
+    confidence = games / (games + 50)
+    return 1000 + (base - 1000) * confidence
+
+
+def attach_metadata(match, message):
+    match["message_id"] = message.id
+    match["created_at"] = message.created_at.isoformat()
+    match["jump_url"] = message.jump_url
+    match["author"] = str(message.author)
+    return match
+
+
+def save_vs_data():
+    data = {
+        "matches": matches,
+        "ratings": dict(ratings),
+        "player_stats": dict(player_stats),
+        "last_message_id": last_message_id
+    }
+
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+
+def load_vs_data():
+    global matches, last_message_id
+
+    if not os.path.exists(DATA_FILE):
+        return
+
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    matches = data.get("matches", [])
+    last_message_id = data.get("last_message_id")
+
+    for player, rating in data.get("ratings", {}).items():
+        ratings[player] = rating
+
+    for player, stats in data.get("player_stats", {}).items():
+        player_stats[player] = stats
+
+
+def record_vs_match(match, message=None, message_id=None, save=True):
+    global last_message_id
+
+    if message is not None:
+        match = attach_metadata(match, message)
+        last_message_id = message.id
+    elif message_id is not None:
+        match["message_id"] = message_id
+        last_message_id = message_id
+
+    matches.append(match)
+    update_ratings(match)
+
+    for player, score in match["scores"].items():
+        player_stats[player]["matches"] += 1
+        player_stats[player]["points"] += score
+
+    if save:
+        save_vs_data()
+
+
+def mark_vs_processed(message_id, save=True):
+    global last_message_id
+
+    last_message_id = message_id
+
+    if save:
+        save_vs_data()
+
+
+def get_vs_leaderboard():
+    eligible = [
+        p for p in ratings
+        if player_stats[p]["matches"] >= MIN_MATCHES
+    ]
+
+    return sorted(
+        eligible,
+        key=lambda p: -adjusted_rating(p)
+    )
+
+
+def format_vs_leaderboard(limit=10):
+    sorted_players = get_vs_leaderboard()[:limit]
+
+    if not sorted_players:
+        return "No eligible players yet."
+
+    lines = ["**MK64 VS Leaderboard**"]
+
+    for i, name in enumerate(sorted_players, 1):
+        adj = adjusted_rating(name)
+        raw = ratings[name]
+        stats = player_stats[name]
+        avg = stats["points"] / stats["matches"] if stats["matches"] else 0
+
+        lines.append(
+            f"{i}. **{name}**: {round(adj)} "
+            f"(raw {round(raw)}) | matches: {stats['matches']} | avg pts: {avg:.1f}"
+        )
+
+    values = [adjusted_rating(p) for p in sorted_players]
+
+    if values:
+        lines.append(f"\nMedian Elo: {round(statistics.median(values))}")
+
+    return "\n".join(lines)
+
+
+def format_vs_rank(name):
+    clean = normalize_name(name)
+
+    if clean not in ratings:
+        return f"No data found for `{clean}`."
+
+    stats = player_stats[clean]
+    avg = stats["points"] / stats["matches"] if stats["matches"] else 0
+
+    return (
+        f"**{clean}**\n"
+        f"Elo: {round(adjusted_rating(clean))} "
+        f"(raw {round(ratings[clean])})\n"
+        f"Matches: {stats['matches']}\n"
+        f"Average points: {avg:.1f}"
+    )
+
+
+def format_vs_stats():
+    return (
+        f"Stored matches: {len(matches)}\n"
+        f"Tracked players: {len(player_stats)}\n"
+        f"Last processed message ID: {last_message_id}"
+    )
 
 
 # -----------------------------
@@ -367,10 +610,13 @@ SOURCES = build_sources()
 # -----------------------------
 
 intents = discord.Intents.default()
+intents.message_content = True
+
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 stream_tracker_started = False
+vs_history_imported = False
 
 
 # -----------------------------
@@ -474,12 +720,70 @@ def make_embed(item):
 
 
 # -----------------------------
+# MK64 history import
+# -----------------------------
+
+async def import_vs_history():
+    global last_message_id
+
+    channel = client.get_channel(MK64_VS_CHANNEL_ID)
+
+    if channel is None:
+        print("ERROR: MK64 VS channel not found")
+        return
+
+    scanned = 0
+    parsed = 0
+    rejected = 0
+
+    after_msg = None
+
+    if last_message_id:
+        try:
+            after_msg = await channel.fetch_message(int(last_message_id))
+            print(f"Resuming VS import after message ID: {last_message_id}")
+        except discord.NotFound:
+            print("Last VS message not found. Falling back to full scan.")
+        except discord.HTTPException:
+            print("Could not fetch last VS message. Falling back to full scan.")
+
+    print("Scanning MK64 VS channel history...")
+
+    async for msg in channel.history(
+        limit=None,
+        oldest_first=True,
+        after=after_msg
+    ):
+        if msg.author == client.user:
+            continue
+
+        scanned += 1
+        match = parse_vs_message(msg.content)
+
+        if match:
+            parsed += 1
+            record_vs_match(match, message=msg, save=False)
+        else:
+            rejected += 1
+            mark_vs_processed(msg.id, save=False)
+
+    save_vs_data()
+
+    print("MK64 VS history scan complete.")
+    print(f"Scanned: {scanned}")
+    print(f"Parsed matches: {parsed}")
+    print(f"Rejected messages: {rejected}")
+    print(f"Saved matches: {len(matches)}")
+    print(f"Last processed message ID: {last_message_id}")
+
+
+# -----------------------------
 # Events
 # -----------------------------
 
 @client.event
 async def on_ready():
-    global stream_tracker_started
+    global stream_tracker_started, vs_history_imported
 
     print(f"Loaded {len(SOURCES)} sources.")
     print("Saved compiled_sources.json.")
@@ -492,9 +796,56 @@ async def on_ready():
     for cmd in synced:
         print(f"- /{cmd.name}")
 
+    if not vs_history_imported:
+        load_vs_data()
+        print(f"Loaded {len(matches)} MK64 VS matches.")
+        await import_vs_history()
+        vs_history_imported = True
+
     if not stream_tracker_started:
         start_stream_tracker(client)
         stream_tracker_started = True
+
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.channel.id != MK64_VS_CHANNEL_ID:
+        return
+
+    content = message.content.strip()
+
+    if content == "!leaderboard":
+        mark_vs_processed(message.id)
+        await message.channel.send(format_vs_leaderboard(10))
+        return
+
+    if content.startswith("!rank"):
+        mark_vs_processed(message.id)
+
+        parts = content.split(maxsplit=1)
+
+        if len(parts) < 2:
+            await message.channel.send("Usage: `!rank playername`")
+            return
+
+        await message.channel.send(format_vs_rank(parts[1]))
+        return
+
+    if content == "!stats":
+        mark_vs_processed(message.id)
+        await message.channel.send(format_vs_stats())
+        return
+
+    match = parse_vs_message(content)
+
+    if match:
+        record_vs_match(match, message=message)
+        await message.add_reaction("✅")
+    else:
+        mark_vs_processed(message.id)
 
 
 # -----------------------------
@@ -502,18 +853,23 @@ async def on_ready():
 # -----------------------------
 
 @tree.command(name="guide", description="Search the full YoyoYoshi continuity ecosystem.")
-@app_commands.describe(query="What are you looking for?")
-async def guide(interaction: discord.Interaction, query: str):
-    results = search_sources(query)
+@app_commands.describe(
+    query="What are you looking for?",
+    limit="Number of results to show, from 1 to 5"
+)
+async def guide(interaction: discord.Interaction, query: str, limit: int = 3):
+    limit = max(1, min(limit, 5))
+    results = search_sources(query, limit=limit)
 
     if not results:
         await interaction.response.send_message(
-            f"I couldn't find anything for **{query}** yet. The archive grows stronger with every restored link."
+            f"I couldn't find anything for **{query}** yet. "
+            f"Try `/sitemap` to see available route categories."
         )
         return
 
     await interaction.response.send_message(
-        content="Here’s what I found:",
+        content=f"Here’s what I found for **{query}**:",
         embeds=[make_embed(r) for r in results]
     )
 
@@ -613,15 +969,11 @@ async def video(interaction: discord.Interaction, query: str):
     )
 
 
-@tree.command(name="sourcecount", description="Show loaded continuity source count.")
-async def sourcecount(interaction: discord.Interaction):
-    await interaction.response.send_message(
-        f"Loaded **{len(SOURCES)}** compiled continuity sources."
-    )
-
-
 @tree.command(name="randomguide", description="Find a random guide or continuity route.")
-async def randomguide(interaction: discord.Interaction):
+@app_commands.describe(server="Optional server filter: awrev, mk64, hub, gamefaqs, or video")
+async def randomguide(interaction: discord.Interaction, server: str = ""):
+    server_clean = server.lower().strip()
+
     guide_sources = [
         s for s in SOURCES
         if s.get("type") in [
@@ -635,15 +987,58 @@ async def randomguide(interaction: discord.Interaction):
         ]
     ]
 
+    if server_clean:
+        guide_sources = [
+            s for s in guide_sources
+            if s.get("server") == server_clean
+        ]
+
     if not guide_sources:
-        await interaction.response.send_message("No guide routes are loaded yet.")
+        if server_clean:
+            await interaction.response.send_message(
+                f"No random guide routes found for **{server_clean}**."
+            )
+        else:
+            await interaction.response.send_message("No guide routes are loaded yet.")
         return
 
     item = random.choice(guide_sources)
 
+    content = (
+        f"Random **{server_clean}** continuity route found:"
+        if server_clean
+        else "Random continuity route found:"
+    )
+
     await interaction.response.send_message(
-        content="Random continuity route found:",
+        content=content,
         embed=make_embed(item)
+    )
+
+
+@tree.command(name="sitemap", description="Show available continuity route categories.")
+async def sitemap(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        "**Available continuity routes:**\n\n"
+        "• `/guide` — search everything\n"
+        "• `/awrev` — Advance Wars / Battalion Wars / awRev\n"
+        "• `/mk64` — MK64 Switch resources\n"
+        "• `/hub` — YoyoYoshi Hub pages\n"
+        "• `/gamefaqs` — GameFAQs guides\n"
+        "• `/video` — YouTube videos/playlists\n"
+        "• `/randomguide` — random route\n"
+        "• `/sourcecount` — loaded source count\n"
+        "• `/debugsources` — source titles by server\n"
+        "• `/vsleaderboard` — MK64 VS leaderboard\n"
+        "• `/vsrank` — MK64 VS player rank\n"
+        "• `/vsstats` — MK64 VS parser stats"
+    )
+
+
+@tree.command(name="sourcecount", description="Show loaded continuity source count.")
+async def sourcecount(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        f"Loaded **{len(SOURCES)}** compiled continuity sources."
     )
 
 
@@ -651,19 +1046,37 @@ async def randomguide(interaction: discord.Interaction):
 @app_commands.describe(server="Server name, like gamefaqs, video, mk64, awrev, hub")
 async def debugsources(interaction: discord.Interaction, server: str):
     server_clean = server.lower().strip()
-    matches = [s for s in SOURCES if s.get("server") == server_clean]
+    matches_found = [s for s in SOURCES if s.get("server") == server_clean]
 
-    if not matches:
+    if not matches_found:
         await interaction.response.send_message(
             f"No sources found for server **{server}**."
         )
         return
 
-    titles = "\n".join([f"- {s['title']}" for s in matches[:20]])
+    titles = "\n".join([f"- {s['title']}" for s in matches_found[:20]])
 
     await interaction.response.send_message(
-        f"Found **{len(matches)}** sources for **{server_clean}**:\n{titles}"
+        f"Found **{len(matches_found)}** sources for **{server_clean}**:\n{titles}"
     )
+
+
+@tree.command(name="vsleaderboard", description="Show the MK64 VS leaderboard.")
+@app_commands.describe(limit="Number of players to show, from 1 to 20")
+async def vsleaderboard(interaction: discord.Interaction, limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(format_vs_leaderboard(limit))
+
+
+@tree.command(name="vsrank", description="Show an MK64 VS player's rating.")
+@app_commands.describe(player="Player name or alias")
+async def vsrank(interaction: discord.Interaction, player: str):
+    await interaction.response.send_message(format_vs_rank(player))
+
+
+@tree.command(name="vsstats", description="Show MK64 VS parser stats.")
+async def vsstats(interaction: discord.Interaction):
+    await interaction.response.send_message(format_vs_stats())
 
 
 # -----------------------------
