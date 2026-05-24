@@ -1,0 +1,242 @@
+[
+  {
+    "id": "mk64_gp_elo_rankings",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "rankings",
+    "game": "Mario Kart 64",
+    "title": "GP Elo Rankings",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/gp-rankings.html",
+    "aliases": [
+      "gp rankings",
+      "elo rankings",
+      "gp elo",
+      "rankings"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "elo",
+      "rankings",
+      "grand prix",
+      "competitive"
+    ],
+    "description": "Current MK64 Switch Grand Prix Elo rankings and competitive standings.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  },
+
+  {
+    "id": "mk64_vs_rankings",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "rankings",
+    "game": "Mario Kart 64",
+    "title": "VS Rankings",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/vs-rankings.html",
+    "aliases": [
+      "vs rankings",
+      "vs elo",
+      "versus rankings"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "vs",
+      "rankings",
+      "competitive"
+    ],
+    "description": "MK64 Switch VS rankings and competitive ladder standings.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  },
+
+  {
+    "id": "mk64_grand_prix_league",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "event",
+    "game": "Mario Kart 64",
+    "title": "Grand Prix League Season 3",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/gpl-s3.html",
+    "aliases": [
+      "gpl",
+      "gpl s3",
+      "grand prix league"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "league",
+      "grand prix",
+      "season 3",
+      "competitive"
+    ],
+    "description": "Grand Prix League Season 3 standings, matches, and historical records.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  },
+
+  {
+    "id": "mk64_campkart_2025",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "event",
+    "game": "Mario Kart 64",
+    "title": "CampKart 2025",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/campkart-2025.html",
+    "aliases": [
+      "campkart",
+      "camp kart",
+      "campkart 2025"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "campkart",
+      "event",
+      "tournament",
+      "community"
+    ],
+    "description": "CampKart 2025 event coverage, media, standings, and tournament history.",
+    "author": "YoyoYoshi",
+    "era": "2025",
+    "source_type": "static"
+  },
+
+  {
+    "id": "mk64_euro_kart_clash",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "event",
+    "game": "Mario Kart 64",
+    "title": "Euro Kart Clash",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/euro-kart-clash.html",
+    "aliases": [
+      "ekc",
+      "euro kart clash"
+    ],
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "europe",
+      "tournament",
+      "competitive",
+      "event"
+    ],
+    "description": "Euro Kart Clash tournament history and competitive event coverage.",
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  }
+]
+[
+  {
+    "id": "awrev_syzygy_hawke_guide",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "guide",
+    "game": "Advance Wars: Dual Strike",
+
+    "title": "Syzygy's AWDS Hawke Guide",
+    "url": "https://awrev.com/guides/guide.php?id=13",
+
+    "aliases": [
+      "hawke",
+      "hawke guide",
+      "syzygy hawke",
+      "awds hawke",
+      "black storm"
+    ],
+
+    "tags": [
+      "advance wars",
+      "advance wars dual strike",
+      "awds",
+      "hawke",
+      "black hole",
+      "syzygy",
+      "tier analysis",
+      "matchups",
+      "strategy"
+    ],
+
+    "description": "Classic 2006 Hawke analysis covering Black Storm, OHKO math, and matchup theory.",
+
+    "author": "Syzygy",
+    "era": "2006",
+    "source_type": "static"
+  },
+
+  {
+    "id": "awrev_battalion_wars_walkthrough",
+    "server": "awrev",
+    "site": "awRev",
+    "type": "walkthrough",
+    "game": "Battalion Wars",
+
+    "title": "Battalion Wars Walkthrough",
+    "url": "https://awrev.com/bwwalkthrough.php",
+
+    "aliases": [
+      "bw",
+      "battalion wars",
+      "bw walkthrough",
+      "da_nut walkthrough"
+    ],
+
+    "tags": [
+      "battalion wars",
+      "walkthrough",
+      "missions",
+      "strategy",
+      "restoration",
+      "da_nut"
+    ],
+
+    "description": "Restored Battalion Wars walkthrough with updated mission navigation and formatting.",
+
+    "author": "Da_Nut",
+    "era": "2000s restored",
+    "source_type": "static"
+  },
+
+  {
+    "id": "mk64_switch_hub",
+    "server": "mk64",
+    "site": "YoyoYoshi Hub",
+    "type": "hub",
+    "game": "Mario Kart 64",
+
+    "title": "MK64 Switch Hub",
+    "url": "https://yoyoyoshihub.neocities.org/mk64/",
+
+    "aliases": [
+      "mk64",
+      "mk64 hub",
+      "mario kart 64",
+      "switch hub",
+      "mk64 switch"
+    ],
+
+    "tags": [
+      "mk64",
+      "mario kart 64",
+      "switch",
+      "hub",
+      "shortcuts",
+      "records",
+      "routing",
+      "yoyoyoshi"
+    ],
+
+    "description": "Main Mario Kart 64 Switch hub with records, guides, routing, and community continuity resources.",
+
+    "author": "YoyoYoshi",
+    "era": "modern",
+    "source_type": "static"
+  }
+]
