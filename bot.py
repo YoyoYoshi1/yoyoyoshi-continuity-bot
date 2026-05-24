@@ -370,6 +370,8 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
+stream_tracker_started = False
+
 
 # -----------------------------
 # Search logic
@@ -477,17 +479,22 @@ def make_embed(item):
 
 @client.event
 async def on_ready():
+    global stream_tracker_started
+
     print(f"Loaded {len(SOURCES)} sources.")
     print("Saved compiled_sources.json.")
     print(f"Logged in as {client.user}")
 
+    tree.copy_global_to(guild=MY_GUILD)
     synced = await tree.sync(guild=MY_GUILD)
 
     print(f"Synced {len(synced)} guild commands:")
     for cmd in synced:
         print(f"- /{cmd.name}")
 
-    start_stream_tracker(client)
+    if not stream_tracker_started:
+        start_stream_tracker(client)
+        stream_tracker_started = True
 
 
 # -----------------------------
