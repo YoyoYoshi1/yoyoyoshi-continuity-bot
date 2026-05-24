@@ -481,7 +481,6 @@ async def on_ready():
     print("Saved compiled_sources.json.")
     print(f"Logged in as {client.user}")
 
-    tree.copy_global_to(guild=MY_GUILD)
     synced = await tree.sync(guild=MY_GUILD)
 
     print(f"Synced {len(synced)} guild commands:")
