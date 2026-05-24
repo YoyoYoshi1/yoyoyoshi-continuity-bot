@@ -3,7 +3,7 @@
     {
       "server": "mk64",
       "discord_guild": "MK64 Nintendo Switch Discord",
-      "announcement_channel_id": 123456789012345678,
+      "announcement_channel_id": 997612998011134042,
       "dedupe_minutes": 180,
       "game_rules": [
         {
@@ -24,7 +24,7 @@
     {
       "server": "awrev",
       "discord_guild": "awRev Discord",
-      "announcement_channel_id": 234567890123456789,
+      "announcement_channel_id": 1502736468580241612,
       "dedupe_minutes": 180,
       "game_rules": [
         {
@@ -47,7 +47,7 @@
     {
       "server": "yoyoyoshi",
       "discord_guild": "YoyoYoshi Discord",
-      "announcement_channel_id": 345678901234567890,
+      "announcement_channel_id": 1071457486365790268,
       "dedupe_minutes": 180,
       "game_rules": [
         {
