@@ -484,6 +484,8 @@ async def backfill_message_stats(guild):
                 skipped_channels.append(channel.name)
                 continue
 
+            print(f"Backfilling channel: #{channel.name}")
+
             batch = []
 
             try:
@@ -501,27 +503,37 @@ async def backfill_message_stats(guild):
 
                     if len(batch) >= 500:
                         before = conn.total_changes
+
                         conn.executemany("""
                             INSERT OR IGNORE INTO message_stats
                             (message_id, guild_id, channel_id, author_id, author_name, created_at)
                             VALUES (?, ?, ?, ?, ?, ?)
                         """, batch)
+
                         inserted += conn.total_changes - before
                         batch = []
 
+                    if scanned % 10000 == 0:
+                        print(
+                            f"Progress: scanned={scanned:,} inserted={inserted:,}"
+                        )
+
                 if batch:
                     before = conn.total_changes
+
                     conn.executemany("""
                         INSERT OR IGNORE INTO message_stats
                         (message_id, guild_id, channel_id, author_id, author_name, created_at)
                         VALUES (?, ?, ?, ?, ?, ?)
                     """, batch)
+
                     inserted += conn.total_changes - before
 
                 conn.commit()
 
             except discord.Forbidden:
                 skipped_channels.append(channel.name)
+
             except discord.HTTPException as e:
                 skipped_channels.append(f"{channel.name} ({e})")
 
@@ -580,7 +592,7 @@ def format_server_stats(guild, channel_limit=10):
 
     lines = [
         "**Server message stats**",
-        f"Total messages indexed: **{total}**"
+        f"Total messages indexed: **{total:,}**"
     ]
 
     if top_channels:
@@ -589,7 +601,7 @@ def format_server_stats(guild, channel_limit=10):
         for channel_id, count in top_channels:
             channel = guild.get_channel(channel_id)
             name = channel.mention if channel else f"`{channel_id}`"
-            lines.append(f"- {name}: {count}")
+            lines.append(f"- {name}: {count:,}")
 
     return "\n".join(lines)
 
@@ -605,7 +617,7 @@ def format_user_stats(guild, limit=10):
     for i, (author_id, author_name, count) in enumerate(top_users, 1):
         member = guild.get_member(author_id)
         name = member.mention if member else author_name
-        lines.append(f"{i}. {name}: {count}")
+        lines.append(f"{i}. {name}: {count:,}")
 
     return "\n".join(lines)
 
@@ -619,7 +631,7 @@ def format_monthly_stats(guild, limit=12):
     lines = ["**Monthly message counts:**"]
 
     for month, count in monthly:
-        lines.append(f"- {month}: {count}")
+        lines.append(f"- {month}: {count:,}")
 
     return "\n".join(lines)
 
