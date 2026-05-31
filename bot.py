@@ -1,3 +1,5 @@
+print("BOT FILE TEST — NEW VERSION LOADED")
+
 import os
 import re
 import json
@@ -5,12 +7,14 @@ import random
 import requests
 import discord
 import statistics
+import sqlite3
 
 from bs4 import BeautifulSoup
 from discord import app_commands
 from dotenv import load_dotenv
 from urllib.parse import urljoin
 from collections import defaultdict
+from datetime import datetime, timezone
 
 from streams import start_stream_tracker
 
@@ -44,6 +48,7 @@ K_FACTOR = 32
 MIN_MATCHES = 5
 MAX_SCORE = 60
 DATA_FILE = "vs_data.json"
+STATS_DB_FILE = "discord_stats.sqlite3"
 
 matches = []
 ratings = defaultdict(lambda: 1000)
@@ -52,6 +57,7 @@ player_stats = defaultdict(lambda: {
     "points": 0
 })
 last_message_id = None
+processed_message_ids = set()
 
 ALIASES = {
     "jesse": "spacedcowboy",
@@ -60,12 +66,16 @@ ALIASES = {
     "socal": "juggernaut",
     "coolex": "thecoolex",
     "fuzzy": "fuzz",
+    "fuzzyfugs": "fuzz",
     "booth": "noakevbo",
     "palatus": "patalus",
     "pat": "patalus",
     "espagetti": "espaghetti",
     "yoyo": "yoyoyoshi",
-    "bobby": "yoyoyoshi"
+    "bobby": "yoyoyoshi",
+    "blazeup": "Martin",
+    "fx": "fx64",
+    "urbanoutlaw": "urban",
 }
 
 
@@ -75,32 +85,107 @@ def normalize_name(name):
     return ALIASES.get(name, name)
 
 
-VS_PATTERN = r"^@?([A-Za-z0-9_\-]{2,})\s+(\d+)$"
+VS_MENTION_PATTERN = re.compile(r"<@!?(\d+)>")
+INLINE_SCORE_PATTERN = re.compile(
+    r"@([^@\n\r]+?)\s+(\d{1,2})(?=\s|$)",
+    re.IGNORECASE
+)
+LINE_SCORE_PATTERN = re.compile(
+    r"^@?([A-Za-z0-9_\-]{2,32})\s+(\d{1,2})$",
+    re.IGNORECASE
+)
 
 
-def parse_vs_message(content):
-    lines = content.split("\n")
-    scores = {}
+def display_name_for_mention(user):
+    if hasattr(user, "display_name") and user.display_name:
+        return user.display_name
+    if hasattr(user, "global_name") and user.global_name:
+        return user.global_name
+    return getattr(user, "name", str(user))
 
-    for line in lines:
-        line = line.strip()
-        match = re.match(VS_PATTERN, line)
 
-        if match:
-            name, score = match.groups()
-            score = int(score)
+def replace_discord_mentions(content, message=None):
+    if message is None:
+        return content
 
-            if score > MAX_SCORE:
-                print("⚠️ SKIPPING BAD SCORE:", name, score)
-                continue
+    mention_names = {
+        str(user.id): display_name_for_mention(user)
+        for user in getattr(message, "mentions", [])
+    }
 
-            clean = normalize_name(name)
-            scores[clean] = score
+    def repl(match):
+        user_id = match.group(1)
+        name = mention_names.get(user_id)
 
-    if len(scores) < 2:
+        if not name:
+            return match.group(0)
+
+        return f"@{name}"
+
+    return VS_MENTION_PATTERN.sub(repl, content)
+
+
+def clean_score_name(name):
+    name = name.strip()
+    name = re.sub(r"\s+", " ", name)
+
+    aka_match = re.search(r"\ba\s*/?\s*k\s*/?\s*a\b\s+(.+)$", name, re.IGNORECASE)
+    if aka_match:
+        name = aka_match.group(1).strip()
+
+    name = re.sub(r"\[[^\]]*\]", "", name)
+    name = re.sub(r"\([^)]*\)", "", name)
+    name = name.strip(" ,:;|-")
+
+    parts = name.split()
+    if len(parts) > 1:
+        name = parts[-1]
+
+    return normalize_name(name)
+
+
+def parse_vs_message(content, message=None):
+    text = content.replace("\n", " ")
+
+    if "ranked" not in text.lower():
         return None
 
-    placements = sorted(scores.items(), key=lambda x: -x[1])
+    mention_pattern = re.compile(
+        r"<@!?(?P<id>\d+)>\s*(?P<score>\d{1,2})"
+    )
+
+    mention_names = {}
+
+    if message:
+        for user in message.mentions:
+            mention_names[str(user.id)] = normalize_name(user.display_name)
+
+    scores = {}
+
+    for match in mention_pattern.finditer(text):
+        user_id = match.group("id")
+        score = int(match.group("score"))
+
+        if score > MAX_SCORE:
+            return None
+
+        player_name = mention_names.get(
+            user_id,
+            f"user_{user_id}"
+        )
+
+        if player_name in scores:
+            return None
+
+        scores[player_name] = score
+
+    if len(scores) not in (3, 4):
+        return None
+
+    placements = sorted(
+        scores.items(),
+        key=lambda x: -x[1]
+    )
 
     return {
         "scores": scores,
@@ -154,7 +239,8 @@ def save_vs_data():
         "matches": matches,
         "ratings": dict(ratings),
         "player_stats": dict(player_stats),
-        "last_message_id": last_message_id
+        "last_message_id": last_message_id,
+        "processed_message_ids": sorted(processed_message_ids)
     }
 
     with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -162,7 +248,7 @@ def save_vs_data():
 
 
 def load_vs_data():
-    global matches, last_message_id
+    global matches, last_message_id, processed_message_ids
 
     if not os.path.exists(DATA_FILE):
         return
@@ -172,6 +258,12 @@ def load_vs_data():
 
     matches = data.get("matches", [])
     last_message_id = data.get("last_message_id")
+    processed_message_ids = set(data.get("processed_message_ids", []))
+
+    for match in matches:
+        msg_id = match.get("message_id")
+        if msg_id:
+            processed_message_ids.add(str(msg_id))
 
     for player, rating in data.get("ratings", {}).items():
         ratings[player] = rating
@@ -183,10 +275,22 @@ def load_vs_data():
 def record_vs_match(match, message=None, message_id=None, save=True):
     global last_message_id
 
+    actual_message_id = None
+
     if message is not None:
+        actual_message_id = str(message.id)
+
+        if actual_message_id in processed_message_ids:
+            return False
+
         match = attach_metadata(match, message)
         last_message_id = message.id
     elif message_id is not None:
+        actual_message_id = str(message_id)
+
+        if actual_message_id in processed_message_ids:
+            return False
+
         match["message_id"] = message_id
         last_message_id = message_id
 
@@ -197,14 +301,20 @@ def record_vs_match(match, message=None, message_id=None, save=True):
         player_stats[player]["matches"] += 1
         player_stats[player]["points"] += score
 
+    if actual_message_id:
+        processed_message_ids.add(actual_message_id)
+
     if save:
         save_vs_data()
+
+    return True
 
 
 def mark_vs_processed(message_id, save=True):
     global last_message_id
 
     last_message_id = message_id
+    processed_message_ids.add(str(message_id))
 
     if save:
         save_vs_data()
@@ -273,6 +383,245 @@ def format_vs_stats():
         f"Tracked players: {len(player_stats)}\n"
         f"Last processed message ID: {last_message_id}"
     )
+
+
+# -----------------------------
+# Discord message stats storage
+# -----------------------------
+
+def init_stats_db():
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS message_stats (
+                message_id INTEGER PRIMARY KEY,
+                guild_id INTEGER NOT NULL,
+                channel_id INTEGER NOT NULL,
+                author_id INTEGER NOT NULL,
+                author_name TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS backfill_state (
+                guild_id INTEGER PRIMARY KEY,
+                completed_at TEXT NOT NULL
+            )
+        """)
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_message_stats_guild
+            ON message_stats(guild_id)
+        """)
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_message_stats_channel
+            ON message_stats(guild_id, channel_id)
+        """)
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_message_stats_author
+            ON message_stats(guild_id, author_id)
+        """)
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_message_stats_created
+            ON message_stats(guild_id, created_at)
+        """)
+
+        conn.commit()
+
+
+def stats_backfill_complete(guild_id):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        row = conn.execute(
+            "SELECT completed_at FROM backfill_state WHERE guild_id = ?",
+            (guild_id,)
+        ).fetchone()
+
+    return row is not None
+
+
+def mark_stats_backfill_complete(guild_id):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO backfill_state (guild_id, completed_at) VALUES (?, ?)",
+            (guild_id, datetime.now(timezone.utc).isoformat())
+        )
+        conn.commit()
+
+
+def record_message_stat(message):
+    if not message.guild:
+        return
+
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        conn.execute("""
+            INSERT OR IGNORE INTO message_stats
+            (message_id, guild_id, channel_id, author_id, author_name, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            message.id,
+            message.guild.id,
+            message.channel.id,
+            message.author.id,
+            str(message.author),
+            message.created_at.isoformat()
+        ))
+        conn.commit()
+
+
+async def backfill_message_stats(guild):
+    scanned = 0
+    inserted = 0
+    skipped_channels = []
+
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        for channel in guild.text_channels:
+            perms = channel.permissions_for(guild.me)
+
+            if not perms.read_messages or not perms.read_message_history:
+                skipped_channels.append(channel.name)
+                continue
+
+            batch = []
+
+            try:
+                async for msg in channel.history(limit=None, oldest_first=True):
+                    scanned += 1
+
+                    batch.append((
+                        msg.id,
+                        guild.id,
+                        channel.id,
+                        msg.author.id,
+                        str(msg.author),
+                        msg.created_at.isoformat()
+                    ))
+
+                    if len(batch) >= 500:
+                        before = conn.total_changes
+                        conn.executemany("""
+                            INSERT OR IGNORE INTO message_stats
+                            (message_id, guild_id, channel_id, author_id, author_name, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        """, batch)
+                        inserted += conn.total_changes - before
+                        batch = []
+
+                if batch:
+                    before = conn.total_changes
+                    conn.executemany("""
+                        INSERT OR IGNORE INTO message_stats
+                        (message_id, guild_id, channel_id, author_id, author_name, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    """, batch)
+                    inserted += conn.total_changes - before
+
+                conn.commit()
+
+            except discord.Forbidden:
+                skipped_channels.append(channel.name)
+            except discord.HTTPException as e:
+                skipped_channels.append(f"{channel.name} ({e})")
+
+    mark_stats_backfill_complete(guild.id)
+
+    return scanned, inserted, skipped_channels
+
+
+def get_total_message_count(guild_id):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        return conn.execute(
+            "SELECT COUNT(*) FROM message_stats WHERE guild_id = ?",
+            (guild_id,)
+        ).fetchone()[0]
+
+
+def get_top_channels(guild_id, limit=10):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        return conn.execute("""
+            SELECT channel_id, COUNT(*) AS c
+            FROM message_stats
+            WHERE guild_id = ?
+            GROUP BY channel_id
+            ORDER BY c DESC
+            LIMIT ?
+        """, (guild_id, limit)).fetchall()
+
+
+def get_top_users(guild_id, limit=10):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        return conn.execute("""
+            SELECT author_id, author_name, COUNT(*) AS c
+            FROM message_stats
+            WHERE guild_id = ?
+            GROUP BY author_id, author_name
+            ORDER BY c DESC
+            LIMIT ?
+        """, (guild_id, limit)).fetchall()
+
+
+def get_monthly_counts(guild_id, limit=12):
+    with sqlite3.connect(STATS_DB_FILE) as conn:
+        return conn.execute("""
+            SELECT substr(created_at, 1, 7) AS month, COUNT(*) AS c
+            FROM message_stats
+            WHERE guild_id = ?
+            GROUP BY month
+            ORDER BY month DESC
+            LIMIT ?
+        """, (guild_id, limit)).fetchall()
+
+
+def format_server_stats(guild, channel_limit=10):
+    total = get_total_message_count(guild.id)
+    top_channels = get_top_channels(guild.id, channel_limit)
+
+    lines = [
+        "**Server message stats**",
+        f"Total messages indexed: **{total}**"
+    ]
+
+    if top_channels:
+        lines.append("\n**Top channels:**")
+
+        for channel_id, count in top_channels:
+            channel = guild.get_channel(channel_id)
+            name = channel.mention if channel else f"`{channel_id}`"
+            lines.append(f"- {name}: {count}")
+
+    return "\n".join(lines)
+
+
+def format_user_stats(guild, limit=10):
+    top_users = get_top_users(guild.id, limit)
+
+    if not top_users:
+        return "No user message stats indexed yet."
+
+    lines = ["**Top message counts by user:**"]
+
+    for i, (author_id, author_name, count) in enumerate(top_users, 1):
+        member = guild.get_member(author_id)
+        name = member.mention if member else author_name
+        lines.append(f"{i}. {name}: {count}")
+
+    return "\n".join(lines)
+
+
+def format_monthly_stats(guild, limit=12):
+    monthly = get_monthly_counts(guild.id, limit)
+
+    if not monthly:
+        return "No monthly message stats indexed yet."
+
+    lines = ["**Monthly message counts:**"]
+
+    for month, count in monthly:
+        lines.append(f"- {month}: {count}")
+
+    return "\n".join(lines)
 
 
 # -----------------------------
@@ -758,11 +1107,13 @@ async def import_vs_history():
             continue
 
         scanned += 1
-        match = parse_vs_message(msg.content)
+        match = parse_vs_message(msg.content, msg)
 
         if match:
-            parsed += 1
-            record_vs_match(match, message=msg, save=False)
+            if record_vs_match(match, message=msg, save=False):
+                parsed += 1
+            else:
+                mark_vs_processed(msg.id, save=False)
         else:
             rejected += 1
             mark_vs_processed(msg.id, save=False)
@@ -785,9 +1136,19 @@ async def import_vs_history():
 async def on_ready():
     global stream_tracker_started, vs_history_imported
 
+    init_stats_db()
+
     print(f"Loaded {len(SOURCES)} sources.")
     print("Saved compiled_sources.json.")
     print(f"Logged in as {client.user}")
+
+    print("MK64_VS_CHANNEL_ID =", MK64_VS_CHANNEL_ID)
+
+    for guild in client.guilds:
+        print("GUILD:", guild.name, guild.id)
+
+        for channel in guild.text_channels:
+            print("CHANNEL:", channel.name, channel.id)
 
     tree.copy_global_to(guild=MY_GUILD)
     synced = await tree.sync(guild=MY_GUILD)
@@ -799,7 +1160,15 @@ async def on_ready():
     if not vs_history_imported:
         load_vs_data()
         print(f"Loaded {len(matches)} MK64 VS matches.")
+
+        try:
+            channel = await client.fetch_channel(MK64_VS_CHANNEL_ID)
+            print("FETCHED VS CHANNEL:", channel, channel.id)
+        except Exception as e:
+            print("FETCH CHANNEL ERROR:", repr(e))
+
         await import_vs_history()
+
         vs_history_imported = True
 
     if not stream_tracker_started:
@@ -811,6 +1180,8 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
+    record_message_stat(message)
 
     if message.channel.id != MK64_VS_CHANNEL_ID:
         return
@@ -839,11 +1210,25 @@ async def on_message(message):
         await message.channel.send(format_vs_stats())
         return
 
-    match = parse_vs_message(content)
+    if content == "!serverstats":
+        await message.channel.send(format_server_stats(message.guild))
+        return
+
+    if content == "!userstats":
+        await message.channel.send(format_user_stats(message.guild))
+        return
+
+    if content == "!monthlystats":
+        await message.channel.send(format_monthly_stats(message.guild))
+        return
+
+    match = parse_vs_message(content, message)
 
     if match:
-        record_vs_match(match, message=message)
-        await message.add_reaction("✅")
+        recorded = record_vs_match(match, message=message)
+
+        if recorded:
+            await message.add_reaction("✅")
     else:
         mark_vs_processed(message.id)
 
@@ -1031,7 +1416,11 @@ async def sitemap(interaction: discord.Interaction):
         "• `/debugsources` — source titles by server\n"
         "• `/vsleaderboard` — MK64 VS leaderboard\n"
         "• `/vsrank` — MK64 VS player rank\n"
-        "• `/vsstats` — MK64 VS parser stats"
+        "• `/vsstats` — MK64 VS parser stats\n"
+        "• `/backfill_stats` — admin-only Discord message stats backfill\n"
+        "• `/serverstats` — Discord message totals by channel\n"
+        "• `/userstats` — Discord message totals by user\n"
+        "• `/monthlystats` — Discord message totals by month"
     )
 
 
@@ -1077,6 +1466,59 @@ async def vsrank(interaction: discord.Interaction, player: str):
 @tree.command(name="vsstats", description="Show MK64 VS parser stats.")
 async def vsstats(interaction: discord.Interaction):
     await interaction.response.send_message(format_vs_stats())
+
+
+@tree.command(name="backfill_stats", description="Admin-only: backfill Discord message stats once.")
+async def backfill_stats(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message(
+            "Only admins can run this command.",
+            ephemeral=True
+        )
+        return
+
+    if stats_backfill_complete(interaction.guild.id):
+        await interaction.response.send_message(
+            "Stats backfill already completed for this server.",
+            ephemeral=True
+        )
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    scanned, inserted, skipped = await backfill_message_stats(interaction.guild)
+
+    msg = (
+        f"Backfill complete.\n"
+        f"Scanned messages: {scanned}\n"
+        f"New rows inserted: {inserted}"
+    )
+
+    if skipped:
+        msg += "\nSkipped channels: " + ", ".join(skipped[:20])
+
+    await interaction.followup.send(msg, ephemeral=True)
+
+
+@tree.command(name="serverstats", description="Show Discord message stats by channel.")
+@app_commands.describe(limit="Number of channels to show, from 1 to 20")
+async def serverstats(interaction: discord.Interaction, limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(format_server_stats(interaction.guild, limit))
+
+
+@tree.command(name="userstats", description="Show Discord message stats by user.")
+@app_commands.describe(limit="Number of users to show, from 1 to 20")
+async def userstats(interaction: discord.Interaction, limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(format_user_stats(interaction.guild, limit))
+
+
+@tree.command(name="monthlystats", description="Show Discord message stats by month.")
+@app_commands.describe(limit="Number of months to show, from 1 to 24")
+async def monthlystats(interaction: discord.Interaction, limit: int = 12):
+    limit = max(1, min(limit, 24))
+    await interaction.response.send_message(format_monthly_stats(interaction.guild, limit))
 
 
 # -----------------------------
