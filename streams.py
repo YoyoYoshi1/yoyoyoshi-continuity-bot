@@ -145,7 +145,7 @@ def make_stream_message(server, stream):
     streamer = stream.get("user_name") or stream.get("user_login")
     game = stream.get("game_name") or "something"
     title = stream.get("title") or ""
-    url = f"https://twitch.tv/{stream.get('user_login')}"
+    url = f"<https://twitch.tv/{stream.get('user_login')}>"
 
     server_key = server.get("server", "")
 
