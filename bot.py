@@ -27,7 +27,43 @@ load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID_RAW = os.getenv("DISCORD_GUILD_ID")
-MK64_VS_CHANNEL_ID_RAW = os.getenv("MK64_VS_CHANNEL_ID", "997416976051871854")
+
+MK64_VS_CHANNEL_ID_RAW = os.getenv(
+    "MK64_VS_CHANNEL_ID",
+    "997416976051871854"
+)
+
+NSO_4P_TOURNEY_CHANNEL_ID_RAW = os.getenv(
+    "NSO_4P_TOURNEY_CHANNEL_ID",
+    "1122249513487310928"
+)
+
+GP_CHANNEL_ID_RAWS = {
+    "GRAND_PRIX_SCORES_CHANNEL_ID": os.getenv(
+        "GRAND_PRIX_SCORES_CHANNEL_ID",
+        "1012093550449655878"
+    ),
+    "ELO_GP_MATCH_RESULTS_CHANNEL_ID": os.getenv(
+        "ELO_GP_MATCH_RESULTS_CHANNEL_ID",
+        "1099432653993820322"
+    ),
+    "TUK_2_DISCUSSION_CHANNEL_ID": os.getenv(
+        "TUK_2_DISCUSSION_CHANNEL_ID",
+        "1290023289946636339"
+    ),
+    "GP_LEAGUE_CHANNEL_ID": os.getenv(
+        "GP_LEAGUE_CHANNEL_ID",
+        "1040839082248503358"
+    ),
+    "TUP_TOURNAMENT_CHANNEL_ID": os.getenv(
+        "TUP_TOURNAMENT_CHANNEL_ID",
+        "1121631676230029332"
+    ),
+    "TUK_TOURNAMENT_CHANNEL_ID": os.getenv(
+        "TUK_TOURNAMENT_CHANNEL_ID",
+        "1076081113946128385"
+    ),
+}
 
 if not TOKEN:
     raise RuntimeError("Missing DISCORD_TOKEN in .env")
@@ -36,7 +72,32 @@ if not GUILD_ID_RAW:
     raise RuntimeError("Missing DISCORD_GUILD_ID in .env")
 
 GUILD_ID = int(GUILD_ID_RAW)
+
 MK64_VS_CHANNEL_ID = int(MK64_VS_CHANNEL_ID_RAW)
+NSO_4P_TOURNEY_CHANNEL_ID = int(NSO_4P_TOURNEY_CHANNEL_ID_RAW)
+
+VS_RESULT_CHANNEL_IDS = {
+    MK64_VS_CHANNEL_ID,
+    NSO_4P_TOURNEY_CHANNEL_ID,
+}
+
+GP_RESULT_CHANNEL_IDS = {
+    int(value)
+    for value in GP_CHANNEL_ID_RAWS.values()
+    if value
+}
+
+# Import this channel first; it is treated as the best historical GP source.
+ELO_GP_MATCH_RESULTS_CHANNEL_ID = int(
+    GP_CHANNEL_ID_RAWS["ELO_GP_MATCH_RESULTS_CHANNEL_ID"]
+)
+
+GP_SUPPLEMENTAL_CHANNEL_IDS = [
+    channel_id
+    for channel_id in GP_RESULT_CHANNEL_IDS
+    if channel_id != ELO_GP_MATCH_RESULTS_CHANNEL_ID
+]
+
 MY_GUILD = discord.Object(id=GUILD_ID)
 
 
@@ -48,7 +109,12 @@ K_FACTOR = 32
 MIN_MATCHES = 5
 MAX_SCORE = 60
 DATA_FILE = "vs_data.json"
+GP_DATA_FILE = "gp_data.json"
 STATS_DB_FILE = "discord_stats.sqlite3"
+
+GP_K_FACTOR = 32
+GP_MIN_MATCHES = 3
+GP_MAX_SCORE = 160
 
 matches = []
 ratings = defaultdict(lambda: 1000)
@@ -58,6 +124,19 @@ player_stats = defaultdict(lambda: {
 })
 last_message_id = None
 processed_message_ids = set()
+
+gp_matches = []
+gp_ratings = defaultdict(lambda: 1000)
+gp_player_stats = defaultdict(lambda: {
+    "matches": 0,
+    "wins": 0,
+    "losses": 0,
+    "ties": 0,
+    "points_for": 0,
+    "points_against": 0
+})
+processed_gp_message_ids = set()
+gp_match_keys = set()
 
 ALIASES = {
     "jesse": "spacedcowboy",
@@ -383,6 +462,567 @@ def format_vs_stats():
         f"Tracked players: {len(player_stats)}\n"
         f"Last processed message ID: {last_message_id}"
     )
+
+
+# -----------------------------
+# MK64 GP parser config/storage
+# -----------------------------
+
+def parse_score_lines(content, message=None, max_score=160):
+    text = replace_discord_mentions(content, message)
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    scores = {}
+
+    for line in lines:
+        line = re.sub(r"^P[1-4]\s*:\s*", "", line, flags=re.IGNORECASE)
+        line = re.sub(r"^(gp|grand prix|tournament|round|match)\s*[:#-]?\s*", "", line, flags=re.IGNORECASE)
+
+        match = re.match(r"^@?(.+?)\s+(\d{1,3})$", line)
+
+        if not match:
+            continue
+
+        raw_name = match.group(1)
+        score = int(match.group(2))
+
+        if score > max_score:
+            return None
+
+        clean = clean_score_name(raw_name)
+
+        if not clean:
+            continue
+
+        if clean in scores:
+            return None
+
+        scores[clean] = score
+
+    return scores
+
+
+def clean_gp_elo_name(name):
+    name = name.strip()
+    name = name.replace("\\", "")
+    name = re.sub(r"#\d{1,5}$", "", name)
+    name = name.strip(" .,:;|-_")
+    return clean_score_name(name)
+
+
+def parse_gp_elo_player_value(value):
+    """
+    Parse old GP Elo bot field values such as:
+    \Cheech\#4947 (1259.1, +7.0)
+    justice90.#0 (1201.5, -7.0)
+    """
+    if not value:
+        return None
+
+    text = value.strip()
+    text = re.sub(r"\s+", " ", text)
+
+    match = re.search(
+        r"(?P<name>.+?)\s*\((?P<rating>\d+(?:\.\d+)?),\s*(?P<delta>[+-]\d+(?:\.\d+)?)\)",
+        text
+    )
+
+    if not match:
+        return None
+
+    player = clean_gp_elo_name(match.group("name"))
+
+    if not player:
+        return None
+
+    return {
+        "player": player,
+        "rating_after": float(match.group("rating")),
+        "delta": float(match.group("delta"))
+    }
+
+
+def parse_gp_elo_ledger_message(message):
+    """
+    Parse old GP Elo bot embed messages. These are not score reports;
+    they are authoritative Elo ledger entries with Win/Loss fields.
+    """
+    if message is None:
+        return None
+
+    for embed in getattr(message, "embeds", []):
+        title = (embed.title or "").lower().strip()
+        description = embed.description or ""
+
+        fields = list(getattr(embed, "fields", []))
+
+        # Most old GP bot entries use title "gp" and fields named Win/Loss.
+        win_field = None
+        loss_field = None
+
+        for field in fields:
+            field_name = (field.name or "").lower()
+
+            if "win" in field_name:
+                win_field = field
+            elif "loss" in field_name or "lose" in field_name:
+                loss_field = field
+
+        # Fallback for unusual embeds: scan description for Win/Loss blocks.
+        if not win_field or not loss_field:
+            continue
+
+        winner_info = parse_gp_elo_player_value(win_field.value)
+        loser_info = parse_gp_elo_player_value(loss_field.value)
+
+        if not winner_info or not loser_info:
+            continue
+
+        winner = winner_info["player"]
+        loser = loser_info["player"]
+
+        if winner == loser:
+            continue
+
+        return {
+            "source_type": "gp_elo_ledger",
+            "scores": {winner: 1, loser: 0},
+            "players": [winner, loser],
+            "winner": winner,
+            "winner_rating_after": winner_info["rating_after"],
+            "loser_rating_after": loser_info["rating_after"],
+            "winner_delta": winner_info["delta"],
+            "loser_delta": loser_info["delta"]
+        }
+
+    return None
+
+
+def parse_gp_message(content, message=None):
+    ledger_match = parse_gp_elo_ledger_message(message)
+
+    if ledger_match:
+        return ledger_match
+
+    scores = parse_score_lines(content, message, GP_MAX_SCORE)
+
+    if not scores or len(scores) != 2:
+        return None
+
+    players = list(scores.keys())
+    p1, p2 = players[0], players[1]
+    s1, s2 = scores[p1], scores[p2]
+
+    if s1 > s2:
+        winner = p1
+    elif s2 > s1:
+        winner = p2
+    else:
+        winner = None
+
+    return {
+        "source_type": "gp_score_report",
+        "scores": scores,
+        "players": [p1, p2],
+        "winner": winner
+    }
+
+
+def update_gp_ratings(match):
+    if match.get("source_type") == "gp_elo_ledger":
+        winner = match.get("winner")
+        players = match.get("players", [])
+        loser = next((p for p in players if p != winner), None)
+
+        if winner and loser:
+            gp_ratings[winner] = float(match["winner_rating_after"])
+            gp_ratings[loser] = float(match["loser_rating_after"])
+
+        return
+
+    p1, p2 = match["players"]
+    s1 = match["scores"][p1]
+    s2 = match["scores"][p2]
+
+    r1 = gp_ratings[p1]
+    r2 = gp_ratings[p2]
+
+    expected1 = expected_score(r1, r2)
+    expected2 = expected_score(r2, r1)
+
+    if s1 > s2:
+        actual1, actual2 = 1, 0
+    elif s2 > s1:
+        actual1, actual2 = 0, 1
+    else:
+        actual1, actual2 = 0.5, 0.5
+
+    gp_ratings[p1] += GP_K_FACTOR * (actual1 - expected1)
+    gp_ratings[p2] += GP_K_FACTOR * (actual2 - expected2)
+
+
+def gp_match_key(match):
+    """
+    Dedupe by date + players.
+
+    The primary #elo-gp-match-results channel contains Elo ledger entries,
+    while supplemental channels may contain original score reports. Date + players
+    keeps those from double-counting the same match when both sources exist.
+    """
+    players = tuple(sorted(match.get("players", [])))
+    created_at = match.get("created_at", "")
+    match_date = created_at[:10] if created_at else "unknown-date"
+
+    return (match_date, players)
+
+
+def rebuild_gp_match_keys():
+    global gp_match_keys
+    gp_match_keys = set()
+
+    for match in gp_matches:
+        gp_match_keys.add(gp_match_key(match))
+
+
+def reset_gp_state_for_rebuild():
+    """
+    GP is rebuilt from Discord history so source priority can be enforced.
+    VS is left alone because its existing parser/data flow is already stable.
+    """
+    global gp_matches, gp_ratings, gp_player_stats, processed_gp_message_ids, gp_match_keys
+
+    gp_matches = []
+    gp_ratings = defaultdict(lambda: 1000)
+    gp_player_stats = defaultdict(lambda: {
+        "matches": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "points_for": 0,
+        "points_against": 0,
+    })
+    processed_gp_message_ids = set()
+    gp_match_keys = set()
+
+
+def save_gp_data():
+    data = {
+        "matches": gp_matches,
+        "ratings": dict(gp_ratings),
+        "player_stats": dict(gp_player_stats),
+        "processed_message_ids": sorted(processed_gp_message_ids),
+        "match_keys": [str(key) for key in sorted(gp_match_keys, key=str)]
+    }
+
+    with open(GP_DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+
+def load_gp_data():
+    global gp_matches, processed_gp_message_ids
+
+    if not os.path.exists(GP_DATA_FILE):
+        return
+
+    with open(GP_DATA_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    gp_matches = data.get("matches", [])
+    processed_gp_message_ids = set(data.get("processed_message_ids", []))
+
+    for player, rating in data.get("ratings", {}).items():
+        gp_ratings[player] = rating
+
+    for player, stats in data.get("player_stats", {}).items():
+        gp_player_stats[player] = stats
+
+    rebuild_gp_match_keys()
+
+
+def record_gp_match(match, message=None, save=True, allow_duplicate_key=False):
+    actual_message_id = None
+
+    if message is not None:
+        actual_message_id = str(message.id)
+
+        if actual_message_id in processed_gp_message_ids:
+            return False
+
+        match = attach_metadata(match, message)
+
+    key = gp_match_key(match)
+
+    if not allow_duplicate_key and key in gp_match_keys:
+        if actual_message_id:
+            processed_gp_message_ids.add(actual_message_id)
+        return False
+
+    gp_matches.append(match)
+    gp_match_keys.add(key)
+    update_gp_ratings(match)
+
+    p1, p2 = match["players"]
+    s1 = match["scores"][p1]
+    s2 = match["scores"][p2]
+
+    gp_player_stats[p1]["matches"] += 1
+    gp_player_stats[p2]["matches"] += 1
+
+    # Real GP score reports use actual points. Old Elo ledger entries do not,
+    # so avoid mixing fake 1-0 values into points totals.
+    if match.get("source_type") != "gp_elo_ledger":
+        gp_player_stats[p1]["points_for"] += s1
+        gp_player_stats[p1]["points_against"] += s2
+        gp_player_stats[p2]["points_for"] += s2
+        gp_player_stats[p2]["points_against"] += s1
+
+    if s1 > s2:
+        gp_player_stats[p1]["wins"] += 1
+        gp_player_stats[p2]["losses"] += 1
+    elif s2 > s1:
+        gp_player_stats[p2]["wins"] += 1
+        gp_player_stats[p1]["losses"] += 1
+    else:
+        gp_player_stats[p1]["ties"] += 1
+        gp_player_stats[p2]["ties"] += 1
+
+    if actual_message_id:
+        processed_gp_message_ids.add(actual_message_id)
+
+    if save:
+        save_gp_data()
+
+    return True
+
+
+def adjusted_gp_rating(player):
+    base = gp_ratings[player]
+    games = gp_player_stats[player]["matches"]
+    confidence = games / (games + 30)
+    return 1000 + (base - 1000) * confidence
+
+
+def format_gp_leaderboard(limit=10):
+    eligible = [
+        p for p in gp_ratings
+        if gp_player_stats[p]["matches"] >= GP_MIN_MATCHES
+    ]
+
+    sorted_players = sorted(
+        eligible,
+        key=lambda p: -adjusted_gp_rating(p)
+    )[:limit]
+
+    if not sorted_players:
+        return "No eligible GP players yet."
+
+    lines = ["**MK64 GP Leaderboard**"]
+
+    for i, name in enumerate(sorted_players, 1):
+        stats = gp_player_stats[name]
+        lines.append(
+            f"{i}. **{name}**: {round(adjusted_gp_rating(name))} "
+            f"(raw {round(gp_ratings[name])}) | "
+            f"{stats['wins']}-{stats['losses']}-{stats['ties']} | "
+            f"matches: {stats['matches']}"
+        )
+
+    return "\n".join(lines)
+
+
+def format_gp_rank(name):
+    clean = normalize_name(name)
+
+    if clean not in gp_ratings:
+        return f"No GP data found for `{clean}`."
+
+    stats = gp_player_stats[clean]
+
+    return (
+        f"**{clean} GP Rank**\n"
+        f"Elo: {round(adjusted_gp_rating(clean))} "
+        f"(raw {round(gp_ratings[clean])})\n"
+        f"Record: {stats['wins']}-{stats['losses']}-{stats['ties']}\n"
+        f"Matches: {stats['matches']}\n"
+        f"Score-report points for: {stats['points_for']}\n"
+        f"Score-report points against: {stats['points_against']}"
+    )
+
+
+def format_gp_stats():
+    return (
+        f"Stored GP matches: {len(gp_matches)}\n"
+        f"Tracked GP players: {len(gp_player_stats)}"
+    )
+
+
+# -----------------------------
+# Quarterly / seasonal leaderboards
+# -----------------------------
+
+def current_quarter_label():
+    now = datetime.now(timezone.utc)
+    quarter = ((now.month - 1) // 3) + 1
+    return f"{now.year}-Q{quarter}"
+
+
+def parse_quarter_label(label):
+    label = (label or current_quarter_label()).strip().upper().replace(" ", "")
+
+    match = re.match(r"^(\d{4})-?Q([1-4])$", label)
+
+    if not match:
+        raise ValueError("Use quarter format like 2026-Q2.")
+
+    year = int(match.group(1))
+    quarter = int(match.group(2))
+    return year, quarter, f"{year}-Q{quarter}"
+
+
+def match_in_quarter(match, year, quarter):
+    created = match.get("created_at")
+
+    if not created:
+        return False
+
+    try:
+        dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+
+    match_quarter = ((dt.month - 1) // 3) + 1
+    return dt.year == year and match_quarter == quarter
+
+
+def format_quarterly_vs_leaderboard(quarter_label=None, limit=10):
+    try:
+        year, quarter, normalized = parse_quarter_label(quarter_label)
+    except ValueError as e:
+        return str(e)
+
+    q_ratings = defaultdict(lambda: 1000)
+    q_stats = defaultdict(lambda: {"matches": 0, "points": 0})
+    q_matches = [m for m in matches if match_in_quarter(m, year, quarter)]
+
+    for match in q_matches:
+        players = [p for p, _ in match.get("placements", [])]
+
+        for i, p1 in enumerate(players):
+            r1 = q_ratings[p1]
+            total_delta = 0
+
+            for j, p2 in enumerate(players):
+                if i == j:
+                    continue
+
+                r2 = q_ratings[p2]
+                actual = 1 if i < j else 0
+                expected = expected_score(r1, r2)
+                total_delta += actual - expected
+
+            if len(players) > 1:
+                q_ratings[p1] += K_FACTOR * (total_delta / (len(players) - 1))
+
+        for player, score in match.get("scores", {}).items():
+            q_stats[player]["matches"] += 1
+            q_stats[player]["points"] += score
+
+    eligible = [p for p in q_ratings if q_stats[p]["matches"] >= MIN_MATCHES]
+    sorted_players = sorted(eligible, key=lambda p: -q_ratings[p])[:limit]
+
+    if not sorted_players:
+        return f"No eligible VS players for {normalized}."
+
+    lines = [f"**MK64 VS Quarterly Leaderboard — {normalized}**"]
+
+    for i, name in enumerate(sorted_players, 1):
+        stats = q_stats[name]
+        avg = stats["points"] / stats["matches"] if stats["matches"] else 0
+        lines.append(
+            f"{i}. **{name}**: {round(q_ratings[name])} | "
+            f"matches: {stats['matches']} | avg pts: {avg:.1f}"
+        )
+
+    return "\n".join(lines)
+
+
+def format_quarterly_gp_leaderboard(quarter_label=None, limit=10):
+    try:
+        year, quarter, normalized = parse_quarter_label(quarter_label)
+    except ValueError as e:
+        return str(e)
+
+    q_ratings = defaultdict(lambda: 1000)
+    q_stats = defaultdict(lambda: {
+        "matches": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "points_for": 0,
+        "points_against": 0
+    })
+    q_matches = [m for m in gp_matches if match_in_quarter(m, year, quarter)]
+
+    for match in q_matches:
+        p1, p2 = match["players"]
+        s1 = match["scores"][p1]
+        s2 = match["scores"][p2]
+
+        if s1 > s2:
+            q_stats[p1]["wins"] += 1
+            q_stats[p2]["losses"] += 1
+        elif s2 > s1:
+            q_stats[p2]["wins"] += 1
+            q_stats[p1]["losses"] += 1
+        else:
+            q_stats[p1]["ties"] += 1
+            q_stats[p2]["ties"] += 1
+
+        if match.get("source_type") == "gp_elo_ledger":
+            winner = match.get("winner")
+            loser = p2 if p1 == winner else p1
+            q_ratings[winner] = float(match["winner_rating_after"])
+            q_ratings[loser] = float(match["loser_rating_after"])
+        else:
+            r1 = q_ratings[p1]
+            r2 = q_ratings[p2]
+            expected1 = expected_score(r1, r2)
+            expected2 = expected_score(r2, r1)
+
+            if s1 > s2:
+                actual1, actual2 = 1, 0
+            elif s2 > s1:
+                actual1, actual2 = 0, 1
+            else:
+                actual1, actual2 = 0.5, 0.5
+
+            q_ratings[p1] += GP_K_FACTOR * (actual1 - expected1)
+            q_ratings[p2] += GP_K_FACTOR * (actual2 - expected2)
+
+            q_stats[p1]["points_for"] += s1
+            q_stats[p1]["points_against"] += s2
+            q_stats[p2]["points_for"] += s2
+            q_stats[p2]["points_against"] += s1
+
+        q_stats[p1]["matches"] += 1
+        q_stats[p2]["matches"] += 1
+
+    eligible = [p for p in q_ratings if q_stats[p]["matches"] >= GP_MIN_MATCHES]
+    sorted_players = sorted(eligible, key=lambda p: -q_ratings[p])[:limit]
+
+    if not sorted_players:
+        return f"No eligible GP players for {normalized}."
+
+    lines = [f"**MK64 GP Quarterly Leaderboard — {normalized}**"]
+
+    for i, name in enumerate(sorted_players, 1):
+        stats = q_stats[name]
+        lines.append(
+            f"{i}. **{name}**: {round(q_ratings[name])} | "
+            f"{stats['wins']}-{stats['losses']}-{stats['ties']} | "
+            f"matches: {stats['matches']}"
+        )
+
+    return "\n".join(lines)
 
 
 # -----------------------------
@@ -978,6 +1618,7 @@ tree = app_commands.CommandTree(client)
 
 stream_tracker_started = False
 vs_history_imported = False
+gp_history_imported = False
 
 
 # -----------------------------
@@ -1084,60 +1725,125 @@ def make_embed(item):
 # MK64 history import
 # -----------------------------
 
-async def import_vs_history():
+async def import_vs_history_for_channel(channel_id):
     global last_message_id
 
-    channel = client.get_channel(MK64_VS_CHANNEL_ID)
+    channel = client.get_channel(channel_id)
 
     if channel is None:
-        print("ERROR: MK64 VS channel not found")
+        print(f"ERROR: VS channel not found: {channel_id}")
         return
 
     scanned = 0
     parsed = 0
     rejected = 0
 
-    after_msg = None
-
-    if last_message_id:
-        try:
-            after_msg = await channel.fetch_message(int(last_message_id))
-            print(f"Resuming VS import after message ID: {last_message_id}")
-        except discord.NotFound:
-            print("Last VS message not found. Falling back to full scan.")
-        except discord.HTTPException:
-            print("Could not fetch last VS message. Falling back to full scan.")
-
-    print("Scanning MK64 VS channel history...")
+    print(f"Scanning VS history in #{channel.name}...")
 
     async for msg in channel.history(
         limit=None,
-        oldest_first=True,
-        after=after_msg
+        oldest_first=True
     ):
         if msg.author == client.user:
             continue
 
         scanned += 1
+
+        if str(msg.id) in processed_message_ids:
+            continue
+
         match = parse_vs_message(msg.content, msg)
 
         if match:
             if record_vs_match(match, message=msg, save=False):
                 parsed += 1
-            else:
-                mark_vs_processed(msg.id, save=False)
         else:
             rejected += 1
             mark_vs_processed(msg.id, save=False)
 
     save_vs_data()
 
-    print("MK64 VS history scan complete.")
+    print(f"VS history scan complete for #{channel.name}.")
     print(f"Scanned: {scanned}")
     print(f"Parsed matches: {parsed}")
     print(f"Rejected messages: {rejected}")
     print(f"Saved matches: {len(matches)}")
-    print(f"Last processed message ID: {last_message_id}")
+
+async def import_vs_history():
+    for channel_id in VS_RESULT_CHANNEL_IDS:
+        await import_vs_history_for_channel(channel_id)
+
+
+async def import_gp_history_for_channel(channel_id, source_label="supplemental"):
+    channel = client.get_channel(channel_id)
+
+    if channel is None:
+        print(f"SKIPPING GP channel not found: {channel_id}")
+        return
+
+    scanned = 0
+    parsed = 0
+    rejected = 0
+    duplicates = 0
+
+    print(f"Scanning GP history in #{channel.name} ({source_label})...")
+
+    try:
+        async for msg in channel.history(limit=None, oldest_first=True):
+            if msg.author == client.user:
+                continue
+
+            scanned += 1
+
+            if str(msg.id) in processed_gp_message_ids:
+                continue
+
+            match = parse_gp_message(msg.content, msg)
+
+            if match:
+                recorded = record_gp_match(match, message=msg, save=False)
+
+                if recorded:
+                    parsed += 1
+                else:
+                    duplicates += 1
+            else:
+                rejected += 1
+
+    except discord.Forbidden:
+        print(f"SKIPPING GP channel #{channel.name}: missing access.")
+        return
+
+    except discord.HTTPException as e:
+        print(f"SKIPPING GP channel #{channel.name}: HTTP error {e}")
+        return
+
+    save_gp_data()
+
+    print(f"GP history scan complete for #{channel.name}.")
+    print(f"Scanned: {scanned}")
+    print(f"Parsed GP matches: {parsed}")
+    print(f"Duplicate GP matches skipped: {duplicates}")
+    print(f"Rejected messages: {rejected}")
+    print(f"Saved GP matches: {len(gp_matches)}")
+
+
+async def import_gp_history():
+    # Rebuild GP from Discord history every startup so source priority is deterministic.
+    reset_gp_state_for_rebuild()
+
+    await import_gp_history_for_channel(
+        ELO_GP_MATCH_RESULTS_CHANNEL_ID,
+        source_label="primary"
+    )
+
+    for channel_id in GP_SUPPLEMENTAL_CHANNEL_IDS:
+        await import_gp_history_for_channel(
+            channel_id,
+            source_label="supplemental"
+        )
+
+
 
 
 # -----------------------------
@@ -1146,7 +1852,7 @@ async def import_vs_history():
 
 @client.event
 async def on_ready():
-    global stream_tracker_started, vs_history_imported
+    global stream_tracker_started, vs_history_imported, gp_history_imported
 
     init_stats_db()
 
@@ -1154,7 +1860,9 @@ async def on_ready():
     print("Saved compiled_sources.json.")
     print(f"Logged in as {client.user}")
 
-    print("MK64_VS_CHANNEL_ID =", MK64_VS_CHANNEL_ID)
+    print("VS_RESULT_CHANNEL_IDS =", VS_RESULT_CHANNEL_IDS)
+    print("GP_PRIMARY_CHANNEL_ID =", ELO_GP_MATCH_RESULTS_CHANNEL_ID)
+    print("GP_SUPPLEMENTAL_CHANNEL_IDS =", GP_SUPPLEMENTAL_CHANNEL_IDS)
 
     for guild in client.guilds:
         print("GUILD:", guild.name, guild.id)
@@ -1183,6 +1891,14 @@ async def on_ready():
 
         vs_history_imported = True
 
+    if not gp_history_imported:
+        load_gp_data()
+        print(f"Loaded {len(gp_matches)} MK64 GP matches.")
+
+        await import_gp_history()
+
+        gp_history_imported = True
+
     if not stream_tracker_started:
         start_stream_tracker(client)
         stream_tracker_started = True
@@ -1195,32 +1911,7 @@ async def on_message(message):
 
     record_message_stat(message)
 
-    if message.channel.id != MK64_VS_CHANNEL_ID:
-        return
-
     content = message.content.strip()
-
-    if content == "!leaderboard":
-        mark_vs_processed(message.id)
-        await message.channel.send(format_vs_leaderboard(10))
-        return
-
-    if content.startswith("!rank"):
-        mark_vs_processed(message.id)
-
-        parts = content.split(maxsplit=1)
-
-        if len(parts) < 2:
-            await message.channel.send("Usage: `!rank playername`")
-            return
-
-        await message.channel.send(format_vs_rank(parts[1]))
-        return
-
-    if content == "!stats":
-        mark_vs_processed(message.id)
-        await message.channel.send(format_vs_stats())
-        return
 
     if content == "!serverstats":
         await message.channel.send(format_server_stats(message.guild))
@@ -1234,15 +1925,69 @@ async def on_message(message):
         await message.channel.send(format_monthly_stats(message.guild))
         return
 
-    match = parse_vs_message(content, message)
+    if message.channel.id in VS_RESULT_CHANNEL_IDS:
+        if content == "!leaderboard":
+            mark_vs_processed(message.id)
+            await message.channel.send(format_vs_leaderboard(10))
+            return
 
-    if match:
-        recorded = record_vs_match(match, message=message)
+        if content.startswith("!rank"):
+            mark_vs_processed(message.id)
 
-        if recorded:
-            await message.add_reaction("✅")
-    else:
-        mark_vs_processed(message.id)
+            parts = content.split(maxsplit=1)
+
+            if len(parts) < 2:
+                await message.channel.send("Usage: `!rank playername`")
+                return
+
+            await message.channel.send(format_vs_rank(parts[1]))
+            return
+
+        if content == "!stats":
+            mark_vs_processed(message.id)
+            await message.channel.send(format_vs_stats())
+            return
+
+        match = parse_vs_message(content, message)
+
+        if match:
+            recorded = record_vs_match(match, message=message)
+
+            if recorded:
+                await message.add_reaction("✅")
+        else:
+            mark_vs_processed(message.id)
+
+        return
+
+    if message.channel.id in GP_RESULT_CHANNEL_IDS:
+        if content == "!gpleaderboard":
+            await message.channel.send(format_gp_leaderboard(10))
+            return
+
+        if content.startswith("!gprank"):
+            parts = content.split(maxsplit=1)
+
+            if len(parts) < 2:
+                await message.channel.send("Usage: `!gprank playername`")
+                return
+
+            await message.channel.send(format_gp_rank(parts[1]))
+            return
+
+        if content == "!gpstats":
+            await message.channel.send(format_gp_stats())
+            return
+
+        match = parse_gp_message(content, message)
+
+        if match:
+            recorded = record_gp_match(match, message=message)
+
+            if recorded:
+                await message.add_reaction("🏁")
+
+        return
 
 
 # -----------------------------
@@ -1429,6 +2174,11 @@ async def sitemap(interaction: discord.Interaction):
         "• `/vsleaderboard` — MK64 VS leaderboard\n"
         "• `/vsrank` — MK64 VS player rank\n"
         "• `/vsstats` — MK64 VS parser stats\n"
+        "• `/vsquarter` — MK64 VS quarterly leaderboard\n"
+        "• `/gpleaderboard` — MK64 GP leaderboard\n"
+        "• `/gprank` — MK64 GP player rank\n"
+        "• `/gpstats` — MK64 GP parser stats\n"
+        "• `/gpquarter` — MK64 GP quarterly leaderboard\n"
         "• `/backfill_stats` — admin-only Discord message stats backfill\n"
         "• `/serverstats` — Discord message totals by channel\n"
         "• `/userstats` — Discord message totals by user\n"
@@ -1480,6 +2230,48 @@ async def vsstats(interaction: discord.Interaction):
     await interaction.response.send_message(format_vs_stats())
 
 
+@tree.command(name="vsquarter", description="Show the MK64 VS quarterly leaderboard.")
+@app_commands.describe(
+    quarter="Quarter in YYYY-Q# format, like 2026-Q2. Leave blank for current quarter.",
+    limit="Number of players to show, from 1 to 20"
+)
+async def vsquarter(interaction: discord.Interaction, quarter: str = "", limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(
+        format_quarterly_vs_leaderboard(quarter or None, limit)
+    )
+
+
+@tree.command(name="gpleaderboard", description="Show the MK64 GP leaderboard.")
+@app_commands.describe(limit="Number of players to show, from 1 to 20")
+async def gpleaderboard(interaction: discord.Interaction, limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(format_gp_leaderboard(limit))
+
+
+@tree.command(name="gprank", description="Show an MK64 GP player's rating.")
+@app_commands.describe(player="Player name or alias")
+async def gprank(interaction: discord.Interaction, player: str):
+    await interaction.response.send_message(format_gp_rank(player))
+
+
+@tree.command(name="gpstats", description="Show MK64 GP parser stats.")
+async def gpstats(interaction: discord.Interaction):
+    await interaction.response.send_message(format_gp_stats())
+
+
+@tree.command(name="gpquarter", description="Show the MK64 GP quarterly leaderboard.")
+@app_commands.describe(
+    quarter="Quarter in YYYY-Q# format, like 2026-Q2. Leave blank for current quarter.",
+    limit="Number of players to show, from 1 to 20"
+)
+async def gpquarter(interaction: discord.Interaction, quarter: str = "", limit: int = 10):
+    limit = max(1, min(limit, 20))
+    await interaction.response.send_message(
+        format_quarterly_gp_leaderboard(quarter or None, limit)
+    )
+
+
 @tree.command(name="backfill_stats", description="Admin-only: backfill Discord message stats once.")
 async def backfill_stats(interaction: discord.Interaction):
     if not interaction.user.guild_permissions.administrator:
@@ -1496,7 +2288,10 @@ async def backfill_stats(interaction: discord.Interaction):
         )
         return
 
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.send_message(
+        "Starting stats backfill... this may take a while.",
+        ephemeral=True
+    )
 
     scanned, inserted, skipped = await backfill_message_stats(interaction.guild)
 
@@ -1509,7 +2304,12 @@ async def backfill_stats(interaction: discord.Interaction):
     if skipped:
         msg += "\nSkipped channels: " + ", ".join(skipped[:20])
 
-    await interaction.followup.send(msg, ephemeral=True)
+    print(msg)
+
+    try:
+        await interaction.channel.send(msg)
+    except Exception as e:
+        print("Could not send completion message:", e)
 
 
 @tree.command(name="serverstats", description="Show Discord message stats by channel.")
