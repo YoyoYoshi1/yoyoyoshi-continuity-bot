@@ -2,8 +2,8 @@ import json
 import os
 from datetime import datetime
 
-DATA_DIR = "public/mk64/vs/data"
-OUTPUT_DIR = "public/mk64/vs"
+DATA_DIR = "public/mk64/gp/data"
+OUTPUT_DIR = "public/mk64/gp"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -158,21 +158,6 @@ fetch("../sidebar.html")
   })
   .then(function(html) {
     document.getElementById("sidebar-container").innerHTML = html;
-
-    var currentPath = window.location.pathname;
-    var sidebarLinks = document.querySelectorAll("#sidebar-container a");
-
-    sidebarLinks.forEach(function(link) {
-      var href = link.getAttribute("href");
-
-      if (
-        href === currentPath ||
-        href === currentPath.replace("/mk64/", "") ||
-        href === currentPath.replace("/mk64/vs/", "vs/")
-      ) {
-        link.classList.add("active");
-      }
-    });
   })
   .catch(function() {
     document.getElementById("sidebar-container").innerHTML =
@@ -235,7 +220,7 @@ leaderboard_rows = "\n".join(
       <td>{p["elo"]}</td>
       <td>{p["raw_elo"]}</td>
       <td>{p["matches"]}</td>
-      <td>{p["avg_points"]}</td>
+      <td>{p["wins"]}-{p["losses"]}-{p["ties"]}</td>
     </tr>
     """
     for p in leaderboard
@@ -249,8 +234,9 @@ players_rows = "\n".join(
       <td>{p["elo"]}</td>
       <td>{p["raw_elo"]}</td>
       <td>{p["matches"]}</td>
-      <td>{p["points"]}</td>
-      <td>{p["avg_points"]}</td>
+      <td>{p["wins"]}-{p["losses"]}-{p["ties"]}</td>
+      <td>{p["points_for"]}</td>
+      <td>{p["points_against"]}</td>
     </tr>
     """
     for p in players
@@ -263,23 +249,32 @@ match_rows = "\n".join(
     <tr>
       <td>{m["match_id"]}</td>
       <td>{fmt_date(m.get("created_at"))}</td>
-      <td>{"<br>".join([str(x["place"]) + ". " + x["player"] + " — " + str(x["score"]) for x in m["placements"]])}</td>
+      <td>{"<br>".join([x["player"] + " — " + str(x["score"]) + " (" + str(x.get("delta", "—")) + ")" for x in m["players"]])}</td>
+      <td>{m.get("winner") or "Tie"}</td>
       <td>{'<a href="' + m.get("jump_url", "#") + '" target="_blank" rel="noreferrer">Discord</a>' if m.get("jump_url") else "—"}</td>
     </tr>
     """
     for m in recent_matches
 )
 
+nav_links = """
+<p>
+  <a href="leaderboard.html">View Leaderboard</a> |
+  <a href="players.html">View All Players</a> |
+  <a href="matches.html">View Match Log</a> |
+  <a href="quarters.html">View Quarterly GP Seasons</a>
+</p>
+"""
+
 explanation = f"""
 <section class="panel">
   <div class="section-heading">How These Rankings Work</div>
   <div class="info-box">
     <strong>Coverage Period</strong><br>
-    These results currently cover parsed VS match posts from {coverage_start} through {coverage_end}.
+    These results currently cover parsed GP match records from {coverage_start} through {coverage_end}.
   </div>
   <p>
-    The leaderboard uses a multi-player Elo model. Each VS match is treated as a set of head-to-head outcomes:
-    finishing above another player counts as a win against that player, and finishing below counts as a loss.
+    The leaderboard uses a 1v1 Elo model for Grand Prix matches. Wins, losses, and ties update each player's rating.
   </p>
   <p>
     The displayed rating is confidence-weighted. Newer or low-sample players are pulled closer to 1000
@@ -292,21 +287,12 @@ explanation = f"""
 </section>
 """
 
-nav_links = """
-<p>
-  <a href="leaderboard.html">View Leaderboard</a> |
-  <a href="players.html">View All Players</a> |
-  <a href="matches.html">View Match Log</a> |
-  <a href="quarters.html">View Quarterly Elo History</a>
-</p>
-"""
-
 index_body = f"""
 <section class="panel">
-  <div class="section-heading">MK64 VS Rankings</div>
+  <div class="section-heading">MK64 GP Rankings</div>
   <p>
-    This section tracks Mario Kart 64 Switch VS results parsed from Discord match posts.
-    It turns scattered score posts into a lasting ranking archive, player record, match log, and historical Elo chronology.
+    This section tracks Mario Kart 64 Switch Grand Prix results parsed from Discord and legacy GP Elo records.
+    It turns scattered match history into a lasting ranking archive, player record, match log, and seasonal Elo chronology.
   </p>
   <p class="note">
     Total matches: {summary["total_matches"]}. Eligible players: {summary["eligible_players"]}.
@@ -320,7 +306,7 @@ index_body = f"""
 leaderboard_body = f"""
 {explanation}
 <section class="panel">
-  <div class="section-heading">VS Leaderboard</div>
+  <div class="section-heading">GP Leaderboard</div>
   <p class="note">
     Weighted Elo leaderboard. Median Elo: {summary["median_elo"]}.
   </p>
@@ -333,7 +319,7 @@ leaderboard_body = f"""
         <th>Weighted Elo</th>
         <th>Raw Elo</th>
         <th>Matches</th>
-        <th>Avg Pts</th>
+        <th>Record</th>
       </tr>
     </thead>
     <tbody>{leaderboard_rows}</tbody>
@@ -343,9 +329,9 @@ leaderboard_body = f"""
 
 players_body = f"""
 <section class="panel">
-  <div class="section-heading">All VS Players</div>
+  <div class="section-heading">All GP Players</div>
   <p>
-    This table includes every parsed player, including players who have not yet reached the minimum match threshold.
+    This table includes every parsed GP player, including players who have not yet reached the minimum match threshold.
   </p>
   <p class="note">Coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.</p>
   {nav_links}
@@ -357,8 +343,9 @@ players_body = f"""
         <th>Weighted Elo</th>
         <th>Raw Elo</th>
         <th>Matches</th>
-        <th>Total Pts</th>
-        <th>Avg Pts</th>
+        <th>Record</th>
+        <th>Points For</th>
+        <th>Points Against</th>
       </tr>
     </thead>
     <tbody>{players_rows}</tbody>
@@ -368,9 +355,9 @@ players_body = f"""
 
 matches_body = f"""
 <section class="panel">
-  <div class="section-heading">VS Match Log</div>
+  <div class="section-heading">GP Match Log</div>
   <p>
-    This log shows all parsed VS matches, with dates and direct Discord source links where available.
+    This log shows all parsed GP matches, with dates and direct Discord source links where available.
   </p>
   <p class="note">Full parsed coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.</p>
   {nav_links}
@@ -379,7 +366,8 @@ matches_body = f"""
       <tr>
         <th>Match ID</th>
         <th>Date</th>
-        <th>Placements</th>
+        <th>Players / Elo Change</th>
+        <th>Winner</th>
         <th>Source</th>
       </tr>
     </thead>
@@ -390,9 +378,9 @@ matches_body = f"""
 
 quarters_body = f"""
 <section class="panel">
-  <div class="section-heading">Quarterly Elo History</div>
+  <div class="section-heading">Quarterly GP Seasons</div>
   <p>
-    Browse quarter-only seasonal Elo rankings. Each quarter recalculates Elo using only matches played during that quarter.
+    Browse quarter-only seasonal GP Elo rankings. Each quarter recalculates Elo using only matches played during that quarter.
   </p>
   <p class="note">Coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.</p>
   {nav_links}
@@ -405,8 +393,8 @@ quarters_body = f"""
 </section>
 
 <section class="panel">
-  <div class="section-heading" id="quarter-heading">Quarter Snapshot</div>
-  <div id="quarter-summary" class="note">Choose a quarter to view historical rankings.</div>
+  <div class="section-heading" id="quarter-heading">Quarter Season</div>
+  <div id="quarter-summary" class="note">Choose a quarter to view seasonal rankings.</div>
   <br>
   <table>
     <thead>
@@ -416,7 +404,7 @@ quarters_body = f"""
         <th>Weighted Elo</th>
         <th>Raw Elo</th>
         <th>Matches</th>
-        <th>Avg Pts</th>
+        <th>Record</th>
       </tr>
     </thead>
     <tbody id="quarter-table">
@@ -433,7 +421,6 @@ QUARTERS_SCRIPT = """
   var table = document.getElementById("quarter-table");
   var heading = document.getElementById("quarter-heading");
   var summary = document.getElementById("quarter-summary");
-  var quarterIndex = [];
 
   function setError(message) {
     select.innerHTML = '<option value="">Unavailable</option>';
@@ -448,7 +435,7 @@ QUARTERS_SCRIPT = """
         return response.json();
       })
       .then(function(data) {
-        heading.innerHTML = "Quarter Snapshot: " + data.quarter;
+        heading.innerHTML = "Quarter Season: " + data.quarter;
         summary.innerHTML =
           "Matches in this quarter: " + data.total_matches +
           ". Eligible players: " + data.eligible_players +
@@ -466,7 +453,7 @@ QUARTERS_SCRIPT = """
             '<td>' + p.elo + '</td>' +
             '<td>' + p.raw_elo + '</td>' +
             '<td>' + p.matches + '</td>' +
-            '<td>' + p.avg_points + '</td>' +
+            '<td>' + p.wins + '-' + p.losses + '-' + p.ties + '</td>' +
           '</tr>';
         }).join("");
       })
@@ -481,60 +468,58 @@ QUARTERS_SCRIPT = """
       return response.json();
     })
     .then(function(index) {
-      quarterIndex = index;
-
-      if (!quarterIndex.length) {
-        setError("No quarterly snapshots are available yet.");
+      if (!index.length) {
+        setError("No quarterly GP seasons are available yet.");
         return;
       }
 
-      select.innerHTML = quarterIndex.map(function(q, i) {
+      select.innerHTML = index.map(function(q, i) {
         return '<option value="' + i + '">' + q.quarter + '</option>';
       }).join("");
 
-      select.value = quarterIndex.length - 1;
-      renderQuarter(quarterIndex[quarterIndex.length - 1]);
+      select.value = index.length - 1;
+      renderQuarter(index[index.length - 1]);
 
       select.addEventListener("change", function() {
-        renderQuarter(quarterIndex[Number(select.value)]);
+        renderQuarter(index[Number(select.value)]);
       });
     })
     .catch(function() {
-      setError("Quarterly index could not be loaded. Run export_vs_quarterly.py first.");
+      setError("Quarterly index could not be loaded. Run export_gp_quarterly.py first.");
     });
 })();
 </script>
 """
 
 write("index.html", page(
-    "MK64 Switch VS Rankings",
-    "Mario Kart 64 Switch VS rankings, weighted Elo leaderboard, player stats, match log, and quarterly Elo history.",
+    "MK64 Switch GP Rankings",
+    "Mario Kart 64 Switch Grand Prix rankings, weighted Elo leaderboard, player stats, match log, and quarterly GP seasons.",
     index_body
 ))
 
 write("leaderboard.html", page(
-    "MK64 Switch VS Leaderboard",
-    "Mario Kart 64 Switch weighted Elo leaderboard for ranked VS play.",
+    "MK64 Switch GP Leaderboard",
+    "Mario Kart 64 Switch weighted Elo leaderboard for Grand Prix play.",
     leaderboard_body
 ))
 
 write("players.html", page(
-    "MK64 Switch VS Players",
-    "Mario Kart 64 Switch VS player stats, Elo ratings, matches, and average points.",
+    "MK64 Switch GP Players",
+    "Mario Kart 64 Switch GP player stats, Elo ratings, records, and point totals.",
     players_body
 ))
 
 write("matches.html", page(
-    "MK64 Switch VS Match Log",
-    "Mario Kart 64 Switch VS match log with dates, placements, scores, and Discord source links.",
+    "MK64 Switch GP Match Log",
+    "Mario Kart 64 Switch GP match log with dates, scores, Elo changes, and Discord source links.",
     matches_body
 ))
 
 write("quarters.html", page(
-    "MK64 Switch Quarterly VS Seasons",
-    "Mario Kart 64 Switch quarter-only VS Elo seasons and historical seasonal rankings.",
+    "MK64 Switch Quarterly GP Seasons",
+    "Mario Kart 64 Switch quarter-only GP Elo seasons and historical seasonal rankings.",
     quarters_body,
     QUARTERS_SCRIPT
 ))
 
-print("VS HTML generation complete.")
+print("GP HTML generation complete.")
