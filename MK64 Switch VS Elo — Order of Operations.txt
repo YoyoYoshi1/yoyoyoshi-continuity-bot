@@ -1,0 +1,138 @@
+MK64 Elo Infrastructure - Order of Operations
+
+Applies to:
+
+* VS Elo
+* GP Elo
+
+---
+
+1. Recover (Optional)
+
+---
+
+Restore latest backup if needed.
+
+Example:
+
+copy backup_file.json active_file.json
+
+Optional full Discord rescan:
+
+Set in config state:
+
+last_message_id = null
+
+Purpose:
+
+* recover database state
+* force complete Discord reindex if desired
+
+---
+
+2. Ingest
+
+---
+
+Run parser bot:
+
+python bot.py
+
+Purpose:
+
+* scan Discord history
+* parse match results
+* append matches to database
+
+---
+
+3. Validate & Rebuild
+
+---
+
+VS Elo
+
+python dedupe_vs.py
+python export_vs_json.py
+python export_vs_quarterly.py
+
+GP Elo
+
+python dedupe_gp.py
+python export_gp_json.py
+python export_gp_quarterly.py
+
+Purpose:
+
+* preserve chronology integrity
+* rebuild career rankings
+* rebuild seasonal rankings
+* generate public datasets
+
+---
+
+4. Generate PHP Pages
+
+---
+
+VS Website
+
+python generate_vs_php.py
+
+GP Website
+
+python generate_gp_php.py
+
+Purpose:
+
+* generate PHP ranking pages
+* integrate rankings into shared MK64 header/sidebar/footer
+* preserve metadata, breadcrumbs, and institutional navigation
+* publish latest rankings
+* publish match history
+* publish seasonal history
+* publish historical browsing
+
+Generated structure:
+
+/mk64/vs/index.php
+/mk64/vs/leaderboard.php
+/mk64/vs/players.php
+/mk64/vs/matches.php
+/mk64/vs/quarters.php
+
+/mk64/gp/index.php
+/mk64/gp/leaderboard.php
+/mk64/gp/players.php
+/mk64/gp/matches.php
+/mk64/gp/quarters.php
+
+---
+
+5. Deploy
+
+---
+
+git add .
+git commit -m Update Elo Data
+git push
+
+Hosting updates automatically.
+
+Purpose:
+
+* publish updated datasets
+* publish generated PHP pages
+* preserve rankings inside the broader awRev MK64 architecture
+
+---
+
+Pipeline
+
+Discord History
+→ Match Database
+→ Validation
+→ Elo Computation
+→ Public JSON Datasets
+→ PHP Page Generation
+→ awRev MK64 Website Publication

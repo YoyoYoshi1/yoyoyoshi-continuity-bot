@@ -12,6 +12,7 @@ TWITCH_CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
 
 RULES_FILE = "stream_rules.json"
 POLL_SECONDS = 180
+LIVE_STREAMS_FILE = "public/live_streams.json"
 
 _last_announced = {}
 _twitch_access_token = None
@@ -83,6 +84,33 @@ def get_live_streams(streamers):
 
     response.raise_for_status()
     return response.json().get("data", [])
+
+def write_live_streams_json(live_streams, rules):
+    public_streams = []
+    now = datetime.now(timezone.utc).isoformat()
+
+    for stream in live_streams:
+        for server in rules.get("servers", []):
+            for game_rule in server.get("game_rules", []):
+                if not stream_matches_rule(stream, game_rule):
+                    continue
+
+                public_streams.append({
+                    "server": server.get("server"),
+                    "user_login": stream.get("user_login"),
+                    "user_name": stream.get("user_name"),
+                    "game_name": stream.get("game_name"),
+                    "title": stream.get("title"),
+                    "started_at": stream.get("started_at"),
+                    "viewer_count": stream.get("viewer_count"),
+                    "url": f"https://twitch.tv/{stream.get('user_login')}",
+                    "updated_at": now
+                })
+
+    os.makedirs(os.path.dirname(LIVE_STREAMS_FILE), exist_ok=True)
+
+    with open(LIVE_STREAMS_FILE, "w", encoding="utf-8") as f:
+        json.dump(public_streams, f, indent=2)
 
 
 def game_matches(game_name, match_type, expected_game):
@@ -186,6 +214,8 @@ async def stream_poll_loop(client):
             rules = load_stream_rules()
             streamers = get_all_streamers(rules)
             live_streams = get_live_streams(streamers)
+
+            write_live_streams_json(live_streams, rules)
 
             for stream in live_streams:
                 for server in rules.get("servers", []):
