@@ -15,9 +15,55 @@ from dotenv import load_dotenv
 from urllib.parse import urljoin
 from collections import defaultdict
 from datetime import datetime, timezone
+import threading
+
+from flask import Flask, jsonify, send_file
 
 from streams import start_stream_tracker
 
+# -----------------------------
+# Web server
+# -----------------------------
+
+app = Flask(__name__)
+
+LIVE_STREAMS_FILE = "live_streams.json"
+
+
+@app.route("/")
+def home():
+    return "YoyoYoshi Bot is running."
+
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    })
+
+
+@app.route("/live_streams.json")
+def live_streams():
+    if os.path.exists(LIVE_STREAMS_FILE):
+        return send_file(
+            LIVE_STREAMS_FILE,
+            mimetype="application/json"
+        )
+
+    return jsonify({
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "streams": []
+    })
+
+
+def run_web_server():
+    port = int(os.environ.get("PORT", 8080))
+
+    app.run(
+        host="0.0.0.0",
+        port=port
+    )
 
 # -----------------------------
 # Environment / startup config
@@ -2336,5 +2382,10 @@ async def monthlystats(interaction: discord.Interaction, limit: int = 12):
 # -----------------------------
 # Run bot
 # -----------------------------
+
+threading.Thread(
+    target=run_web_server,
+    daemon=True
+).start()
 
 client.run(TOKEN)
