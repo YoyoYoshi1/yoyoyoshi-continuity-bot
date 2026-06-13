@@ -27,15 +27,17 @@ def e(value: Any) -> str:
     return html.escape(str(value if value is not None else ""), quote=True)
 
 
-def php_header(title: str, description: str = "", current_page: str = "players") -> str:
-    title_e = e(title)
-    desc_e = e(description or title)
-    current_e = e(current_page)
+def fmt(value: Any, fallback: str = "TBD") -> str:
+    if value is None or value == "":
+        return fallback
+    return e(value)
 
+
+def php_header(title: str, description: str = "", current_page: str = "players") -> str:
     return f"""<?php
-$pageTitle = '{title_e}';
-$pageDescription = '{desc_e}';
-$currentPage = '{current_e}';
+$pageTitle = '{e(title)}';
+$pageDescription = '{e(description or title)}';
+$currentPage = '{e(current_page)}';
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -60,12 +62,42 @@ def render_link_list(links: list[str]) -> str:
     if not links:
         return "<li>TBD</li>"
 
-    items = []
-    for link in links:
-        link_e = e(link)
-        items.append(f'<li><a href="{link_e}">{link_e}</a></li>')
+    return "\n".join(
+        f'<li><a href="{e(link)}" target="_blank" rel="noopener noreferrer">{e(link)}</a></li>'
+        for link in links
+    )
 
-    return "\n".join(items)
+
+def render_key_value_table(rows: list[tuple[str, Any]]) -> str:
+    rendered = []
+
+    for label, value in rows:
+        rendered.append(
+            f"<tr><th>{e(label)}</th><td>{fmt(value)}</td></tr>"
+        )
+
+    return f"""<table class="data-table">
+<tbody>
+{''.join(rendered)}
+</tbody>
+</table>"""
+
+
+def format_scores(scores: dict[str, Any]) -> str:
+    if not scores:
+        return "TBD"
+
+    return ", ".join(
+        f"{e(player)} {e(score)}"
+        for player, score in scores.items()
+    )
+
+
+def render_source_link(url: str) -> str:
+    if not url:
+        return "TBD"
+
+    return f'<a href="{e(url)}" target="_blank" rel="noopener noreferrer">source</a>'
 
 
 def render_recent_vs(profile: dict[str, Any]) -> str:
@@ -77,18 +109,25 @@ def render_recent_vs(profile: dict[str, Any]) -> str:
     rows = []
 
     for m in matches:
-        scores = m.get("scores", {})
-        score_text = ", ".join(f"{e(p)} {e(s)}" for p, s in scores.items())
-        url = m.get("jump_url", "")
-        source = f' <a href="{e(url)}">source</a>' if url else ""
-
         rows.append(
-            f"<tr><td>{e(m.get('date', 'unknown'))}</td><td>{score_text}{source}</td></tr>"
+            f"<tr>"
+            f"<td>{e(m.get('date', 'unknown'))}</td>"
+            f"<td>{format_scores(m.get('scores', {}))}</td>"
+            f"<td>{render_source_link(m.get('jump_url', ''))}</td>"
+            f"</tr>"
         )
 
     return f"""<table class="data-table">
-<thead><tr><th>Date</th><th>Scores</th></tr></thead>
-<tbody>{''.join(rows)}</tbody>
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Players / Scores</th>
+  <th>Source</th>
+</tr>
+</thead>
+<tbody>
+{''.join(rows)}
+</tbody>
 </table>"""
 
 
@@ -101,26 +140,38 @@ def render_recent_gp(profile: dict[str, Any]) -> str:
     rows = []
 
     for m in matches:
-        scores = m.get("scores", {})
-        score_text = ", ".join(f"{e(p)} {e(s)}" for p, s in scores.items())
-        winner = e(m.get("winner") or "TBD")
-        url = m.get("jump_url", "")
-        source = f' <a href="{e(url)}">source</a>' if url else ""
-
         rows.append(
-            f"<tr><td>{e(m.get('date', 'unknown'))}</td><td>{winner}</td><td>{score_text}{source}</td></tr>"
+            f"<tr>"
+            f"<td>{e(m.get('date', 'unknown'))}</td>"
+            f"<td>{e(m.get('winner') or 'TBD')}</td>"
+            f"<td>{format_scores(m.get('scores', {}))}</td>"
+            f"<td>{render_source_link(m.get('jump_url', ''))}</td>"
+            f"</tr>"
         )
 
     return f"""<table class="data-table">
-<thead><tr><th>Date</th><th>Winner</th><th>Scores</th></tr></thead>
-<tbody>{''.join(rows)}</tbody>
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Winner</th>
+  <th>Players / Scores</th>
+  <th>Source</th>
+</tr>
+</thead>
+<tbody>
+{''.join(rows)}
+</tbody>
 </table>"""
 
 
 def render_player_page(profile: dict[str, Any]) -> str:
     name = profile.get("display_name", profile.get("player_id", "Player"))
+    player_id = profile.get("player_id", "")
     roles = profile.get("roles", [])
     role_text = ", ".join(e(r) for r in roles) if roles else "TBD"
+
+    vs = profile.get("vs", {})
+    gp = profile.get("gp", {})
 
     title = f"{name} - MK64 Switch Player Profile"
     description = (
@@ -128,28 +179,33 @@ def render_player_page(profile: dict[str, Any]) -> str:
         f"match history, roles, and community notes."
     )
 
-    vs = profile.get("vs", {})
-    gp = profile.get("gp", {})
+    summary = profile.get(
+        "summary",
+        "No manual biography note has been added yet."
+    )
+
+    competition_rows = [
+        ("Player ID", player_id),
+        ("Roles", role_text),
+        ("First Seen", profile.get("first_seen", "unknown")),
+        ("Latest Record", profile.get("last_seen", "unknown")),
+        ("VS Elo", vs.get("elo_raw") or "TBD"),
+        ("VS Matches", vs.get("matches", 0)),
+        ("GP Elo", gp.get("elo_raw") or "TBD"),
+        ("GP Record", gp.get("record", "0-0-0")),
+        ("GP Matches", gp.get("matches", 0)),
+        ("Total Recorded Matches", profile.get("total_recorded_matches", 0)),
+    ]
 
     return f"""{php_header(title, description, "players")}
 <section class="panel">
   <div class="section-heading">{e(name)}</div>
-  <p><strong>Roles:</strong> {role_text}</p>
-  <p><strong>First seen in bot records:</strong> {e(profile.get('first_seen', 'unknown'))}</p>
-  <p><strong>Latest bot record:</strong> {e(profile.get('last_seen', 'unknown'))}</p>
-  <p>{e(profile.get('summary', 'No manual biography note has been added yet.'))}</p>
+  <p>{e(summary)}</p>
 </section>
 
 <section class="panel">
   <div class="section-heading">Competition Summary</div>
-  <ul>
-    <li>VS matches: {e(vs.get('matches', 0))}</li>
-    <li>VS Elo: {e(vs.get('elo_raw') or 'TBD')}</li>
-    <li>GP matches: {e(gp.get('matches', 0))}</li>
-    <li>GP record: {e(gp.get('record', '0-0-0'))}</li>
-    <li>GP Elo: {e(gp.get('elo_raw') or 'TBD')}</li>
-    <li>Total recorded matches: {e(profile.get('total_recorded_matches', 0))}</li>
-  </ul>
+  {render_key_value_table(competition_rows)}
 </section>
 
 <section class="panel">
@@ -168,7 +224,7 @@ def render_player_page(profile: dict[str, Any]) -> str:
 </section>
 
 <section class="panel">
-  <div class="section-heading">Source Note</div>
+  <div class="section-heading">Continuity Note</div>
   <p><em>{e(profile.get('source_note', 'Generated from MK64 continuity exports. Review before publication.'))}</em></p>
 </section>
 {php_footer()}"""
@@ -176,7 +232,6 @@ def render_player_page(profile: dict[str, Any]) -> str:
 
 def render_index(index: dict[str, Any]) -> str:
     players = index.get("players", [])
-    rows = []
 
     sorted_players = sorted(
         players,
@@ -185,6 +240,8 @@ def render_index(index: dict[str, Any]) -> str:
             str(x.get("display_name", "")).lower()
         )
     )
+
+    rows = []
 
     for p in sorted_players:
         pid = e(p.get("player_id", ""))
@@ -206,7 +263,7 @@ def render_index(index: dict[str, Any]) -> str:
     )}
 <section class="panel">
   <div class="section-heading">MK64 Switch Player Profiles</div>
-  <p>Draft player profile pages generated from MK64 bot records, match data, and continuity notes. Review before publication.</p>
+  <p>Player profile pages generated from MK64 bot records, match data, and continuity notes.</p>
   <p>Generated profiles: {e(index.get('count', len(players)))}</p>
 </section>
 
@@ -223,7 +280,9 @@ def render_index(index: dict[str, Any]) -> str:
         <th>Total</th>
       </tr>
     </thead>
-    <tbody>{''.join(rows)}</tbody>
+    <tbody>
+      {''.join(rows)}
+    </tbody>
   </table>
 </section>
 {php_footer()}"""
@@ -285,7 +344,6 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
     generate(Path(args.input), Path(args.output))
 
 

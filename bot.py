@@ -162,6 +162,8 @@ STATS_DB_FILE = "discord_stats.sqlite3"
 GP_K_FACTOR = 32
 GP_MIN_MATCHES = 3
 GP_MAX_SCORE = 160
+GP_REJECTS_FILE = "gp_rejected_examples.json"
+GP_REJECT_SAMPLE_LIMIT = 50
 
 CONTINUITY_EXPORT_DIR = "public_mk64_continuity"
 
@@ -533,37 +535,174 @@ def format_vs_stats():
 # MK64 GP parser config/storage
 # -----------------------------
 
-def parse_score_lines(content, message=None, max_score=160):
-    text = replace_discord_mentions(content, message)
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    scores = {}
+def strip_score_formatting(text):
+    text = replace_discord_mentions(text or "")
+    text = html.unescape(text)
+    text = text.replace("**", "")
+    text = text.replace("__", "")
+    text = text.replace("`", "")
+    text = text.replace("\u2013", "-").replace("\u2014", "-")
+    return text
 
-    for line in lines:
-        line = re.sub(r"^P[1-4]\s*:\s*", "", line, flags=re.IGNORECASE)
-        line = re.sub(r"^(gp|grand prix|tournament|round|match)\s*[:#-]?\s*", "", line, flags=re.IGNORECASE)
 
-        match = re.match(r"^@?(.+?)\s+(\d{1,3})$", line)
+def parse_score_value(value, max_score):
+    try:
+        score = int(value)
+    except (TypeError, ValueError):
+        return None
+
+    if score < 0 or score > max_score:
+        return None
+
+    return score
+
+
+def add_score(scores, raw_name, raw_score, max_score):
+    score = parse_score_value(raw_score, max_score)
+
+    if score is None:
+        return False
+
+    clean = clean_score_name(raw_name)
+
+    if not clean:
+        return False
+
+    if clean in scores:
+        return False
+
+    scores[clean] = score
+    return True
+
+
+def parse_name_score_line(line, max_score=160):
+    line = line.strip()
+
+    if not line:
+        return None
+
+    # Remove common list markers and labels.
+    line = re.sub(r"^[•*-]\s*", "", line)
+    line = re.sub(r"^\d{1,2}[.)]\s*", "", line)
+    line = re.sub(r"^P[1-4]\s*[:.)-]\s*", "", line, flags=re.IGNORECASE)
+    line = re.sub(
+        r"^(gp|grand prix|tournament|round|match|game|result|score|scores|winner|loser)\s*[:#-]?\s*",
+        "",
+        line,
+        flags=re.IGNORECASE
+    )
+
+    patterns = [
+        # Name: 120 / Name - 120 / Name = 120
+        r"^@?(.+?)\s*[:=\-]\s*(\d{1,3})$",
+        # Name 120
+        r"^@?(.+?)\s+(\d{1,3})$",
+        # Name (120)
+        r"^@?(.+?)\s*\((\d{1,3})\)$",
+    ]
+
+    for pattern in patterns:
+        match = re.match(pattern, line, re.IGNORECASE)
 
         if not match:
             continue
 
-        raw_name = match.group(1)
-        score = int(match.group(2))
+        raw_name = match.group(1).strip()
+        raw_score = match.group(2).strip()
+        score = parse_score_value(raw_score, max_score)
 
-        if score > max_score:
-            return None
+        if score is None:
+            continue
 
         clean = clean_score_name(raw_name)
 
         if not clean:
             continue
 
-        if clean in scores:
+        return clean, score
+
+    return None
+
+
+def parse_inline_gp_scores(content, message=None, max_score=160):
+    text = strip_score_formatting(content)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    if not text:
+        return {}
+
+    scores = {}
+
+    # Format: PlayerA 120 - 117 PlayerB
+    match = re.search(
+        r"@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s*-\s*(\d{1,3})\s+@?([A-Za-z0-9_\-\s.]+)",
+        text,
+        re.IGNORECASE
+    )
+
+    if match:
+        if (
+            add_score(scores, match.group(1), match.group(2), max_score)
+            and add_score(scores, match.group(4), match.group(3), max_score)
+        ):
+            return scores
+
+    # Format: PlayerA 120 vs PlayerB 117
+    match = re.search(
+        r"@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s+(?:vs\.?|v\.?|versus)\s+@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})",
+        text,
+        re.IGNORECASE
+    )
+
+    if match:
+        if (
+            add_score(scores, match.group(1), match.group(2), max_score)
+            and add_score(scores, match.group(3), match.group(4), max_score)
+        ):
+            return scores
+
+    # Format: PlayerA beat PlayerB 120-117.
+    match = re.search(
+        r"@?([A-Za-z0-9_\-\s.]+?)\s+(?:defeats?|beat|beats|won against|over)\s+@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s*-\s*(\d{1,3})",
+        text,
+        re.IGNORECASE
+    )
+
+    if match:
+        if (
+            add_score(scores, match.group(1), match.group(3), max_score)
+            and add_score(scores, match.group(2), match.group(4), max_score)
+        ):
+            return scores
+
+    return {}
+
+
+def parse_score_lines(content, message=None, max_score=160):
+    text = strip_score_formatting(content)
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    scores = {}
+
+    for line in lines:
+        parsed = parse_name_score_line(line, max_score)
+
+        if not parsed:
+            continue
+
+        player, score = parsed
+
+        if player in scores:
             return None
 
-        scores[clean] = score
+        scores[player] = score
 
-    return scores
+    if scores:
+        return scores
+
+    inline_scores = parse_inline_gp_scores(content, message, max_score)
+
+    return inline_scores or {}
+
 
 
 def clean_gp_elo_name(name):
@@ -670,7 +809,13 @@ def parse_gp_message(content, message=None):
 
     scores = parse_score_lines(content, message, GP_MAX_SCORE)
 
-    if not scores or len(scores) != 2:
+    if not scores:
+        return None
+
+    # This GP Elo pipeline currently supports two-player GP matches.
+    # Four-player or standings-style results should be reviewed before import
+    # rather than silently converted into inaccurate 1v1 Elo records.
+    if len(scores) != 2:
         return None
 
     players = list(scores.keys())
@@ -690,6 +835,7 @@ def parse_gp_message(content, message=None):
         "players": [p1, p2],
         "winner": winner
     }
+
 
 
 def update_gp_ratings(match):
@@ -1846,6 +1992,51 @@ async def import_vs_history():
         await import_vs_history_for_channel(channel_id)
 
 
+
+def summarize_gp_rejected_message(msg):
+    content = strip_score_formatting(getattr(msg, "content", "") or "")
+    content = re.sub(r"\s+", " ", content).strip()
+
+    embed_titles = []
+    for embed in getattr(msg, "embeds", []):
+        if embed.title:
+            embed_titles.append(embed.title)
+        if embed.description:
+            embed_titles.append(embed.description[:200])
+
+    return {
+        "message_id": str(msg.id),
+        "created_at": msg.created_at.isoformat() if getattr(msg, "created_at", None) else "",
+        "author": str(msg.author),
+        "jump_url": msg.jump_url,
+        "content": content[:500],
+        "embed_summary": " | ".join(embed_titles)[:500]
+    }
+
+
+def write_gp_reject_report(channel_name, examples):
+    if not examples:
+        return
+
+    existing = {}
+
+    if os.path.exists(GP_REJECTS_FILE):
+        try:
+            with open(GP_REJECTS_FILE, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            existing = {}
+
+    existing[channel_name] = {
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "sample_count": len(examples),
+        "examples": examples
+    }
+
+    with open(GP_REJECTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(existing, f, indent=2, ensure_ascii=False)
+
+
 async def import_gp_history_for_channel(channel_id, source_label="supplemental"):
     channel = client.get_channel(channel_id)
 
@@ -1857,6 +2048,7 @@ async def import_gp_history_for_channel(channel_id, source_label="supplemental")
     parsed = 0
     rejected = 0
     duplicates = 0
+    rejected_examples = []
 
     print(f"Scanning GP history in #{channel.name} ({source_label})...")
 
@@ -1882,6 +2074,9 @@ async def import_gp_history_for_channel(channel_id, source_label="supplemental")
             else:
                 rejected += 1
 
+                if len(rejected_examples) < GP_REJECT_SAMPLE_LIMIT:
+                    rejected_examples.append(summarize_gp_rejected_message(msg))
+
     except discord.Forbidden:
         print(f"SKIPPING GP channel #{channel.name}: missing access.")
         return
@@ -1891,13 +2086,22 @@ async def import_gp_history_for_channel(channel_id, source_label="supplemental")
         return
 
     save_gp_data()
+    write_gp_reject_report(channel.name, rejected_examples)
+
+    parse_rate = (parsed / scanned * 100) if scanned else 0
 
     print(f"GP history scan complete for #{channel.name}.")
     print(f"Scanned: {scanned}")
     print(f"Parsed GP matches: {parsed}")
     print(f"Duplicate GP matches skipped: {duplicates}")
     print(f"Rejected messages: {rejected}")
+    print(f"Parse rate: {parse_rate:.1f}%")
     print(f"Saved GP matches: {len(gp_matches)}")
+
+    if rejected_examples:
+        print(f"Saved GP reject examples for #{channel.name} to {GP_REJECTS_FILE}")
+
+
 
 
 async def import_gp_history():
