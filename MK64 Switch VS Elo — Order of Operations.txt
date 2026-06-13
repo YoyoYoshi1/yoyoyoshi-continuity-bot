@@ -1,9 +1,12 @@
-MK64 Elo Infrastructure - Order of Operations
+MK64 Elo & Continuity Infrastructure — Order of Operations
 
 Applies to:
 
-* VS Elo
-* GP Elo
+• VS Elo
+• GP Elo
+• Player Pages
+• Community History
+• Continuity Infrastructure
 
 ---
 
@@ -15,97 +18,157 @@ Restore latest backup if needed.
 
 Example:
 
+```bat
 copy backup_file.json active_file.json
+```
 
 Optional full Discord rescan:
 
 Set in config state:
 
+```text
 last_message_id = null
+```
 
 Purpose:
 
-* recover database state
-* force complete Discord reindex if desired
+• recover database state
+• rebuild from known-good data
+• force complete Discord reindex when necessary
+
+Result:
+
+Known State → Active Database
 
 ---
 
-2. Ingest
+2. Ingest Discord History
 
 ---
 
 Run parser bot:
 
+```bat
 python bot.py
+```
 
 Purpose:
 
-* scan Discord history
-* parse match results
-* append matches to database
+• scan Discord history
+• ingest new messages
+• parse match results
+• preserve chronological records
+• update institutional memory
+
+Result:
+
+Discord History → Structured Database
 
 ---
 
-3. Validate & Rebuild
+3. Validate & Export Data
 
 ---
 
 VS Elo
 
+```bat
 python dedupe_vs.py
 python export_vs_json.py
 python export_vs_quarterly.py
+```
 
 GP Elo
 
+```bat
 python dedupe_gp.py
 python export_gp_json.py
 python export_gp_quarterly.py
+```
+
+Continuity Infrastructure
+
+```bat
+python export_continuity.py
+python continuity_qa.py
+```
 
 Purpose:
 
-* preserve chronology integrity
-* rebuild career rankings
-* rebuild seasonal rankings
-* generate public datasets
+• preserve chronology integrity
+• remove duplicate records
+• rebuild career rankings
+• rebuild seasonal rankings
+• export public datasets
+• generate continuity datasets
+• identify missing links and metadata gaps
+
+Examples:
+
+```text
+[WARNING] Found 9 MK64 source URL(s) still pointing to Neocities.
+
+[NOTICE] High-activity players without manual continuity notes:
+fuzz, martin, fx64, dip...
+```
+
+Result:
+
+Structured Database → Public Datasets
 
 ---
 
-4. Generate PHP Pages
+4. Generate Website Pages
 
 ---
 
-VS Website
+Rankings
 
+```bat
 python generate_vs_php.py
-
-GP Website
-
 python generate_gp_php.py
+```
+
+Continuity
+
+```bat
+python generate_player_php.py
+python generate_continuity_php.py
+```
 
 Purpose:
 
-* generate PHP ranking pages
-* integrate rankings into shared MK64 header/sidebar/footer
-* preserve metadata, breadcrumbs, and institutional navigation
-* publish latest rankings
-* publish match history
-* publish seasonal history
-* publish historical browsing
+• generate ranking pages
+• generate player pages
+• generate community-history pages
+• publish match chronology
+• publish seasonal archives
+• preserve institutional memory
+• integrate content into shared MK64 architecture
 
-Generated structure:
+Generated Structure:
 
-/mk64/vs/index.php
-/mk64/vs/leaderboard.php
-/mk64/vs/players.php
-/mk64/vs/matches.php
-/mk64/vs/quarters.php
+```text
+/mk64/vs/
+/mk64/gp/
 
-/mk64/gp/index.php
-/mk64/gp/leaderboard.php
-/mk64/gp/players.php
-/mk64/gp/matches.php
-/mk64/gp/quarters.php
+/mk64/players/
+    gumby.php
+    patalus.php
+    martin.php
+    fx64.php
+    ...
+
+/mk64/history/
+    mk64-switch-history.php
+    gp-league-season3.php
+    campkart.php
+    ...
+```
+
+Result:
+
+Public Datasets → Website Pages
 
 ---
 
@@ -113,26 +176,52 @@ Generated structure:
 
 ---
 
+```bat
 git add .
-git commit -m Update Elo Data
+git commit -m "Update MK64 Data"
 git push
+```
 
 Hosting updates automatically.
 
 Purpose:
 
-* publish updated datasets
-* publish generated PHP pages
-* preserve rankings inside the broader awRev MK64 architecture
+• publish updated rankings
+• publish player pages
+• publish historical archives
+• preserve long-term community continuity
+• maintain the MK64 institutional record
+
+Result:
+
+Website → Public Community Resource
 
 ---
 
 Pipeline
 
+```text
 Discord History
-→ Match Database
-→ Validation
-→ Elo Computation
-→ Public JSON Datasets
-→ PHP Page Generation
-→ awRev MK64 Website Publication
+        ↓
+Structured Database
+        ↓
+Validation & Continuity QA
+        ↓
+Elo & Continuity Exports
+        ↓
+PHP Page Generation
+        ↓
+awRev MK64 Publication
+        ↓
+Institutional Memory
+```
+
+Core Principle:
+
+```text
+Discord generates.
+The bot structures.
+AI synthesizes.
+Humans curate.
+The website preserves.
+```
