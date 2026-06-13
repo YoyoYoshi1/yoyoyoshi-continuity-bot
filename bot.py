@@ -8,6 +8,7 @@ import requests
 import discord
 import statistics
 import sqlite3
+import html
 
 from bs4 import BeautifulSoup
 from discord import app_commands
@@ -161,6 +162,24 @@ STATS_DB_FILE = "discord_stats.sqlite3"
 GP_K_FACTOR = 32
 GP_MIN_MATCHES = 3
 GP_MAX_SCORE = 160
+
+CONTINUITY_EXPORT_DIR = "public_mk64_continuity"
+
+PLAYER_NOTES = {
+    "gumby": {"display_name": "Gumby", "roles": ["Founder", "administrator", "organizer", "recruiter"], "summary": "Co-founded the MK64 Switch Discord in July 2022 and helped build the community through recruitment, organization, events, and competition.", "links": ["https://awrev.com/mk64/history.php"]},
+    "spacedcowboy": {"display_name": "SpacedCowboy", "roles": ["Co-founder", "competitor", "CampKart champion"], "summary": "Co-founded the MK64 Switch Discord and became one of the community's major early competitive figures.", "links": ["https://awrev.com/mk64/campkart2025.php"]},
+    "yoyoyoshi": {"display_name": "YoyoYoshi", "roles": ["Co-founder", "administrator", "webmaster", "broadcaster", "community historian"], "summary": "Co-founded the MK64 Switch Discord and maintains the MK64 Switch website, rankings, records, broadcasts, and community documentation.", "links": ["https://awrev.com/mk64/", "https://www.youtube.com/@YoyoYoshi1"]},
+    "gg": {"display_name": "GG", "roles": ["Co-founder", "administrator", "competitor"], "summary": "Co-founded the MK64 Switch Discord and has been a major competitor and community figure.", "links": ["https://awrev.com/mk64/history.php"]},
+    "patalus": {"display_name": "Patalus", "roles": ["Administrator", "competitor", "tournament champion"], "summary": "Joined the admin/mod team in 2023 and became a major tournament and multiplayer competitor.", "links": ["https://awrev.com/mk64/history.php"]}
+}
+
+COMMUNITY_MILESTONES = [
+    {"date": "2022-07-15", "title": "MK64 Switch Discord founded", "summary": "Gumby launched the MK64 Switch Discord with SpacedCowboy, YoyoYoshi, and GG to organize Mario Kart 64 Nintendo Switch Online multiplayer matches.", "tags": ["founding", "discord", "community"]},
+    {"date": "2023-04-22", "title": "2P GP Elo rankings introduced", "summary": "The community introduced Elo rankings for 2P Grand Prix competition, helping turn match results into long-term competitive records.", "tags": ["gp", "elo", "rankings"]},
+    {"date": "2024-09-06", "title": "CampKart 1 begins", "summary": "CampKart 1 became the first major in-person championship benchmark for the MK64 Switch community.", "tags": ["campkart", "in-person", "tournament"]},
+    {"date": "2026-04-25", "title": "MK64 Switch Hub launches", "summary": "YoyoYoshi launched the MK64 Switch Multiplayer Hub as a centralized website for tournament history, rankings, media, records, events, and resources.", "tags": ["website", "history", "rankings"]},
+    {"date": "2026-06-12", "title": "MK64 Switch website moves to awRev", "summary": "The MK64 Switch website moved to awRev.com/mk64 as a stronger permanent home for rankings, player pages, match history, tournament coverage, media, and community documentation.", "tags": ["awrev", "migration", "institution"]}
+]
 
 matches = []
 ratings = defaultdict(lambda: 1000)
@@ -1558,27 +1577,34 @@ def load_yoyoyoshi_hub():
 def load_mk64_hub():
     return [
         make_source(
-            server="mk64",
-            site="YoyoYoshi Hub",
-            content_type="hub",
-            game="Mario Kart 64",
-            title="MK64 Switch Multiplayer Hub",
-            url="https://yoyoyoshihub.neocities.org/mk64/",
-            tags=["mk64", "mario kart 64", "switch", "rankings", "tournaments", "records"],
-            aliases=["mk64", "mario kart 64", "mk64 switch", "mk64 hub"],
-            description="Central MK64 Switch hub for tournament history, rankings, media, records, events, and community resources.",
-            source_type="static",
-            author="YoyoYoshi",
-            era="modern"
+            server="mk64", site="awRev", content_type="hub", game="Mario Kart 64",
+            title="MK64 Switch Website", url="https://awrev.com/mk64/",
+            tags=["mk64", "mario kart 64", "switch", "nintendo switch online", "rankings", "tournaments", "records", "gp league", "vs elo", "community history", "competitive community"],
+            aliases=["mk64", "mario kart 64", "mk64 switch", "mk64 website", "mk64 hub", "mk64 switch hub", "mk64 switch website", "mario kart 64 switch", "mario kart 64 nso"],
+            description="Main MK64 Switch website on awRev for Nintendo Switch Online community history, rankings, player pages, match history, league coverage, tournaments, videos, and community resources.",
+            source_type="static", author="YoyoYoshi", era="2022-modern"
+        ),
+        make_source(
+            server="mk64", site="awRev", content_type="history", game="Mario Kart 64",
+            title="MK64 Switch Community History", url="https://awrev.com/mk64/history.php",
+            tags=["mk64", "history", "community history", "nso", "league", "tournaments"],
+            aliases=["mk64 history", "community history", "mk64 switch history"],
+            description="Chronology of the MK64 Switch competitive community from Discord founding through leagues, tournaments, CampKart, rankings, and awRev migration.",
+            source_type="static", author="YoyoYoshi", era="2022-modern"
+        ),
+        make_source(
+            server="mk64", site="awRev", content_type="about", game="Mario Kart 64",
+            title="About MK64 Switch", url="https://awrev.com/mk64/about-mk64-switch.php",
+            tags=["mk64", "about", "nintendo switch online", "competitive scene", "time trials", "nso"],
+            aliases=["about mk64 switch", "what is mk64 switch", "mk64 nso community"],
+            description="Explains the MK64 Switch Nintendo Switch Online competitive scene and how it relates to broader Mario Kart 64 competition.",
+            source_type="static", author="YoyoYoshi", era="2022-modern"
         )
     ] + scrape_links(
-        root_url="https://yoyoyoshihub.neocities.org/mk64/",
-        server="mk64",
-        site="YoyoYoshi Hub",
-        base_tags=["mk64", "mario kart 64", "switch", "hub"],
-        aliases=["mk64", "mario kart 64"],
-        description_prefix="MK64 Hub page",
-        game="Mario Kart 64"
+        root_url="https://awrev.com/mk64/", server="mk64", site="awRev",
+        base_tags=["mk64", "mario kart 64", "switch", "nso", "awrev"],
+        aliases=["mk64", "mario kart 64", "mk64 switch"],
+        description_prefix="MK64 Switch website page", game="Mario Kart 64"
     )
 
 
@@ -2036,6 +2062,229 @@ async def on_message(message):
         return
 
 
+
+# -----------------------------
+# Continuity pages / digital historiography helpers
+# -----------------------------
+
+def parse_iso_datetime(value):
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def short_date(value):
+    dt = parse_iso_datetime(value)
+    return dt.date().isoformat() if dt else "unknown"
+
+
+def combined_player_names():
+    return sorted(set(player_stats.keys()) | set(gp_player_stats.keys()) | set(PLAYER_NOTES.keys()))
+
+
+def get_player_matches(player):
+    clean = normalize_name(player)
+    vs = [m for m in matches if clean in m.get("scores", {})]
+    gp = [m for m in gp_matches if clean in m.get("players", [])]
+    return vs, gp
+
+
+def player_date_range(vs, gp):
+    dates = []
+    for match in vs + gp:
+        dt = parse_iso_datetime(match.get("created_at"))
+        if dt:
+            dates.append(dt)
+    if not dates:
+        return "unknown", "unknown"
+    return min(dates).date().isoformat(), max(dates).date().isoformat()
+
+
+def build_player_continuity_profile(player):
+    clean = normalize_name(player)
+    note = PLAYER_NOTES.get(clean, {})
+    vs, gp = get_player_matches(clean)
+    first_seen, last_seen = player_date_range(vs, gp)
+    vs_stat = player_stats.get(clean, {})
+    gp_stat = gp_player_stats.get(clean, {})
+    return {
+        "player_id": clean,
+        "display_name": note.get("display_name", clean),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_note": "Generated from MK64 Discord match data, bot records, manual community notes, and awRev continuity metadata. Review before publication.",
+        "roles": note.get("roles", []),
+        "summary": note.get("summary", "No manual biography note has been added yet."),
+        "first_seen": first_seen,
+        "last_seen": last_seen,
+        "links": note.get("links", []),
+        "vs": {
+            "matches": vs_stat.get("matches", 0),
+            "points": vs_stat.get("points", 0),
+            "elo_adjusted": round(adjusted_rating(clean)) if clean in ratings else None,
+            "elo_raw": round(ratings[clean]) if clean in ratings else None,
+            "recent_matches": [
+                {"date": short_date(m.get("created_at")), "scores": m.get("scores", {}), "jump_url": m.get("jump_url", "")}
+                for m in sorted(vs, key=lambda x: x.get("created_at", ""), reverse=True)[:10]
+            ]
+        },
+        "gp": {
+            "matches": gp_stat.get("matches", 0),
+            "record": f"{gp_stat.get('wins', 0)}-{gp_stat.get('losses', 0)}-{gp_stat.get('ties', 0)}",
+            "elo_adjusted": round(adjusted_gp_rating(clean)) if clean in gp_ratings else None,
+            "elo_raw": round(gp_ratings[clean]) if clean in gp_ratings else None,
+            "recent_matches": [
+                {"date": short_date(m.get("created_at")), "players": m.get("players", []), "winner": m.get("winner"), "scores": m.get("scores", {}), "jump_url": m.get("jump_url", "")}
+                for m in sorted(gp, key=lambda x: x.get("created_at", ""), reverse=True)[:10]
+            ]
+        }
+    }
+
+
+def format_player_continuity_profile(player):
+    profile = build_player_continuity_profile(player)
+    lines = [
+        f"**{profile['display_name']} - MK64 Continuity Profile**",
+        f"First seen in records: {profile['first_seen']}",
+        f"Latest record: {profile['last_seen']}"
+    ]
+    if profile["roles"]:
+        lines.append("Roles: " + ", ".join(profile["roles"]))
+    if profile["summary"]:
+        lines.append("\n" + profile["summary"])
+    lines.append(
+        f"\nVS: {profile['vs']['matches']} matches"
+        + (f" | Elo {profile['vs']['elo_adjusted']}" if profile['vs']['elo_adjusted'] else "")
+    )
+    lines.append(
+        f"GP: {profile['gp']['matches']} matches | {profile['gp']['record']}"
+        + (f" | Elo {profile['gp']['elo_adjusted']}" if profile['gp']['elo_adjusted'] else "")
+    )
+    if profile["links"]:
+        lines.append("\nLinks:\n" + "\n".join(profile["links"][:5]))
+    lines.append("\nGenerated from bot records and manual notes. Review before using as a public bio.")
+    return "\n".join(lines)[:1900]
+
+
+def render_player_profile_html(profile):
+    title = html.escape(profile["display_name"])
+    roles = ", ".join(html.escape(r) for r in profile.get("roles", [])) or "TBD"
+    summary = html.escape(profile.get("summary", ""))
+    links = "".join(f'<li><a href="{html.escape(link)}">{html.escape(link)}</a></li>' for link in profile.get("links", [])) or "<li>TBD</li>"
+    return f'''<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>{title} - MK64 Continuity Profile</title></head>
+<body>
+<h1>{title}</h1>
+<p><strong>Roles:</strong> {roles}</p>
+<p><strong>First seen:</strong> {html.escape(profile['first_seen'])}</p>
+<p><strong>Latest record:</strong> {html.escape(profile['last_seen'])}</p>
+<p>{summary}</p>
+<h2>Competition Summary</h2>
+<ul>
+<li>VS matches: {profile['vs']['matches']}</li>
+<li>VS Elo: {profile['vs']['elo_adjusted'] or 'TBD'}</li>
+<li>GP matches: {profile['gp']['matches']}</li>
+<li>GP record: {html.escape(profile['gp']['record'])}</li>
+<li>GP Elo: {profile['gp']['elo_adjusted'] or 'TBD'}</li>
+</ul>
+<h2>Links</h2><ul>{links}</ul>
+<p><em>{html.escape(profile['source_note'])}</em></p>
+</body></html>'''
+
+
+def render_player_index_html(index):
+    rows = []
+    for player in sorted(index["players"], key=lambda p: p["display_name"].lower()):
+        pid = html.escape(player["player_id"])
+        name = html.escape(player["display_name"])
+        rows.append(f'<tr><td><a href="{pid}.html">{name}</a></td><td>{html.escape(player["first_seen"])}</td><td>{html.escape(player["last_seen"])}</td><td>{player["vs_matches"]}</td><td>{player["gp_matches"]}</td></tr>')
+    return f'''<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>MK64 Continuity Player Index</title></head>
+<body><h1>MK64 Continuity Player Index</h1>
+<p>Generated from MK64 bot records and manual continuity notes. Review before publication.</p>
+<table border="1" cellpadding="6" cellspacing="0">
+<tr><th>Player</th><th>First Seen</th><th>Latest Record</th><th>VS Matches</th><th>GP Matches</th></tr>
+{''.join(rows)}
+</table></body></html>'''
+
+
+def write_player_profile_files(export_dir=CONTINUITY_EXPORT_DIR):
+    player_dir = os.path.join(export_dir, "players")
+    os.makedirs(player_dir, exist_ok=True)
+    profiles = []
+    for name in combined_player_names():
+        profile = build_player_continuity_profile(name)
+        if not profile["roles"] and profile["vs"]["matches"] == 0 and profile["gp"]["matches"] == 0:
+            continue
+        profiles.append(profile)
+        with open(os.path.join(player_dir, f"{profile['player_id']}.json"), "w", encoding="utf-8") as f:
+            json.dump(profile, f, indent=2, ensure_ascii=False)
+        with open(os.path.join(player_dir, f"{profile['player_id']}.html"), "w", encoding="utf-8") as f:
+            f.write(render_player_profile_html(profile))
+    index = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "count": len(profiles),
+        "players": [{"player_id": p["player_id"], "display_name": p["display_name"], "first_seen": p["first_seen"], "last_seen": p["last_seen"], "vs_matches": p["vs"]["matches"], "gp_matches": p["gp"]["matches"]} for p in profiles]
+    }
+    with open(os.path.join(player_dir, "index.json"), "w", encoding="utf-8") as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+    with open(os.path.join(player_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(render_player_index_html(index))
+    return len(profiles), player_dir
+
+
+def render_community_history_html(history):
+    items = []
+    for m in history["milestones"]:
+        items.append(f'<li><strong>{html.escape(m["date"])} - {html.escape(m["title"])}</strong><br>{html.escape(m["summary"])}</li>')
+    stats = history["stats"]
+    return f'''<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>MK64 Switch Community History Draft</title></head>
+<body><h1>MK64 Switch Community History Draft</h1>
+<p><em>{html.escape(history['source_note'])}</em></p>
+<p>Bot records currently include {stats['vs_matches']} VS matches, {stats['gp_matches']} GP matches, {stats['tracked_vs_players']} VS players, and {stats['tracked_gp_players']} GP players.</p>
+<ol>{''.join(items)}</ol>
+</body></html>'''
+
+
+def export_community_history(export_dir=CONTINUITY_EXPORT_DIR):
+    os.makedirs(export_dir, exist_ok=True)
+    history = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_note": "Draft digital historiography generated from manual milestones and bot records. Review before publication.",
+        "milestones": COMMUNITY_MILESTONES,
+        "stats": {"vs_matches": len(matches), "gp_matches": len(gp_matches), "tracked_vs_players": len(player_stats), "tracked_gp_players": len(gp_player_stats)}
+    }
+    with open(os.path.join(export_dir, "community_history.json"), "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2, ensure_ascii=False)
+    path = os.path.join(export_dir, "community_history.html")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(render_community_history_html(history))
+    return path
+
+
+def run_continuity_qa():
+    issues = []
+    old_mk64 = [src for src in SOURCES if "yoyoyoshihub.neocities.org/mk64" in src.get("url", "")]
+    if old_mk64:
+        issues.append(f"Found {len(old_mk64)} MK64 source(s) still pointing to Neocities instead of awRev.")
+    for required in ["https://awrev.com/mk64/", "https://awrev.com/mk64/history.php", "https://awrev.com/mk64/about-mk64-switch.php"]:
+        if not any(normalize_url(src.get("url", "")) == normalize_url(required) for src in SOURCES):
+            issues.append(f"Missing required MK64 source: {required}")
+    high_activity = []
+    for name in combined_player_names():
+        clean = normalize_name(name)
+        total = player_stats.get(clean, {}).get("matches", 0) + gp_player_stats.get(clean, {}).get("matches", 0)
+        if total >= 20 and clean not in PLAYER_NOTES:
+            high_activity.append((clean, total))
+    if high_activity:
+        sample = ", ".join(f"{name} ({count})" for name, count in sorted(high_activity, key=lambda x: -x[1])[:10])
+        issues.append("High-activity players without manual continuity notes: " + sample)
+    return "**Continuity QA:** No major issues found." if not issues else "**Continuity QA findings:**\n" + "\n".join(f"- {issue}" for issue in issues)
+
 # -----------------------------
 # Slash commands
 # -----------------------------
@@ -2228,7 +2477,11 @@ async def sitemap(interaction: discord.Interaction):
         "• `/backfill_stats` — admin-only Discord message stats backfill\n"
         "• `/serverstats` — Discord message totals by channel\n"
         "• `/userstats` — Discord message totals by user\n"
-        "• `/monthlystats` — Discord message totals by month"
+        "• `/monthlystats` — Discord message totals by month\n"
+        "• `/playerpage` — draft MK64 continuity profile\n"
+        "• `/communityhistory` — draft MK64 history milestones\n"
+        "• `/continuityqa` — admin-only continuity QA\n"
+        "• `/exportcontinuity` — admin-only draft player/history export"
     )
 
 
@@ -2316,6 +2569,39 @@ async def gpquarter(interaction: discord.Interaction, quarter: str = "", limit: 
     await interaction.response.send_message(
         format_quarterly_gp_leaderboard(quarter or None, limit)
     )
+
+
+@tree.command(name="playerpage", description="Draft an MK64 continuity profile from bot records.")
+@app_commands.describe(player="Player name or alias")
+async def playerpage(interaction: discord.Interaction, player: str):
+    await interaction.response.send_message(format_player_continuity_profile(player))
+
+
+@tree.command(name="communityhistory", description="Show MK64 community history milestones and bot record totals.")
+async def communityhistory(interaction: discord.Interaction):
+    lines = ["**MK64 Switch Community History — Draft Milestones**"]
+    for milestone in COMMUNITY_MILESTONES:
+        lines.append(f"- **{milestone['date']} — {milestone['title']}**: {milestone['summary']}")
+    lines.append(f"\nBot records: {len(matches)} VS matches, {len(gp_matches)} GP matches, {len(player_stats)} VS players, {len(gp_player_stats)} GP players.")
+    await interaction.response.send_message("\n".join(lines)[:1900])
+
+
+@tree.command(name="continuityqa", description="Admin-only: check continuity links, missing player notes, and migration issues.")
+async def continuityqa(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("Only admins can run this command.", ephemeral=True)
+        return
+    await interaction.response.send_message(run_continuity_qa(), ephemeral=True)
+
+
+@tree.command(name="exportcontinuity", description="Admin-only: export draft MK64 player pages and community history files.")
+async def exportcontinuity(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("Only admins can run this command.", ephemeral=True)
+        return
+    player_count, player_dir = write_player_profile_files()
+    history_path = export_community_history()
+    await interaction.response.send_message(f"Exported {player_count} draft player continuity profiles to `{player_dir}` and community history to `{history_path}`. Review before publication.", ephemeral=True)
 
 
 @tree.command(name="backfill_stats", description="Admin-only: backfill Discord message stats once.")
