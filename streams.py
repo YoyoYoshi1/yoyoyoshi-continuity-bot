@@ -2,7 +2,8 @@ import os
 import json
 import asyncio
 import requests
-from datetime import datetime, timezone
+
+from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,10 +13,11 @@ TWITCH_CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
 
 RULES_FILE = "stream_rules.json"
 POLL_SECONDS = 180
-LIVE_STREAMS_FILE = "public/live_streams.json"
+LIVE_STREAMS_FILE = "live_streams.json"
 
 _last_announced = {}
 _twitch_access_token = None
+_twitch_access_token_expires_at = None
 
 
 def load_stream_rules():
@@ -29,93 +31,130 @@ def get_all_streamers(rules):
     for server in rules.get("servers", []):
         for game_rule in server.get("game_rules", []):
             for streamer in game_rule.get("allowed_streamers", []):
-                streamers.add(streamer.lower().strip())
+                clean = (streamer or "").lower().strip()
+                if clean:
+                    streamers.add(clean)
 
     return sorted(streamers)
 
 
-def get_twitch_access_token():
-    global _twitch_access_token
+def clear_twitch_access_token():
+    global _twitch_access_token, _twitch_access_token_expires_at
+    _twitch_access_token = None
+    _twitch_access_token_expires_at = None
 
-    if _twitch_access_token:
+
+def get_twitch_access_token(force_refresh=False):
+    global _twitch_access_token, _twitch_access_token_expires_at
+
+    now = datetime.now(timezone.utc)
+
+    if force_refresh:
+        clear_twitch_access_token()
+
+    if (
+        _twitch_access_token
+        and _twitch_access_token_expires_at
+        and now < _twitch_access_token_expires_at
+    ):
         return _twitch_access_token
 
     if not TWITCH_CLIENT_ID or not TWITCH_CLIENT_SECRET:
-        raise RuntimeError("Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in .env")
+        raise RuntimeError(
+            "Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET in environment."
+        )
 
     response = requests.post(
         "https://id.twitch.tv/oauth2/token",
         params={
             "client_id": TWITCH_CLIENT_ID,
             "client_secret": TWITCH_CLIENT_SECRET,
-            "grant_type": "client_credentials"
+            "grant_type": "client_credentials",
         },
-        timeout=10
+        timeout=10,
     )
 
     response.raise_for_status()
     data = response.json()
 
     _twitch_access_token = data["access_token"]
+
+    # Refresh slightly before Twitch's reported expiration time.
+    expires_in = int(data.get("expires_in", 3600))
+    refresh_buffer_seconds = min(300, max(30, expires_in // 10))
+    _twitch_access_token_expires_at = (
+        now + timedelta(seconds=max(60, expires_in - refresh_buffer_seconds))
+    )
+
+    print(
+        "Twitch access token refreshed. "
+        f"Refresh scheduled before {_twitch_access_token_expires_at.isoformat()}."
+    )
+
     return _twitch_access_token
+
+
+def _request_live_streams(streamers, force_refresh=False):
+    token = get_twitch_access_token(force_refresh=force_refresh)
+
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+    }
+
+    params = [
+        ("user_login", streamer)
+        for streamer in streamers
+    ]
+
+    return requests.get(
+        "https://api.twitch.tv/helix/streams",
+        headers=headers,
+        params=params,
+        timeout=10,
+    )
 
 
 def get_live_streams(streamers):
     if not streamers:
         return []
 
-    token = get_twitch_access_token()
+    response = _request_live_streams(streamers)
 
-    headers = {
-        "Client-ID": TWITCH_CLIENT_ID,
-        "Authorization": f"Bearer {token}"
-    }
-
-    params = []
-    for streamer in streamers:
-        params.append(("user_login", streamer))
-
-    response = requests.get(
-        "https://api.twitch.tv/helix/streams",
-        headers=headers,
-        params=params,
-        timeout=10
-    )
+    if response.status_code == 401:
+        print("Twitch returned 401. Refreshing access token and retrying once.")
+        response = _request_live_streams(streamers, force_refresh=True)
 
     response.raise_for_status()
-    return response.json().get("data", [])
 
-def write_live_streams_json(live_streams, rules):
-    public_streams = []
-    now = datetime.now(timezone.utc).isoformat()
+    data = response.json()
+    live_streams = data.get("data", [])
+
+    print(
+        f"Twitch poll complete: checked {len(streamers)} streamer(s), "
+        f"found {len(live_streams)} live."
+    )
 
     for stream in live_streams:
-        for server in rules.get("servers", []):
-            for game_rule in server.get("game_rules", []):
-                if not stream_matches_rule(stream, game_rule):
-                    continue
+        print(
+            "TWITCH LIVE:",
+            {
+                "user_login": stream.get("user_login"),
+                "user_name": stream.get("user_name"),
+                "game_name": stream.get("game_name"),
+                "title": stream.get("title"),
+                "stream_id": stream.get("id"),
+                "started_at": stream.get("started_at"),
+            }
+        )
 
-                public_streams.append({
-                    "server": server.get("server"),
-                    "user_login": stream.get("user_login"),
-                    "user_name": stream.get("user_name"),
-                    "game_name": stream.get("game_name"),
-                    "title": stream.get("title"),
-                    "started_at": stream.get("started_at"),
-                    "viewer_count": stream.get("viewer_count"),
-                    "url": f"https://twitch.tv/{stream.get('user_login')}",
-                    "updated_at": now
-                })
-
-    os.makedirs(os.path.dirname(LIVE_STREAMS_FILE), exist_ok=True)
-
-    with open(LIVE_STREAMS_FILE, "w", encoding="utf-8") as f:
-        json.dump(public_streams, f, indent=2)
+    return live_streams
 
 
 def game_matches(game_name, match_type, expected_game):
-    game_name = (game_name or "").lower().strip()
-    expected_game = (expected_game or "").lower().strip()
+    game_name = (game_name or "").casefold().strip()
+    expected_game = (expected_game or "").casefold().strip()
+    match_type = (match_type or "exact").casefold().strip()
 
     if match_type == "any":
         return True
@@ -133,12 +172,13 @@ def game_matches(game_name, match_type, expected_game):
 
 
 def stream_matches_rule(stream, game_rule):
-    streamer = stream.get("user_login", "").lower().strip()
-    game_name = stream.get("game_name", "")
+    streamer = (stream.get("user_login") or "").casefold().strip()
+    game_name = stream.get("game_name") or ""
 
     allowed_streamers = [
-        s.lower().strip()
+        (s or "").casefold().strip()
         for s in game_rule.get("allowed_streamers", [])
+        if (s or "").strip()
     ]
 
     if streamer not in allowed_streamers:
@@ -147,33 +187,99 @@ def stream_matches_rule(stream, game_rule):
     return game_matches(
         game_name=game_name,
         match_type=game_rule.get("match_type", "exact"),
-        expected_game=game_rule.get("game", "")
+        expected_game=game_rule.get("game", ""),
     )
 
 
+def write_live_streams_json(live_streams, rules):
+    public_streams = []
+    now = datetime.now(timezone.utc).isoformat()
+    seen = set()
+
+    for stream in live_streams:
+        for server in rules.get("servers", []):
+            for game_rule in server.get("game_rules", []):
+                if not stream_matches_rule(stream, game_rule):
+                    continue
+
+                dedupe_key = (
+                    server.get("server"),
+                    stream.get("user_login"),
+                    stream.get("id"),
+                )
+
+                if dedupe_key in seen:
+                    continue
+
+                seen.add(dedupe_key)
+
+                public_streams.append({
+                    "server": server.get("server"),
+                    "live": True,
+                    "streamer": stream.get("user_name") or stream.get("user_login"),
+                    "user_login": stream.get("user_login"),
+                    "url": f"https://twitch.tv/{stream.get('user_login')}",
+                    "title": stream.get("title"),
+                    "game": stream.get("game_name"),
+                    "viewer_count": stream.get("viewer_count"),
+                    "started_at": stream.get("started_at"),
+                    "checked_at": now,
+                })
+
+    with open(LIVE_STREAMS_FILE, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "updated_at": now,
+                "streams": public_streams,
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+
+def announcement_key(server_key, stream):
+    stream_id = stream.get("id") or stream.get("started_at") or "unknown"
+    streamer = (stream.get("user_login") or "").casefold().strip()
+    return f"{server_key}:{streamer}:{stream_id}"
+
+
 def should_announce(server_key, stream, dedupe_minutes):
-    stream_id = stream.get("id")
-    streamer = stream.get("user_login", "").lower().strip()
-
-    dedupe_key = f"{server_key}:{streamer}:{stream_id}"
+    key = announcement_key(server_key, stream)
     now = datetime.now(timezone.utc)
+    previous = _last_announced.get(key)
 
-    previous = _last_announced.get(dedupe_key)
+    if not previous:
+        return True
 
-    if previous:
-        elapsed_minutes = (now - previous).total_seconds() / 60
-        if elapsed_minutes < dedupe_minutes:
-            return False
+    elapsed_minutes = (now - previous).total_seconds() / 60
+    return elapsed_minutes >= dedupe_minutes
 
-    _last_announced[dedupe_key] = now
-    return True
+
+def mark_announced(server_key, stream):
+    key = announcement_key(server_key, stream)
+    _last_announced[key] = datetime.now(timezone.utc)
+
+
+def prune_announcement_cache(max_age_hours=24):
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=max_age_hours)
+
+    stale_keys = [
+        key
+        for key, announced_at in _last_announced.items()
+        if announced_at < cutoff
+    ]
+
+    for key in stale_keys:
+        _last_announced.pop(key, None)
 
 
 def make_stream_message(server, stream):
-    streamer = stream.get("user_name") or stream.get("user_login")
+    streamer = stream.get("user_name") or stream.get("user_login") or "A streamer"
     game = stream.get("game_name") or "something"
     title = stream.get("title") or ""
-    url = f"<https://twitch.tv/{stream.get('user_login')}>"
+    user_login = stream.get("user_login") or ""
+    url = f"<https://twitch.tv/{user_login}>"
 
     server_key = server.get("server", "")
 
@@ -197,11 +303,19 @@ async def send_stream_announcement(client, server, stream):
     channel = client.get_channel(channel_id)
 
     if channel is None:
-        print(f"Could not find channel ID {channel_id}")
-        return
+        try:
+            channel = await client.fetch_channel(channel_id)
+        except Exception as e:
+            raise RuntimeError(
+                f"Could not resolve announcement channel ID {channel_id}: {e}"
+            ) from e
 
     message = make_stream_message(server, stream)
     await channel.send(message)
+
+
+async def fetch_live_streams_async(streamers):
+    return await asyncio.to_thread(get_live_streams, streamers)
 
 
 async def stream_poll_loop(client):
@@ -213,29 +327,99 @@ async def stream_poll_loop(client):
         try:
             rules = load_stream_rules()
             streamers = get_all_streamers(rules)
-            live_streams = get_live_streams(streamers)
+            live_streams = await fetch_live_streams_async(streamers)
 
             write_live_streams_json(live_streams, rules)
+            prune_announcement_cache()
 
             for stream in live_streams:
+                streamer = stream.get("user_login")
+                game_name = stream.get("game_name")
+                stream_id = stream.get("id")
+
                 for server in rules.get("servers", []):
+                    server_key = server.get("server", "unknown")
+                    matched_server = False
+
                     for game_rule in server.get("game_rules", []):
-                        if not stream_matches_rule(stream, game_rule):
-                            continue
+                        matched = stream_matches_rule(stream, game_rule)
 
-                        dedupe_minutes = int(server.get("dedupe_minutes", 180))
+                        print(
+                            "STREAM ROUTE CHECK:",
+                            {
+                                "server": server_key,
+                                "streamer": streamer,
+                                "game": game_name,
+                                "rule_match_type": game_rule.get("match_type"),
+                                "rule_game": game_rule.get("game"),
+                                "matched": matched,
+                            }
+                        )
 
-                        if not should_announce(
-                            server_key=server.get("server", "unknown"),
-                            stream=stream,
-                            dedupe_minutes=dedupe_minutes
-                        ):
-                            continue
+                        if matched:
+                            matched_server = True
+                            break
 
+                    if not matched_server:
+                        continue
+
+                    dedupe_minutes = int(server.get("dedupe_minutes", 180))
+
+                    if not should_announce(
+                        server_key=server_key,
+                        stream=stream,
+                        dedupe_minutes=dedupe_minutes,
+                    ):
+                        print(
+                            "STREAM ANNOUNCEMENT SKIPPED (dedupe):",
+                            {
+                                "server": server_key,
+                                "streamer": streamer,
+                                "stream_id": stream_id,
+                            }
+                        )
+                        continue
+
+                    try:
                         await send_stream_announcement(client, server, stream)
+                    except Exception as e:
+                        print(
+                            "STREAM ANNOUNCEMENT ERROR:",
+                            {
+                                "server": server_key,
+                                "streamer": streamer,
+                                "stream_id": stream_id,
+                                "error": repr(e),
+                            }
+                        )
+                        continue
+
+                    mark_announced(server_key, stream)
+
+                    print(
+                        "STREAM ANNOUNCEMENT SENT:",
+                        {
+                            "server": server_key,
+                            "streamer": streamer,
+                            "game": game_name,
+                            "stream_id": stream_id,
+                        }
+                    )
+
+        except FileNotFoundError:
+            print(f"Stream tracker error: rules file not found: {RULES_FILE}")
+
+        except requests.HTTPError as e:
+            response = e.response
+            status = response.status_code if response is not None else "unknown"
+            body = response.text[:500] if response is not None else ""
+            print(
+                f"Stream tracker HTTP error: status={status}, "
+                f"response={body!r}"
+            )
 
         except Exception as e:
-            print("Stream tracker error:", e)
+            print("Stream tracker error:", repr(e))
 
         await asyncio.sleep(POLL_SECONDS)
 
