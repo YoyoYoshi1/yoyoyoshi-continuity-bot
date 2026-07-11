@@ -17,18 +17,31 @@
             "fx6400",
             "denvarsc",
             "kaznmk64",
-            "Gibrias"
+            "gibrias"
           ]
         }
       ]
     },
-
     {
       "server": "awrev",
       "discord_guild": "awRev Discord",
       "announcement_channel_id": 1502736468580241612,
       "dedupe_minutes": 180,
       "game_rules": [
+        {
+          "match_type": "exact",
+          "game": "Advance Wars: Dual Strike",
+          "allowed_streamers": [
+            "yoyoyoshi1"
+          ]
+        },
+        {
+          "match_type": "exact",
+          "game": "Advance Wars 1+2: Re-Boot Camp",
+          "allowed_streamers": [
+            "yoyoyoshi1"
+          ]
+        },
         {
           "match_type": "startswith",
           "game": "Advance Wars",
@@ -45,7 +58,6 @@
         }
       ]
     },
-
     {
       "server": "yoyoyoshi",
       "discord_guild": "YoyoYoshi Discord",
