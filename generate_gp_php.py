@@ -33,6 +33,15 @@ def php_escape(value):
     return str(value).replace("\\", "\\\\").replace("'", "\\'")
 
 
+def match_source_link(match):
+    """Render the best available source link for Discord or reviewed event data."""
+    if match.get("jump_url"):
+        return '<a href="' + match["jump_url"] + '" target="_blank" rel="noreferrer">Discord</a>'
+    if match.get("source_url"):
+        return '<a href="' + match["source_url"] + '" target="_blank" rel="noreferrer">Event source</a>'
+    return "—"
+
+
 leaderboard = load_json("leaderboard.json")
 players = load_json("players.json")
 matches = load_json("matches.json")
@@ -161,7 +170,7 @@ match_rows = "\n".join(
       <td>{fmt_date(m.get("created_at"))}</td>
       <td>{"<br>".join([x["player"] + " — " + str(x["score"]) + " (" + str(x.get("delta", "—")) + ")" for x in m["players"]])}</td>
       <td>{m.get("winner") or "Tie"}</td>
-      <td>{'<a href="' + m.get("jump_url", "#") + '" target="_blank" rel="noreferrer">Discord</a>' if m.get("jump_url") else "—"}</td>
+      <td>{match_source_link(m)}</td>
     </tr>
     """
     for m in recent_matches
@@ -174,7 +183,7 @@ explanation = f"""
 
   <div class="info-box">
     <strong>Coverage Period</strong><br>
-    These results currently cover parsed GP match records from {coverage_start} through {coverage_end}.
+    These results currently cover recorded GP matches from Discord, legacy Elo records, and reviewed tournament records from {coverage_start} through {coverage_end}.
   </div>
 
   <p>
@@ -199,15 +208,15 @@ index_body = f"""
   <div class="news-board-title">MK64 Switch GP Rankings</div>
   <div class="intro-box-body">
     <p>
-      <strong>This section tracks Mario Kart 64 Switch Grand Prix results parsed from Discord and legacy GP Elo records.</strong>
+      <strong>This section tracks Mario Kart 64 Switch Grand Prix results from Discord, legacy GP Elo records, and reviewed tournament records.</strong>
     </p>
 
     <p>
-      It turns scattered match history into a lasting ranking archive, player record, match log, and seasonal Elo chronology.
+      It turns scattered match history into a connected ranking system, player record, match log, and seasonal Elo chronology.
     </p>
 
     <p>
-      These pages help preserve the competitive Grand Prix history of the MK64 Switch community and make the ratings easier to find, verify, and archive outside Discord.
+      These pages document the competitive Grand Prix history of the MK64 Switch community and make the ratings easier to find, verify, compare, and follow outside Discord.
     </p>
 
     <p class="note">
@@ -269,7 +278,7 @@ players_body = f"""
   </p>
 
   <p>
-    Player records help preserve match volume, wins, losses, ties, points for, points against, and Elo ratings across the MK64 Switch Grand Prix scene.
+    Player records track match volume, wins, losses, ties, points for, points against, and Elo ratings across the MK64 Switch Grand Prix scene.
   </p>
 
   <p class="note">
@@ -306,15 +315,15 @@ matches_body = f"""
   <div class="news-board-title">GP Match Log</div>
 
   <p>
-    This log shows all parsed Grand Prix matches, with dates, scores, Elo changes, winners, and direct Discord source links where available.
+    This log shows all recorded Grand Prix matches, with dates, scores, Elo changes, winners, and source links where available.
   </p>
 
   <p>
-    The match log provides the source record behind the GP Elo rankings and helps make the MK64 Switch Grand Prix history publicly auditable.
+    The match log provides the source record behind the GP Elo rankings and makes the MK64 Switch Grand Prix history publicly auditable.
   </p>
 
   <p class="note">
-    Full parsed coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.
+    Full recorded coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.
   </p>
 
   {nav_links}
@@ -348,7 +357,7 @@ quarters_body = f"""
   </p>
 
   <p>
-    Quarterly snapshots help preserve seasonal form, historical standings, and competitive development across the MK64 Switch Grand Prix community.
+    Quarterly snapshots track seasonal form, historical standings, and competitive development across the MK64 Switch Grand Prix community.
   </p>
 
   <p class="note">
@@ -502,7 +511,7 @@ write("players.php", page(
 write("matches.php", page(
     "gp-matches",
     "MK64 Switch GP Match Log",
-    "Mario Kart 64 Switch GP match log with dates, scores, Elo changes, and Discord source links.",
+    "Mario Kart 64 Switch GP match log with dates, scores, Elo changes, and source links.",
     "GP Match Log",
     "/mk64/gp/matches.php",
     matches_body,

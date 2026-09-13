@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "CampKart 3 / CampKart 2026 reviewed tournament records.",
+    "created_at is a day-level event date anchor, not an asserted exact match timestamp; event_order preserves within-event sequence.",
+    "GP rounds 1-22 occurred Friday, September 4, 2026; the third-place match and GP final occurred Saturday, September 5, 2026, per the published Challonge schedule.",
+    "The supplied VS schedule/results follow the GP schedule and are anchored to Sunday, September 6, 2026; event_order preserves the supplied lobby/round sequence.",
+    "VS scores are exact lobby points. Pairwise Elo treats equal scores as ties.",
+    "GP records preserve winner/loser only because the current GP Elo formula uses match outcome, not score margin; synthetic 1-0 values are excluded from points-for/against statistics."
+  ],
+  "vs": [
+    {
+      "source_id": "campkart2026-vs-kids-play-in",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 1,
+      "round": "Kids Play-In",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Wilder": 40,
+        "Arkyn": 31,
+        "Dexter": 30,
+        "Elias": 1
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-1a",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 2,
+      "round": "Main Seeding — Match 1A",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "SpacedCowboy": 42,
+        "Coolex": 33,
+        "Dip": 15,
+        "Dexter": 6
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-1b",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 3,
+      "round": "Main Seeding — Match 1B",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Martin": 38,
+        "GG": 28,
+        "Fx64": 27,
+        "Hank Trill": 2
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-2a",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 4,
+      "round": "Main Seeding — Match 2A",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Martin": 33,
+        "Coolex": 27,
+        "MrPitt": 23,
+        "YoyoYoshi": 13
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-2b",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 5,
+      "round": "Main Seeding — Match 2B",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Gumby": 37,
+        "Fx64": 22,
+        "Dip": 20,
+        "Wilder": 17
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-3a",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 6,
+      "round": "Main Seeding — Match 3A",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "SpacedCowboy": 45,
+        "Wilder": 27,
+        "YoyoYoshi": 16,
+        "Hank Trill": 8
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-seed-3b",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 7,
+      "round": "Main Seeding — Match 3B",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Gumby": 33,
+        "GG": 33,
+        "MrPitt": 25,
+        "Dexter": 5
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-top10-play-in",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 8,
+      "round": "Top-10 Play-In",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "MrPitt": 31,
+        "Dip": 24,
+        "YoyoYoshi": 24,
+        "Wilder": 17
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-sf-a",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 9,
+      "round": "Semifinal A",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "Gumby": 37,
+        "Martin": 25,
+        "MrPitt": 20,
+        "Fx64": 14
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-sf-b",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 10,
+      "round": "Semifinal B",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "SpacedCowboy": 36,
+        "Coolex": 26,
+        "GG": 21,
+        "Dip": 13
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-vs-final",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 11,
+      "round": "Championship Final",
+      "source_url": "https://awrev.com/mk64/campkart2026.php",
+      "scores": {
+        "SpacedCowboy": 35,
+        "Gumby": 28,
+        "Martin": 19,
+        "Coolex": 15
+      },
+      "created_at": "2026-09-06",
+      "date_precision": "day"
+    }
+  ],
+  "gp": [
+    {
+      "source_id": "campkart2026-gp-wr1-martin-arkyn",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 1,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Martin",
+      "loser": "Arkyn",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-coolex-hank",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 2,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Coolex",
+      "loser": "Hank Trill",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-gg-devilbird",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 3,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "GG",
+      "loser": "DevilBird",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-gumby-elias",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 4,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Gumby",
+      "loser": "Elias",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-dip-wilder",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 5,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Dip",
+      "loser": "Wilder",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-yoyo-mrpitt",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 6,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "YoyoYoshi",
+      "loser": "MrPitt",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wr1-fx-dexter",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 7,
+      "round": "Winners Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Fx64",
+      "loser": "Dexter",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wqf-coolex-martin",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 8,
+      "round": "Winners Quarterfinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Coolex",
+      "loser": "Martin",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wqf-gumby-dip",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 9,
+      "round": "Winners Quarterfinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Gumby",
+      "loser": "Dip",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wqf-spaced-yoyo",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 10,
+      "round": "Winners Quarterfinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "SpacedCowboy",
+      "loser": "YoyoYoshi",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wqf-gg-fx",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 11,
+      "round": "Winners Quarterfinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "GG",
+      "loser": "Fx64",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr1-hank-arkyn",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 12,
+      "round": "Placement Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Hank Trill",
+      "loser": "Arkyn",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr1-wilder-elias",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 13,
+      "round": "Placement Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Wilder",
+      "loser": "Elias",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr1-dexter-devilbird",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 14,
+      "round": "Placement Round 1",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Dexter",
+      "loser": "DevilBird",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr2-fx-mrpitt",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 15,
+      "round": "Placement Round 2",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Fx64",
+      "loser": "MrPitt",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr2-martin-wilder",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 16,
+      "round": "Placement Round 2",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Martin",
+      "loser": "Wilder",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr2-yoyo-dexter",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 17,
+      "round": "Placement Round 2",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "YoyoYoshi",
+      "loser": "Dexter",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr2-dip-hank",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 18,
+      "round": "Placement Round 2",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Dip",
+      "loser": "Hank Trill",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wsf-coolex-spaced",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 19,
+      "round": "Winners Semifinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Coolex",
+      "loser": "SpacedCowboy",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-wsf-gumby-gg",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 20,
+      "round": "Winners Semifinal",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Gumby",
+      "loser": "GG",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr3-martin-fx",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 21,
+      "round": "Placement Round 3",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Martin",
+      "loser": "Fx64",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-pr3-dip-yoyo",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 22,
+      "round": "Placement Round 3",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Dip",
+      "loser": "YoyoYoshi",
+      "created_at": "2026-09-04",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-third-spaced-gg",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 23,
+      "round": "3rd-Place Match",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "SpacedCowboy",
+      "loser": "GG",
+      "created_at": "2026-09-05",
+      "date_precision": "day"
+    },
+    {
+      "source_id": "campkart2026-gp-final-coolex-gumby",
+      "event": "CampKart 3 / CampKart 2026",
+      "event_order": 24,
+      "round": "Grand Prix Final",
+      "source_url": "https://challonge.com/nl1w3qip",
+      "winner": "Coolex",
+      "loser": "Gumby",
+      "created_at": "2026-09-05",
+      "date_precision": "day"
+    }
+  ]
+}

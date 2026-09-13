@@ -158,12 +158,15 @@ MAX_SCORE = 60
 DATA_FILE = "vs_data.json"
 GP_DATA_FILE = "gp_data.json"
 STATS_DB_FILE = "discord_stats.sqlite3"
+MANUAL_EVENT_RESULTS_FILE = "mk64_event_results.json"
+
+# CampKart 3 GP concluded on Saturday, September 5, 2026.
+# Insert reviewed CampKart GP results before later Discord GP activity.
+GP_MANUAL_EVENT_CUTOFF = datetime(2026, 9, 6, tzinfo=timezone.utc)
 
 GP_K_FACTOR = 32
 GP_MIN_MATCHES = 3
 GP_MAX_SCORE = 160
-GP_REJECTS_FILE = "gp_rejected_examples.json"
-GP_REJECT_SAMPLE_LIMIT = 50
 
 CONTINUITY_EXPORT_DIR = "public_mk64_continuity"
 
@@ -219,7 +222,7 @@ ALIASES = {
     "espagetti": "espaghetti",
     "yoyo": "yoyoyoshi",
     "bobby": "yoyoyoshi",
-    "blazeup": "Martin",
+    "blazeup": "martin",
     "fx": "fx64",
     "urbanoutlaw": "urban",
 }
@@ -272,7 +275,7 @@ def replace_discord_mentions(content, message=None):
 
 
 def clean_score_name(name):
-    name = name.strip()
+    name = str(name or "").strip()
     name = re.sub(r"\s+", " ", name)
 
     aka_match = re.search(r"\ba\s*/?\s*k\s*/?\s*a\b\s+(.+)$", name, re.IGNORECASE)
@@ -281,12 +284,12 @@ def clean_score_name(name):
 
     name = re.sub(r"\[[^\]]*\]", "", name)
     name = re.sub(r"\([^)]*\)", "", name)
-    name = name.strip(" ,:;|-")
+    name = re.sub(r"^@", "", name)
+    name = name.strip(" ,:;|-()")
 
-    parts = name.split()
-    if len(parts) > 1:
-        name = parts[-1]
-
+    # Preserve multi-word player handles such as "Mr Pitt" as mrpitt instead
+    # of collapsing them to the final word. normalize_name removes spacing and
+    # punctuation afterward.
     return normalize_name(name)
 
 
@@ -349,16 +352,28 @@ def update_ratings(match):
     if len(players) < 2:
         return
 
-    for i, p1 in enumerate(players):
+
+    # Compare actual lobby scores pairwise so tied scores are true Elo ties.
+    # Sorting order alone must not turn a 33-33 or 24-24 result into a win/loss.
+    for p1 in players:
         r1 = ratings[p1]
         total_delta = 0
 
-        for j, p2 in enumerate(players):
-            if i == j:
+        for p2 in players:
+            if p1 == p2:
                 continue
 
             r2 = ratings[p2]
-            actual = 1 if i < j else 0
+            s1 = match["scores"][p1]
+            s2 = match["scores"][p2]
+
+            if s1 > s2:
+                actual = 1.0
+            elif s1 < s2:
+                actual = 0.0
+            else:
+                actual = 0.5
+
             expected = expected_score(r1, r2)
             total_delta += actual - expected
 
@@ -416,6 +431,26 @@ def load_vs_data():
 
     for player, stats in data.get("player_stats", {}).items():
         player_stats[player] = stats
+
+
+def rebuild_vs_state_from_matches(save=True):
+    """Recalculate stored VS Elo/stats with the current score-aware tie model."""
+    global ratings, player_stats
+
+    ratings = defaultdict(lambda: 1000)
+    player_stats = defaultdict(lambda: {
+        "matches": 0,
+        "points": 0
+    })
+
+    for match in matches:
+        update_ratings(match)
+        for player, score in match.get("scores", {}).items():
+            player_stats[player]["matches"] += 1
+            player_stats[player]["points"] += score
+
+    if save:
+        save_vs_data()
 
 
 def record_vs_match(match, message=None, message_id=None, save=True):
@@ -535,174 +570,208 @@ def format_vs_stats():
 # MK64 GP parser config/storage
 # -----------------------------
 
-def strip_score_formatting(text):
-    text = replace_discord_mentions(text or "")
-    text = html.unescape(text)
-    text = text.replace("**", "")
-    text = text.replace("__", "")
-    text = text.replace("`", "")
-    text = text.replace("\u2013", "-").replace("\u2014", "-")
-    return text
-
-
-def parse_score_value(value, max_score):
-    try:
-        score = int(value)
-    except (TypeError, ValueError):
-        return None
-
-    if score < 0 or score > max_score:
-        return None
-
-    return score
-
-
-def add_score(scores, raw_name, raw_score, max_score):
-    score = parse_score_value(raw_score, max_score)
-
-    if score is None:
-        return False
-
-    clean = clean_score_name(raw_name)
-
-    if not clean:
-        return False
-
-    if clean in scores:
-        return False
-
-    scores[clean] = score
-    return True
-
-
-def parse_name_score_line(line, max_score=160):
-    line = line.strip()
-
-    if not line:
-        return None
-
-    # Remove common list markers and labels.
-    line = re.sub(r"^[•*-]\s*", "", line)
-    line = re.sub(r"^\d{1,2}[.)]\s*", "", line)
-    line = re.sub(r"^P[1-4]\s*[:.)-]\s*", "", line, flags=re.IGNORECASE)
-    line = re.sub(
-        r"^(gp|grand prix|tournament|round|match|game|result|score|scores|winner|loser)\s*[:#-]?\s*",
-        "",
-        line,
-        flags=re.IGNORECASE
-    )
-
-    patterns = [
-        # Name: 120 / Name - 120 / Name = 120
-        r"^@?(.+?)\s*[:=\-]\s*(\d{1,3})$",
-        # Name 120
-        r"^@?(.+?)\s+(\d{1,3})$",
-        # Name (120)
-        r"^@?(.+?)\s*\((\d{1,3})\)$",
-    ]
-
-    for pattern in patterns:
-        match = re.match(pattern, line, re.IGNORECASE)
-
-        if not match:
-            continue
-
-        raw_name = match.group(1).strip()
-        raw_score = match.group(2).strip()
-        score = parse_score_value(raw_score, max_score)
-
-        if score is None:
-            continue
-
-        clean = clean_score_name(raw_name)
-
-        if not clean:
-            continue
-
-        return clean, score
-
-    return None
-
-
-def parse_inline_gp_scores(content, message=None, max_score=160):
-    text = strip_score_formatting(content)
+def reject_gp_score_reason(content):
+    """Classify obvious non-results for parser audit output."""
+    text = html.unescape(content or "")
     text = re.sub(r"\s+", " ", text).strip()
 
     if not text:
-        return {}
+        return "empty_or_attachment_only"
 
-    scores = {}
+    lower = text.lower()
 
-    # Format: PlayerA 120 - 117 PlayerB
-    match = re.search(
-        r"@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s*-\s*(\d{1,3})\s+@?([A-Za-z0-9_\-\s.]+)",
-        text,
-        re.IGNORECASE
-    )
+    if not re.search(r"\d", text):
+        return "no_numeric_score"
 
-    if match:
-        if (
-            add_score(scores, match.group(1), match.group(2), max_score)
-            and add_score(scores, match.group(4), match.group(3), max_score)
-        ):
-            return scores
+    if re.search(r"\b(friend code|friend request|available|schedule|scheduling|rules|bracket|challonge|good luck|practice|what time|are you free|rdy|ready)\b", lower):
+        return "conversation_or_scheduling"
 
-    # Format: PlayerA 120 vs PlayerB 117
-    match = re.search(
-        r"@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s+(?:vs\.?|v\.?|versus)\s+@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})",
-        text,
-        re.IGNORECASE
-    )
+    if re.search(r"\b(score\?|do we have a score|i need the points|points totaled|totaled up)\b", lower):
+        return "score_request_not_result"
 
-    if match:
-        if (
-            add_score(scores, match.group(1), match.group(2), max_score)
-            and add_score(scores, match.group(3), match.group(4), max_score)
-        ):
-            return scores
+    if re.search(r"\b(alot|a lot|not much|ashamed|lol)\b", lower) and not re.search(r"\b\d{1,3}\b", text):
+        return "non_numeric_score"
 
-    # Format: PlayerA beat PlayerB 120-117.
-    match = re.search(
-        r"@?([A-Za-z0-9_\-\s.]+?)\s+(?:defeats?|beat|beats|won against|over)\s+@?([A-Za-z0-9_\-\s.]+?)\s+(\d{1,3})\s*-\s*(\d{1,3})",
-        text,
-        re.IGNORECASE
-    )
+    return "unknown_format"
 
-    if match:
-        if (
-            add_score(scores, match.group(1), match.group(3), max_score)
-            and add_score(scores, match.group(2), match.group(4), max_score)
-        ):
-            return scores
 
-    return {}
+def normalize_gp_score_text(content, message=None):
+    text = replace_discord_mentions(content or "", message)
+    text = html.unescape(text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def clean_gp_score_segment(segment):
+    text = segment or ""
+
+    # Remove leading labels so they do not become part of the first player name.
+    text = re.sub(r"^\s*Round\s+\d+\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"^\s*Extra\s+mode\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
+
+    # Remove non-score parenthetical notes, but preserve scores written as (120).
+    text = re.sub(r"\((?!\d{1,3}\))[^)]*\)", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def extract_alternating_gp_pairs(text, max_score=160):
+    """Extract NAME SCORE NAME SCORE without letting one pair swallow the next."""
+    blocked_names = {
+        "round", "score", "scores", "points", "point", "cup", "match", "gp", "mode", "extra",
+        "him", "me", "one", "on", "of", "place", "thats", "that", "mushroom", "flower",
+        "star", "special", "friend", "code",
+    }
+
+    token_pattern = re.compile(r"\(?\d{1,3}(?:\s*/\s*\d{1,2})?\)?|@?[A-Za-z][A-Za-z0-9_#.'\-]*\)?")
+    tokens = token_pattern.findall(text)
+
+    pairs = []
+    name_tokens = []
+
+    for token in tokens:
+        token_clean = token.strip()
+        score_match = re.fullmatch(r"\(?(\d{1,3})(?:\s*/\s*\d{1,2})?\)?", token_clean)
+
+        if score_match:
+            score = int(score_match.group(1))
+
+            if not name_tokens or score > max_score:
+                name_tokens = []
+                continue
+
+            raw_name = " ".join(name_tokens)
+            clean = clean_score_name(raw_name)
+            name_tokens = []
+
+            if not clean or clean in blocked_names or re.fullmatch(r"\d+", clean):
+                continue
+
+            pairs.append((clean, score))
+            continue
+
+        name_tokens.append(token_clean)
+
+    return pairs
 
 
 def parse_score_lines(content, message=None, max_score=160):
-    text = strip_score_formatting(content)
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    """
+    Parse conservative two-player GP score reports.
+
+    Supported rejected-example families:
+    - Booth 111 Simon 111 (Simon won tiebreaker)
+    - Tom) 110/9 Gumby) 100/7
+    - Gumby) 117/10 Martin) 97/6
+    - Round 1: Gumby) 129 <@id>) 90
+    - <@id> - 100 / <@id> - 120 when mentions resolve on Discord
+
+    The parser intentionally returns {} unless it finds exactly two distinct
+    player/score pairs. Chatter and partial/non-numeric score messages stay out.
+    """
+    original_text = normalize_gp_score_text(content, message)
+
+    if reject_gp_score_reason(original_text) in {
+        "empty_or_attachment_only",
+        "no_numeric_score",
+        "conversation_or_scheduling",
+        "score_request_not_result",
+        "non_numeric_score",
+    }:
+        return {}
+
+    text = clean_gp_score_segment(original_text)
+
+    # Separators often appear between player-score pairs.
+    text = re.sub(r"\s+(?:vs\.?|versus)\s+", " ", text, flags=re.IGNORECASE)
+    text = text.replace("–", "-").replace("—", "-")
+
+    pairs = extract_alternating_gp_pairs(text, max_score=max_score)
+
+    if len(pairs) != 2:
+        return {}
+
     scores = {}
-
-    for line in lines:
-        parsed = parse_name_score_line(line, max_score)
-
-        if not parsed:
-            continue
-
-        player, score = parsed
-
+    for player, score in pairs:
         if player in scores:
-            return None
-
+            return {}
         scores[player] = score
 
-    if scores:
-        return scores
+    return scores
 
-    inline_scores = parse_inline_gp_scores(content, message, max_score)
+def split_gp_score_segments(content, message=None):
+    """
+    Split messages that contain multiple GP results in one Discord post.
 
-    return inline_scores or {}
+    Example:
+    Round 1: Gumby) 129 Opponent) 90 Round 2: Gumby) 132 Opponent) 84
+    becomes two independently parseable segments.
+    """
+    text = replace_discord_mentions(content or "", message)
+    text = html.unescape(text)
+    text = re.sub(r"\s+", " ", text).strip()
 
+    if not text:
+        return []
+
+    label_matches = list(re.finditer(r"\b(?:Round\s+\d+|Extra\s+mode)\s*[:\-]", text, re.IGNORECASE))
+
+    if len(label_matches) >= 2:
+        segments = []
+        for i, match in enumerate(label_matches):
+            start = match.start()
+            end = label_matches[i + 1].start() if i + 1 < len(label_matches) else len(text)
+            segments.append(text[start:end].strip())
+        return segments
+
+    return [text]
+
+
+def make_gp_score_match(scores, source_type="gp_score_report", submatch_index=None):
+    if not scores or len(scores) != 2:
+        return None
+
+    players = list(scores.keys())
+    p1, p2 = players[0], players[1]
+    s1, s2 = scores[p1], scores[p2]
+
+    if s1 > s2:
+        winner = p1
+    elif s2 > s1:
+        winner = p2
+    else:
+        winner = None
+
+    match = {
+        "source_type": source_type,
+        "scores": scores,
+        "players": [p1, p2],
+        "winner": winner,
+    }
+
+    if submatch_index is not None:
+        match["submatch_index"] = submatch_index
+
+    return match
+
+
+def parse_gp_score_report_messages(content, message=None):
+    matches_found = []
+    segments = split_gp_score_segments(content, message)
+
+    for idx, segment in enumerate(segments, 1):
+        scores = parse_score_lines(segment, message, GP_MAX_SCORE)
+        match = make_gp_score_match(
+            scores,
+            source_type="gp_score_report",
+            submatch_index=idx if len(segments) > 1 else None,
+        )
+
+        if match:
+            matches_found.append(match)
+
+    return matches_found
 
 
 def clean_gp_elo_name(name):
@@ -801,41 +870,20 @@ def parse_gp_elo_ledger_message(message):
     return None
 
 
-def parse_gp_message(content, message=None):
+def parse_gp_messages(content, message=None):
+    """Return all GP matches found in a Discord message."""
     ledger_match = parse_gp_elo_ledger_message(message)
 
     if ledger_match:
-        return ledger_match
+        return [ledger_match]
 
-    scores = parse_score_lines(content, message, GP_MAX_SCORE)
+    return parse_gp_score_report_messages(content, message)
 
-    if not scores:
-        return None
 
-    # This GP Elo pipeline currently supports two-player GP matches.
-    # Four-player or standings-style results should be reviewed before import
-    # rather than silently converted into inaccurate 1v1 Elo records.
-    if len(scores) != 2:
-        return None
-
-    players = list(scores.keys())
-    p1, p2 = players[0], players[1]
-    s1, s2 = scores[p1], scores[p2]
-
-    if s1 > s2:
-        winner = p1
-    elif s2 > s1:
-        winner = p2
-    else:
-        winner = None
-
-    return {
-        "source_type": "gp_score_report",
-        "scores": scores,
-        "players": [p1, p2],
-        "winner": winner
-    }
-
+def parse_gp_message(content, message=None):
+    """Backward-compatible helper for live single-match parsing."""
+    parsed = parse_gp_messages(content, message)
+    return parsed[0] if parsed else None
 
 
 def update_gp_ratings(match):
@@ -873,17 +921,27 @@ def update_gp_ratings(match):
 
 def gp_match_key(match):
     """
-    Dedupe by date + players.
+    Dedupe GP matches without collapsing legitimate same-day rematches.
 
-    The primary #elo-gp-match-results channel contains Elo ledger entries,
-    while supplemental channels may contain original score reports. Date + players
-    keeps those from double-counting the same match when both sources exist.
+    Prefer a stable reviewed source_id for manual event records, then Discord
+    message ID + submatch index for parsed Discord history.
     """
-    players = tuple(sorted(match.get("players", [])))
-    created_at = match.get("created_at", "")
-    match_date = created_at[:10] if created_at else "unknown-date"
+    source_id = match.get("source_id")
+    if source_id:
+        return ("source_id", str(source_id))
 
-    return (match_date, players)
+    message_id = match.get("message_id")
+    submatch_index = match.get("submatch_index")
+
+    if message_id:
+        return (str(message_id), str(submatch_index or 1))
+
+    players = tuple(sorted(match.get("players", [])))
+    scores = tuple(sorted((str(p), str(s)) for p, s in match.get("scores", {}).items()))
+    created_at = match.get("created_at", "")
+    source_type = match.get("source_type", "unknown")
+
+    return (source_type, created_at, players, scores)
 
 
 def rebuild_gp_match_keys():
@@ -955,9 +1013,9 @@ def record_gp_match(match, message=None, save=True, allow_duplicate_key=False):
     if message is not None:
         actual_message_id = str(message.id)
 
-        if actual_message_id in processed_gp_message_ids:
-            return False
-
+        # Do not reject solely because this Discord message was already marked
+        # processed. A single message can contain multiple GP results, and each
+        # submatch is deduped below by message_id + submatch_index.
         match = attach_metadata(match, message)
 
     key = gp_match_key(match)
@@ -978,9 +1036,10 @@ def record_gp_match(match, message=None, save=True, allow_duplicate_key=False):
     gp_player_stats[p1]["matches"] += 1
     gp_player_stats[p2]["matches"] += 1
 
-    # Real GP score reports use actual points. Old Elo ledger entries do not,
-    # so avoid mixing fake 1-0 values into points totals.
-    if match.get("source_type") != "gp_elo_ledger":
+    # Real GP score reports use actual points. Old Elo ledger entries and
+    # manually preserved outcome-only tournament records do not, so avoid
+    # mixing synthetic 1-0 values into points totals.
+    if match.get("source_type") not in {"gp_elo_ledger", "manual_gp_outcome"}:
         gp_player_stats[p1]["points_for"] += s1
         gp_player_stats[p1]["points_against"] += s2
         gp_player_stats[p2]["points_for"] += s2
@@ -1116,17 +1175,27 @@ def format_quarterly_vs_leaderboard(quarter_label=None, limit=10):
 
     for match in q_matches:
         players = [p for p, _ in match.get("placements", [])]
+        scores = match.get("scores", {})
 
-        for i, p1 in enumerate(players):
+        for p1 in players:
             r1 = q_ratings[p1]
             total_delta = 0
 
-            for j, p2 in enumerate(players):
-                if i == j:
+            for p2 in players:
+                if p1 == p2:
                     continue
 
                 r2 = q_ratings[p2]
-                actual = 1 if i < j else 0
+                s1 = scores[p1]
+                s2 = scores[p2]
+
+                if s1 > s2:
+                    actual = 1.0
+                elif s1 < s2:
+                    actual = 0.0
+                else:
+                    actual = 0.5
+
                 expected = expected_score(r1, r2)
                 total_delta += actual - expected
 
@@ -1209,10 +1278,11 @@ def format_quarterly_gp_leaderboard(quarter_label=None, limit=10):
             q_ratings[p1] += GP_K_FACTOR * (actual1 - expected1)
             q_ratings[p2] += GP_K_FACTOR * (actual2 - expected2)
 
-            q_stats[p1]["points_for"] += s1
-            q_stats[p1]["points_against"] += s2
-            q_stats[p2]["points_for"] += s2
-            q_stats[p2]["points_against"] += s1
+            if match.get("source_type") != "manual_gp_outcome":
+                q_stats[p1]["points_for"] += s1
+                q_stats[p1]["points_against"] += s2
+                q_stats[p2]["points_for"] += s2
+                q_stats[p2]["points_against"] += s1
 
         q_stats[p1]["matches"] += 1
         q_stats[p2]["matches"] += 1
@@ -1803,6 +1873,25 @@ def load_video_root():
     ]
 
 
+DEPRECATED_MK64_SOURCE_PREFIXES = (
+    "https://yoyoyoshihub.neocities.org/mk64/",
+)
+
+
+def filter_deprecated_sources(sources):
+    """Drop superseded MK64 Hub routes now served from awRev."""
+    filtered = []
+    for source in sources:
+        url = normalize_url(source.get("url", ""))
+        if any(
+            url == prefix.rstrip("/") or url.startswith(prefix)
+            for prefix in DEPRECATED_MK64_SOURCE_PREFIXES
+        ):
+            continue
+        filtered.append(source)
+    return filtered
+
+
 def build_sources():
     all_sources = []
     all_sources.extend(load_manual_sources())
@@ -1813,6 +1902,7 @@ def build_sources():
     all_sources.extend(load_gamefaqs_root())
     all_sources.extend(load_video_root())
 
+    all_sources = filter_deprecated_sources(all_sources)
     all_sources = dedupe_sources(all_sources)
 
     with open("compiled_sources.json", "w", encoding="utf-8") as f:
@@ -1992,52 +2082,12 @@ async def import_vs_history():
         await import_vs_history_for_channel(channel_id)
 
 
-
-def summarize_gp_rejected_message(msg):
-    content = strip_score_formatting(getattr(msg, "content", "") or "")
-    content = re.sub(r"\s+", " ", content).strip()
-
-    embed_titles = []
-    for embed in getattr(msg, "embeds", []):
-        if embed.title:
-            embed_titles.append(embed.title)
-        if embed.description:
-            embed_titles.append(embed.description[:200])
-
-    return {
-        "message_id": str(msg.id),
-        "created_at": msg.created_at.isoformat() if getattr(msg, "created_at", None) else "",
-        "author": str(msg.author),
-        "jump_url": msg.jump_url,
-        "content": content[:500],
-        "embed_summary": " | ".join(embed_titles)[:500]
-    }
-
-
-def write_gp_reject_report(channel_name, examples):
-    if not examples:
-        return
-
-    existing = {}
-
-    if os.path.exists(GP_REJECTS_FILE):
-        try:
-            with open(GP_REJECTS_FILE, "r", encoding="utf-8") as f:
-                existing = json.load(f)
-        except (json.JSONDecodeError, OSError):
-            existing = {}
-
-    existing[channel_name] = {
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-        "sample_count": len(examples),
-        "examples": examples
-    }
-
-    with open(GP_REJECTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(existing, f, indent=2, ensure_ascii=False)
-
-
-async def import_gp_history_for_channel(channel_id, source_label="supplemental"):
+async def import_gp_history_for_channel(
+    channel_id,
+    source_label="supplemental",
+    before=None,
+    after=None,
+):
     channel = client.get_channel(channel_id)
 
     if channel is None:
@@ -2048,34 +2098,58 @@ async def import_gp_history_for_channel(channel_id, source_label="supplemental")
     parsed = 0
     rejected = 0
     duplicates = 0
-    rejected_examples = []
+
+    earliest_message = None
+    latest_message = None
+    latest_parsed = None
+    latest_recorded = None
+    latest_rejected = None
 
     print(f"Scanning GP history in #{channel.name} ({source_label})...")
 
     try:
-        async for msg in channel.history(limit=None, oldest_first=True):
+        history_kwargs = {"limit": None, "oldest_first": True}
+        if before is not None:
+            history_kwargs["before"] = before
+        if after is not None:
+            history_kwargs["after"] = after
+
+        async for msg in channel.history(**history_kwargs):
             if msg.author == client.user:
                 continue
 
             scanned += 1
 
+            if earliest_message is None:
+                earliest_message = msg.created_at
+
+            latest_message = msg.created_at
+
             if str(msg.id) in processed_gp_message_ids:
                 continue
 
-            match = parse_gp_message(msg.content, msg)
+            parsed_matches = parse_gp_messages(msg.content, msg)
 
-            if match:
-                recorded = record_gp_match(match, message=msg, save=False)
+            if parsed_matches:
+                latest_parsed = msg.created_at
+                message_recorded = 0
 
-                if recorded:
-                    parsed += 1
-                else:
-                    duplicates += 1
+                for match in parsed_matches:
+                    recorded = record_gp_match(match, message=msg, save=False)
+
+                    if recorded:
+                        parsed += 1
+                        message_recorded += 1
+                        latest_recorded = msg.created_at
+                    else:
+                        duplicates += 1
+
+                if message_recorded == 0:
+                    # The message contained parseable results, but all were duplicates.
+                    pass
             else:
                 rejected += 1
-
-                if len(rejected_examples) < GP_REJECT_SAMPLE_LIMIT:
-                    rejected_examples.append(summarize_gp_rejected_message(msg))
+                latest_rejected = msg.created_at
 
     except discord.Forbidden:
         print(f"SKIPPING GP channel #{channel.name}: missing access.")
@@ -2086,26 +2160,26 @@ async def import_gp_history_for_channel(channel_id, source_label="supplemental")
         return
 
     save_gp_data()
-    write_gp_reject_report(channel.name, rejected_examples)
-
-    parse_rate = (parsed / scanned * 100) if scanned else 0
 
     print(f"GP history scan complete for #{channel.name}.")
     print(f"Scanned: {scanned}")
     print(f"Parsed GP matches: {parsed}")
     print(f"Duplicate GP matches skipped: {duplicates}")
     print(f"Rejected messages: {rejected}")
-    print(f"Parse rate: {parse_rate:.1f}%")
     print(f"Saved GP matches: {len(gp_matches)}")
+    print(f"Earliest scanned message: {earliest_message}")
+    print(f"Latest scanned message: {latest_message}")
+    print(f"Latest parseable GP message: {latest_parsed}")
+    print(f"Latest recorded GP match: {latest_recorded}")
+    print(f"Latest rejected GP message: {latest_rejected}")
 
-    if rejected_examples:
-        print(f"Saved GP reject examples for #{channel.name} to {GP_REJECTS_FILE}")
-
-
+    if scanned:
+        parse_rate = (parsed / scanned) * 100
+        print(f"GP parse rate for #{channel.name}: {parse_rate:.2f}%")
 
 
 async def import_gp_history():
-    # Rebuild GP from Discord history every startup so source priority is deterministic.
+    # Rebuild GP from Discord history every startup so source priority remains deterministic.
     reset_gp_state_for_rebuild()
 
     await import_gp_history_for_channel(
@@ -2113,13 +2187,136 @@ async def import_gp_history():
         source_label="primary"
     )
 
+    # Preserve the established historical source-priority model. CampKart 3 is
+    # inserted at its actual place in the post-legacy chronology so later GP
+    # activity is rated after it.
     for channel_id in GP_SUPPLEMENTAL_CHANNEL_IDS:
         await import_gp_history_for_channel(
             channel_id,
-            source_label="supplemental"
+            source_label="supplemental-pre-campkart3",
+            before=GP_MANUAL_EVENT_CUTOFF,
         )
 
+    import_manual_gp_results(save=False)
 
+    for channel_id in GP_SUPPLEMENTAL_CHANNEL_IDS:
+        await import_gp_history_for_channel(
+            channel_id,
+            source_label="supplemental-post-campkart3",
+            after=GP_MANUAL_EVENT_CUTOFF,
+        )
+
+    save_gp_data()
+
+
+def load_manual_event_results():
+    """Load reviewed non-Discord tournament results used by the Elo systems."""
+    if not os.path.exists(MANUAL_EVENT_RESULTS_FILE):
+        print(f"{MANUAL_EVENT_RESULTS_FILE} not found. Skipping manual event results.")
+        return {"vs": [], "gp": []}
+
+    with open(MANUAL_EVENT_RESULTS_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return {
+        "vs": data.get("vs", []),
+        "gp": data.get("gp", []),
+    }
+
+
+def manual_source_ids(records):
+    return {
+        str(match.get("source_id"))
+        for match in records
+        if match.get("source_id")
+    }
+
+
+def make_manual_vs_match(entry):
+    scores = {
+        normalize_name(name): int(score)
+        for name, score in entry.get("scores", {}).items()
+    }
+
+    if len(scores) not in (3, 4):
+        raise ValueError(f"Manual VS result must have 3 or 4 players: {entry.get('source_id')}")
+
+    placements = sorted(scores.items(), key=lambda x: -x[1])
+
+    return {
+        "source_type": "manual_event_vs",
+        "source_id": entry["source_id"],
+        "event": entry.get("event", ""),
+        "round": entry.get("round", ""),
+        "event_order": entry.get("event_order"),
+        "created_at": entry.get("created_at", ""),
+        "date_precision": entry.get("date_precision", ""),
+        "source_url": entry.get("source_url", ""),
+        "scores": scores,
+        "placements": placements,
+    }
+
+
+def make_manual_gp_match(entry):
+    winner = normalize_name(entry["winner"])
+    loser = normalize_name(entry["loser"])
+
+    if not winner or not loser or winner == loser:
+        raise ValueError(f"Invalid manual GP result: {entry.get('source_id')}")
+
+    return {
+        "source_type": "manual_gp_outcome",
+        "source_id": entry["source_id"],
+        "event": entry.get("event", ""),
+        "round": entry.get("round", ""),
+        "event_order": entry.get("event_order"),
+        "created_at": entry.get("created_at", ""),
+        "date_precision": entry.get("date_precision", ""),
+        "source_url": entry.get("source_url", ""),
+        # GP Elo uses win/loss outcome, not margin. These synthetic values are
+        # deliberately excluded from points-for/against statistics.
+        "scores": {winner: 1, loser: 0},
+        "players": [winner, loser],
+        "winner": winner,
+    }
+
+
+def import_manual_vs_results(save=True):
+    data = load_manual_event_results()
+    existing_vs_ids = manual_source_ids(matches)
+    vs_added = 0
+
+    for entry in sorted(data["vs"], key=lambda x: x.get("event_order", 0)):
+        source_id = str(entry.get("source_id", ""))
+        if not source_id or source_id in existing_vs_ids:
+            continue
+
+        match = make_manual_vs_match(entry)
+        record_vs_match(match, save=False)
+        existing_vs_ids.add(source_id)
+        vs_added += 1
+
+    if save and vs_added:
+        save_vs_data()
+
+    print(f"Imported manual VS event results: {vs_added}")
+    return vs_added
+
+
+def import_manual_gp_results(save=True):
+    data = load_manual_event_results()
+    gp_added = 0
+
+    for entry in sorted(data["gp"], key=lambda x: x.get("event_order", 0)):
+        match = make_manual_gp_match(entry)
+        if record_gp_match(match, save=False):
+            gp_added += 1
+
+    if save and gp_added:
+        save_gp_data()
+
+    print(f"Imported manual GP event results: {gp_added}")
+    return gp_added
 
 
 # -----------------------------
@@ -2164,6 +2361,10 @@ async def on_ready():
             print("FETCH CHANNEL ERROR:", repr(e))
 
         await import_vs_history()
+        import_manual_vs_results(save=False)
+
+        # Recalculate the full stored VS history with score-aware tie handling.
+        rebuild_vs_state_from_matches(save=True)
 
         vs_history_imported = True
 
@@ -2255,12 +2456,16 @@ async def on_message(message):
             await message.channel.send(format_gp_stats())
             return
 
-        match = parse_gp_message(content, message)
+        parsed_matches = parse_gp_messages(content, message)
 
-        if match:
-            recorded = record_gp_match(match, message=message)
+        if parsed_matches:
+            recorded_any = False
 
-            if recorded:
+            for match in parsed_matches:
+                recorded = record_gp_match(match, message=message)
+                recorded_any = recorded_any or recorded
+
+            if recorded_any:
                 await message.add_reaction("🏁")
 
         return

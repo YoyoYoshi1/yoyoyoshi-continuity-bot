@@ -29,6 +29,15 @@ def fmt_date(value):
         return "Unknown"
 
 
+def match_source_link(match):
+    """Render the best available source link for Discord or reviewed event data."""
+    if match.get("jump_url"):
+        return '<a href="' + match["jump_url"] + '" target="_blank" rel="noreferrer">Discord</a>'
+    if match.get("source_url"):
+        return '<a href="' + match["source_url"] + '" target="_blank" rel="noreferrer">Event source</a>'
+    return "—"
+
+
 leaderboard = load_json("leaderboard.json")
 players = load_json("players.json")
 matches = load_json("matches.json")
@@ -159,7 +168,7 @@ match_rows = "\n".join(
       <td>{m["match_id"]}</td>
       <td>{fmt_date(m.get("created_at"))}</td>
       <td>{"<br>".join([str(x["place"]) + ". " + x["player"] + " — " + str(x["score"]) for x in m["placements"]])}</td>
-      <td>{'<a href="' + m.get("jump_url", "#") + '" target="_blank" rel="noreferrer">Discord</a>' if m.get("jump_url") else "—"}</td>
+      <td>{match_source_link(m)}</td>
     </tr>
     """
     for m in recent_matches
@@ -172,7 +181,7 @@ explanation = f"""
 
   <div class="info-box">
     <strong>Coverage Period</strong><br>
-    These results currently cover parsed Mario Kart 64 Nintendo Switch Online VS match posts from {coverage_start} through {coverage_end}.
+    These results currently cover recorded Mario Kart 64 Nintendo Switch Online VS matches from Discord and reviewed tournament records from {coverage_start} through {coverage_end}.
   </div>
 
   <p>
@@ -203,18 +212,18 @@ index_body = f"""
     </p>
 
     <p>
-      It converts Discord-based league results into public weighted Elo rankings, player records,
+      It converts Discord results and reviewed tournament records into public weighted Elo rankings, player records,
       match logs, and historical seasonal snapshots.
     </p>
 
     <p>
       The MK64 Switch community features organized leagues, Elo rankings, tournaments, streams,
-      and historical records. These rankings help preserve and document that competitive history.
+      and historical records. These rankings document that competitive history and connect it to the community's current standings.
     </p>
 
     <p>
       The goal is to make the community's competitive structure easier to find, understand, verify,
-      archive, and recognize through public web pages rather than Discord posts alone.
+      compare, and recognize through public web pages rather than Discord posts alone.
     </p>
 
     <p class="note">
@@ -278,7 +287,7 @@ players_body = f"""
   </p>
 
   <p>
-    Player records help preserve participation history, total points, average points, match volume, and Elo ratings
+    Player records track participation history, total points, average points, match volume, and Elo ratings
     across the MK64 Switch competitive scene.
   </p>
 
@@ -315,17 +324,17 @@ matches_body = f"""
   <div class="news-board-title">Competitive VS Match Log</div>
 
   <p>
-    This log preserves parsed Mario Kart 64 Switch VS matches, including dates, placements, scores,
+    This log tracks parsed Mario Kart 64 Switch VS matches, including dates, placements, scores,
     and direct Discord source links where available.
   </p>
 
   <p>
-    The match log provides the source record behind the competitive Elo rankings and helps make the
+    The match log provides the source record behind the competitive Elo rankings and makes the
     MK64 Switch Online league history publicly auditable.
   </p>
 
   <p class="note">
-    Full parsed coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.
+    Full recorded coverage: {coverage_start} – {coverage_end}. Last updated: {generated}.
   </p>
 
   {nav_links}
@@ -359,7 +368,7 @@ quarters_body = f"""
   </p>
 
   <p>
-    Quarterly snapshots help preserve historical form, seasonal standings, and competitive development
+    Quarterly snapshots track historical form, seasonal standings, and competitive development
     across the MK64 Switch Online community.
   </p>
 
@@ -517,7 +526,7 @@ write("players.php", page(
 write("matches.php", page(
     "vs-matches",
     "MK64 Switch Competitive VS Match Log",
-    "Mario Kart 64 Switch Online competitive VS match log with dates, placements, scores, and Discord source links.",
+    "Mario Kart 64 Switch Online competitive VS match log with dates, placements, scores, and source links.",
     "VS Match Log",
     "/mk64/vs/matches.php",
     matches_body,
