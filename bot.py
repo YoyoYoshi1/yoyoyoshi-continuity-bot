@@ -291,6 +291,10 @@ MIN_MATCHES = 5
 MAX_SCORE = 60
 DATA_FILE = "vs_data.json"
 GP_DATA_FILE = "gp_data.json"
+# Optional persistent Railway volume path; the default is local to the bot process.
+GP_REJECTED_AUDIT_FILE = os.getenv("GP_REJECTED_AUDIT_FILE", "gp_rejected_audit.json")
+GP_REJECTED_AUDIT_LIMIT = 10000
+
 STATS_DB_FILE = "discord_stats.sqlite3"
 MANUAL_EVENT_RESULTS_FILE = "mk64_event_results.json"
 
@@ -363,6 +367,7 @@ ALIASES = {
     "coolex": "thecoolex",
     "fuzzy": "fuzz",
     "fuzzyfugs": "fuzz",
+    "fuzzyfugsdkchallenge": "fuzz",
     "booth": "noakevbo",
     "palatus": "patalus",
     "pat": "patalus",
@@ -371,6 +376,7 @@ ALIASES = {
     "bobby": "yoyoyoshi",
     "blazeup": "martin",
     "fx": "fx64",
+    "fx64ranked": "fx64",
     "urbanoutlaw": "urban",
     "wildermk64": "wilder",
 }
@@ -824,6 +830,91 @@ def reject_gp_score_reason(content):
     return "unknown_format"
 
 
+# Audit only messages that resemble actual GP results; routine conversation is excluded.
+# This is intentionally independent of Elo eligibility and does not import a match.
+def gp_review_candidate(content, message=None):
+    raw = html.unescape(replace_discord_mentions(content or "", message))
+    if not raw.strip():
+        return False
+    if re.search(r"\b(?:casual|unranked)\b", raw, re.I):
+        return False
+    if GP_CUP_PATTERN.search(raw) or GP_TOTAL_PATTERN.search(raw):
+        return True
+    if re.search(r"(?im)^\s*(?:ranked|:total:|total\s*[:=]|=[ ]*\d{1,3}\s*[-–—]\s*\d{1,3})", raw):
+        return True
+    # A named match plus multiple numeric cup rows may be a report missing labels.
+    lines = [x.strip() for x in raw.splitlines() if x.strip()]
+    if len(lines) >= 4 and any(GP_MATCHUP_PATTERN.fullmatch(x) for x in lines[:3]):
+        if sum(bool(GP_BARE_PAIR_PATTERN.fullmatch(x)) for x in lines) >= 3:
+            return True
+    return False
+
+
+def gp_review_reason(content, message=None):
+    raw = html.unescape(replace_discord_mentions(content or "", message))
+    if not raw.strip():
+        return "empty_or_attachment_only"
+    if re.search(r"\b(?:casual|unranked)\b", raw, re.I):
+        return "casual_or_unranked"
+    lines = [x.strip() for x in raw.splitlines() if x.strip()]
+    if GP_CUP_PATTERN.search(raw) or GP_TOTAL_PATTERN.search(raw) or any(
+        GP_CUP_PATTERN.fullmatch(x) or GP_TOTAL_PATTERN.fullmatch(x) for x in lines
+    ):
+        matchups = [x for x in lines if GP_MATCHUP_PATTERN.fullmatch(x)]
+        if not matchups:
+            return "missing_or_unrecognized_matchup"
+        if len(matchups) != 1:
+            return "ambiguous_matchup"
+        cups = [tuple(map(int, m.groups())) for x in lines if (m := GP_CUP_PATTERN.fullmatch(x))]
+        totals = [tuple(map(int, m.groups())) for x in lines if (m := GP_TOTAL_PATTERN.fullmatch(x))]
+        if len(cups) == 4 and len(totals) == 1:
+            if tuple(map(sum, zip(*cups))) != totals[0]:
+                return "cup_total_mismatch"
+        if len(cups) < 4:
+            return "missing_or_unrecognized_cup_rows"
+        if len(totals) != 1:
+            return "missing_or_ambiguous_total"
+        return "recognized_structure_failed_validation"
+    if re.search(r"\branked\b", raw, re.I):
+        return "ranked_result_unrecognized_format"
+    return "unrecognized_result_format"
+
+
+def gp_review_entry(message, segment, channel_name, source_label, segment_index=1):
+    """Serializable, evidence-preserving record for human review, never Elo input."""
+    raw = html.unescape(replace_discord_mentions(segment or "", message))
+    return {
+        "message_id": str(message.id),
+        "segment_index": segment_index,
+        "channel_id": str(message.channel.id),
+        "channel_name": channel_name,
+        "source": source_label,
+        "created_at": message.created_at.isoformat(),
+        "jump_url": message.jump_url,
+        "author": str(message.author),
+        "reason": gp_review_reason(segment, message),
+        "content": raw[:6000],
+        "content_truncated": len(raw) > 6000,
+    }
+
+
+def write_gp_rejected_audit(entries):
+    """Replace the report on a successful full rebuild; never edit GP match data."""
+    folder = os.path.dirname(os.path.abspath(GP_REJECTED_AUDIT_FILE))
+    os.makedirs(folder, exist_ok=True)
+    report = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "count": len(entries),
+        "truncated": len(entries) > GP_REJECTED_AUDIT_LIMIT,
+        "entries": entries[:GP_REJECTED_AUDIT_LIMIT],
+    }
+    temp_path = GP_REJECTED_AUDIT_FILE + ".tmp"
+    with open(temp_path, "w", encoding="utf-8") as handle:
+        json.dump(report, handle, ensure_ascii=False, indent=2)
+    os.replace(temp_path, GP_REJECTED_AUDIT_FILE)
+    print(f"GP rejected-result audit: {report['count']} candidate segments → {GP_REJECTED_AUDIT_FILE}")
+
+
 def normalize_gp_score_text(content, message=None):
     text = replace_discord_mentions(content or "", message)
     text = html.unescape(text)
@@ -848,20 +939,21 @@ def clean_gp_score_segment(segment):
 # GP reports must contain an identifiable matchup and an unambiguous final result.
 # Never infer player names from arbitrary words preceding numbers in conversation.
 GP_MATCHUP_PATTERN = re.compile(
-    r"^\s*(?:ranked\s+|casual\s+)?"
-    r"(?P<first>@[\w][^\n]*?)\s+"
+    r"^\s*(?P<first>@.+?)\s+"
     r"(?:vs\.?|versus|defeats?|beats?|barely\s+beats?|and)\s+"
-    r"(?P<second>@[\w][^\n]*?)\s*(?:tie|tied)?\s*$",
+    r"(?P<second>@.+?)\s*(?:tie|tied)?\s*$",
     re.IGNORECASE,
 )
 GP_CUP_PATTERN = re.compile(
-    r"^\s*(?:<a?:(?:mushroomcup|flowercup|starcup|specialcup):\d+>|:(?:mushroomcup|flowercup|starcup|specialcup):)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
+    r"^\s*(?:(?:<a?:)?(?:mushroomcup|flowercup|starcup|specialcup)(?::\d+>)?|:(?:mushroomcup|flowercup|starcup|specialcup):)\s*"
+    r"(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
     re.IGNORECASE,
 )
 GP_TOTAL_PATTERN = re.compile(
     r"^\s*(?::total:|<a?:total:\d+>|total\s*[:=]|=)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
     re.IGNORECASE,
 )
+GP_BARE_PAIR_PATTERN = re.compile(r"^\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$")
 GP_SIMPLE_PAIR_PATTERN = re.compile(
     r"^\s*@?(?P<first>[A-Za-z][\w.-]{1,31})\)?\s*"
     r"(?P<score1>\d{1,3})(?:/\d{1,2})?\s+"
@@ -870,116 +962,102 @@ GP_SIMPLE_PAIR_PATTERN = re.compile(
     r"(?:\([^\n]{0,65}\))?\s*$",
     re.IGNORECASE,
 )
+GP_NOTES_PATTERN = re.compile(r"^(?:game\s*notes?|notes?)\s*:", re.I)
+GP_ROUND_LABEL_PATTERN = re.compile(r"^\s*(?:Round\s+\d+|Extra\s+mode)\s*[:\-]\s*", re.I)
 
 
 def gp_report_player(name):
+    name = re.sub(r"<a?:[A-Za-z0-9_~]+:\d+>|:[A-Za-z0-9_~]+:", " ", name).strip()
     name = re.sub(r"\s*<:[^>]+>", "", name).strip()
     name = re.sub(r"\s*\([^)]*\)\s*$", "", name).strip()
-    name = re.sub(r"\s+a\s*/?\s*k\s*/?\s*a\s+", " a/k/a ", name, flags=re.I)
     return clean_score_name(name)
 
 
 def parse_score_lines(content, message=None, max_score=160):
-    """Parse only structured GP reports; return {} for ambiguous or casual posts.
+    """Recognize GP results without interpreting commentary as scores.
 
-    Supported: two mentioned players with four labeled cups and a total,
-    or a standalone legacy `Player 110 Player 100` result. All other text is
-    deliberately rejected rather than treated as Elo evidence.
+    Cup-by-cup reports need two identifiable @players and four cup rows.
+    Explicit totals are checked against those rows; mismatches are rejected
+    for review, not silently given a winner. Older single-line player/score
+    pairs remain supported. Explicitly casual results are excluded.
     """
-    raw = replace_discord_mentions(content or "", message)
-    raw = html.unescape(raw)
-    lines = [line.strip() for line in raw.splitlines() if line.strip()]
-    if not lines:
+    raw = html.unescape(replace_discord_mentions(content or "", message))
+    lines = [GP_ROUND_LABEL_PATTERN.sub("", x.strip()) for x in raw.splitlines() if x.strip()]
+    if not lines or re.search(r"\b(?:casual|unranked)\b", raw, re.I):
         return {}
 
-    # Explicitly unranked/casual posts must never affect the ranked GP Elo.
-    if re.search(r"\b(?:casual|unranked)\b", raw, flags=re.I):
-        return {}
+    # Only the result section is eligible for parsing; ignore narrative notes.
+    cutoff = next((i for i, line in enumerate(lines) if GP_NOTES_PATTERN.match(line)), len(lines))
+    result_lines = lines[:cutoff]
+    cup_rows = []
+    explicit_totals = []
+    for line in result_lines:
+        cup = GP_CUP_PATTERN.fullmatch(line)
+        total = GP_TOTAL_PATTERN.fullmatch(line)
+        if cup:
+            cup_rows.append(tuple(map(int, cup.groups())))
+        elif total:
+            explicit_totals.append(tuple(map(int, total.groups())))
 
+    # Find the one actual matchup among the header lines. Ignore Ranked.
     header = []
-    for line in lines:
+    for line in result_lines:
         if GP_CUP_PATTERN.fullmatch(line) or GP_TOTAL_PATTERN.fullmatch(line):
             break
-        if re.match(r"^(?:game\s*notes?|notes?)\s*:", line, flags=re.I):
-            break
         header.append(line)
-
-    # Recognize one clear matchup, not arbitrary @mentions in game notes.
-    matchup_lines = [line for line in header if re.search(r"\b(?:vs\.?|versus|defeats?|beats?|and)\b", line, re.I)]
-    if matchup_lines:
-        if len(matchup_lines) != 1:
-            return {}
-        found = GP_MATCHUP_PATTERN.fullmatch(matchup_lines[0])
-        if not found:
-            return {}
-        p1 = gp_report_player(found.group("first"))
-        p2 = gp_report_player(found.group("second"))
+    matchups = [GP_MATCHUP_PATTERN.fullmatch(line) for line in header]
+    matchups = [m for m in matchups if m is not None]
+    if len(matchups) == 1:
+        match = matchups[0]
+        p1, p2 = (gp_report_player(match.group(k)) for k in ('first', 'second'))
         if not p1 or not p2 or p1 == p2:
             return {}
-        cups = []
-        totals = []
-        for line in lines:
-            cup = GP_CUP_PATTERN.fullmatch(line)
-            total = GP_TOTAL_PATTERN.fullmatch(line)
-            if cup:
-                cups.append(tuple(map(int, cup.groups())))
-            elif total:
-                totals.append(tuple(map(int, total.groups())))
-        if len(cups) != 4 or len(totals) != 1:
-            # Some reports accidentally label the final total as a fifth cup.
-            # Accept only when the fifth row equals the sum of the first four.
-            if len(cups) == 5 and not totals:
-                candidate = tuple(map(sum, zip(*cups[:4])))
-                if cups[4] == candidate:
-                    cups, totals = cups[:4], [candidate]
-            if len(cups) != 4 or len(totals) != 1:
-                return {}
-        summed = tuple(map(sum, zip(*cups)))
-        if summed != totals[0]:
+
+        if len(cup_rows) == 5 and not explicit_totals:
+            expected = tuple(map(sum, zip(*cup_rows[:4])))
+            if cup_rows[4] == expected:
+                explicit_totals = [expected]
+                cup_rows = cup_rows[:4]
+        # Reports without cup labels use four bare numeric rows + final total.
+        if not cup_rows:
+            numeric = [GP_BARE_PAIR_PATTERN.fullmatch(line) for line in result_lines]
+            numeric = [tuple(map(int, m.groups())) for m in numeric if m]
+            if len(numeric) == 4 and len(explicit_totals) == 1:
+                cup_rows = numeric
+            elif len(numeric) == 5 and not explicit_totals and tuple(map(sum, zip(*numeric[:4]))) == numeric[4]:
+                cup_rows, explicit_totals = numeric[:4], [numeric[4]]
+
+        if len(cup_rows) != 4 or len(explicit_totals) != 1:
             return {}
-        a, b = totals[0]
-        if a > max_score or b > max_score:
+        computed = tuple(map(sum, zip(*cup_rows)))
+        if computed != explicit_totals[0]:
+            return {}
+        a, b = computed
+        if max(a, b) > max_score:
             return {}
         return {p1: a, p2: b}
 
-    # Historic short-form reports: whole segment must be the score line.
-    # The pattern is intentionally anchored to exclude explanatory prose.
-    if len(lines) == 1:
-        m = GP_SIMPLE_PAIR_PATTERN.fullmatch(lines[0])
+    # Preserve historic short-form results, without accepting prose or notes.
+    if len(result_lines) == 1:
+        m = GP_SIMPLE_PAIR_PATTERN.fullmatch(result_lines[0])
         if m:
-            p1, p2 = gp_report_player(m.group("first")), gp_report_player(m.group("second"))
-            a, b = int(m.group("score1")), int(m.group("score2"))
-            if p1 and p2 and p1 != p2 and a <= max_score and b <= max_score:
+            p1, p2 = gp_report_player(m.group('first')), gp_report_player(m.group('second'))
+            a, b = int(m.group('score1')), int(m.group('score2'))
+            if p1 and p2 and p1 != p2 and max(a, b) <= max_score:
                 return {p1: a, p2: b}
     return {}
 
 
 def split_gp_score_segments(content, message=None):
-    """
-    Split messages that contain multiple GP results in one Discord post.
-
-    Example:
-    Round 1: Gumby) 129 Opponent) 90 Round 2: Gumby) 132 Opponent) 84
-    becomes two independently parseable segments.
-    """
-    text = replace_discord_mentions(content or "", message)
-    text = html.unescape(text)
-    text = re.sub(r"\s+", " ", text).strip()
-
-    if not text:
+    """Keep Discord line breaks intact; split only explicitly numbered games."""
+    raw = html.unescape(replace_discord_mentions(content or "", message))
+    if not raw.strip():
         return []
-
-    label_matches = list(re.finditer(r"\b(?:Round\s+\d+|Extra\s+mode)\s*[:\-]", text, re.IGNORECASE))
-
-    if len(label_matches) >= 2:
-        segments = []
-        for i, match in enumerate(label_matches):
-            start = match.start()
-            end = label_matches[i + 1].start() if i + 1 < len(label_matches) else len(text)
-            segments.append(text[start:end].strip())
-        return segments
-
-    return [text]
+    parts = list(re.finditer(r"(?im)^\s*(?:Round\s+\d+|Extra\s+mode)\s*[:\-]", raw))
+    if len(parts) > 1:
+        return [raw[m.start():(parts[i+1].start() if i+1 < len(parts) else len(raw))].strip()
+                for i, m in enumerate(parts)]
+    return [raw]
 
 
 def make_gp_score_match(scores, source_type="gp_score_report", submatch_index=None):
@@ -2250,12 +2328,16 @@ async def import_gp_history_for_channel(
     source_label="supplemental",
     before=None,
     after=None,
+    review_entries=None,
 ):
     channel = client.get_channel(channel_id)
 
     if channel is None:
         print(f"SKIPPING GP channel not found: {channel_id}")
         return
+
+    if review_entries is None:
+        review_entries = []
 
     scanned = 0
     parsed = 0
@@ -2293,6 +2375,17 @@ async def import_gp_history_for_channel(
 
             parsed_matches = parse_gp_messages(msg.content, msg)
 
+            # Preserve the rejection of each candidate segment even where a
+            # different segment in the same Discord message was imported.
+            # Historical Elo ledger embeds are handled separately and aren't
+            # mistaken for free-text score reports.
+            if parse_gp_elo_ledger_message(msg) is None:
+                for segment_idx, segment in enumerate(split_gp_score_segments(msg.content, msg), 1):
+                    if gp_review_candidate(segment, msg) and not parse_score_lines(segment, msg, GP_MAX_SCORE):
+                        review_entries.append(gp_review_entry(
+                            msg, segment, channel.name, source_label, segment_idx
+                        ))
+
             if parsed_matches:
                 latest_parsed = msg.created_at
                 message_recorded = 0
@@ -2313,9 +2406,7 @@ async def import_gp_history_for_channel(
             else:
                 rejected += 1
                 latest_rejected = msg.created_at
-                # Surface possible result reports without contaminating Elo.
-                if re.search(r"\b(?:ranked|total)\b|:total:", msg.content or "", re.I):
-                    print(f"GP REVIEW (not imported): {msg.jump_url}")
+                # Candidate reports are preserved in the JSON audit, not Elo.
 
     except discord.Forbidden:
         print(f"SKIPPING GP channel #{channel.name}: missing access.")
@@ -2347,10 +2438,12 @@ async def import_gp_history_for_channel(
 async def import_gp_history():
     # Rebuild GP from Discord history every startup so source priority remains deterministic.
     reset_gp_state_for_rebuild()
+    gp_review_entries = []
 
     await import_gp_history_for_channel(
         ELO_GP_MATCH_RESULTS_CHANNEL_ID,
-        source_label="primary"
+        source_label="primary",
+        review_entries=gp_review_entries,
     )
 
     # Preserve the established historical source-priority model. CampKart 3 is
@@ -2361,6 +2454,7 @@ async def import_gp_history():
             channel_id,
             source_label="supplemental-pre-campkart3",
             before=GP_MANUAL_EVENT_CUTOFF,
+            review_entries=gp_review_entries,
         )
 
     import_manual_gp_results(save=False)
@@ -2370,9 +2464,13 @@ async def import_gp_history():
             channel_id,
             source_label="supplemental-post-campkart3",
             after=GP_MANUAL_EVENT_CUTOFF,
+            review_entries=gp_review_entries,
         )
 
     save_gp_data()
+    # Do not publish an incomplete audit if a channel failed; those channels
+    # still produce their normal diagnostics above.
+    write_gp_rejected_audit(gp_review_entries)
 
 
 def load_manual_event_results():
