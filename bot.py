@@ -836,7 +836,7 @@ def gp_review_candidate(content, message=None):
     raw = html.unescape(replace_discord_mentions(content or "", message))
     if not raw.strip():
         return False
-    if re.search(r"\b(?:casual|unranked)\b", raw, re.I):
+    if re.search(r"\b(?:casual|unranked|exhibition)\b", raw, re.I):
         return False
     if GP_CUP_PATTERN.search(raw) or GP_TOTAL_PATTERN.search(raw):
         return True
@@ -844,7 +844,7 @@ def gp_review_candidate(content, message=None):
         return True
     # A named match plus multiple numeric cup rows may be a report missing labels.
     lines = [x.strip() for x in raw.splitlines() if x.strip()]
-    if len(lines) >= 4 and any(GP_MATCHUP_PATTERN.fullmatch(x) for x in lines[:3]):
+    if len(lines) >= 4 and any(gp_result_matchup(x) for x in lines[:3]):
         if sum(bool(GP_BARE_PAIR_PATTERN.fullmatch(x)) for x in lines) >= 3:
             return True
     return False
@@ -854,13 +854,13 @@ def gp_review_reason(content, message=None):
     raw = html.unescape(replace_discord_mentions(content or "", message))
     if not raw.strip():
         return "empty_or_attachment_only"
-    if re.search(r"\b(?:casual|unranked)\b", raw, re.I):
+    if re.search(r"\b(?:casual|unranked|exhibition)\b", raw, re.I):
         return "casual_or_unranked"
     lines = [x.strip() for x in raw.splitlines() if x.strip()]
     if GP_CUP_PATTERN.search(raw) or GP_TOTAL_PATTERN.search(raw) or any(
         GP_CUP_PATTERN.fullmatch(x) or GP_TOTAL_PATTERN.fullmatch(x) for x in lines
     ):
-        matchups = [x for x in lines if GP_MATCHUP_PATTERN.fullmatch(x)]
+        matchups = [x for x in lines if gp_result_matchup(x)]
         if not matchups:
             return "missing_or_unrecognized_matchup"
         if len(matchups) != 1:
@@ -939,18 +939,19 @@ def clean_gp_score_segment(segment):
 # GP reports must contain an identifiable matchup and an unambiguous final result.
 # Never infer player names from arbitrary words preceding numbers in conversation.
 GP_MATCHUP_PATTERN = re.compile(
-    r"^\s*(?P<first>@.+?)\s+"
-    r"(?:vs\.?|versus|defeats?|beats?|barely\s+beats?|and)\s+"
-    r"(?P<second>@.+?)\s*(?:tie|tied)?\s*$",
+    r"^\s*(?P<first>@?[^\n]+?)\s+"
+    r"(?:vs\.?|versus|defeats?|defeated|beats?|barely\s+beats?|and|va|-)\s+"
+    r"(?P<second>@?[^\n]+?)\s*(?:tie|tied)?\s*$",
     re.IGNORECASE,
 )
+# Old reports use Mush/Flow/Spec, bare text, colon emojis, or custom Discord emojis.
 GP_CUP_PATTERN = re.compile(
-    r"^\s*(?:(?:<a?:)?(?:mushroomcup|flowercup|starcup|specialcup)(?::\d+>)?|:(?:mushroomcup|flowercup|starcup|specialcup):)\s*"
-    r"(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
+    r"^\s*\*?\s*(?:(?:<a?:)?(?:mushroomcup|flowercup|starcup|specialcup|mushroom|flower|special|star|mush|flow|spec)(?::\d+>)?|:(?:mushroomcup|flowercup|starcup|specialcup|mushroom|flower|special|star|mush|flow|spec):)\s*:?\s*"
+    r"(\d{1,3})\s*[-–—]\s*(\d{1,3})(?:\s*\[[^\]\n]*\])?\s*$",
     re.IGNORECASE,
 )
 GP_TOTAL_PATTERN = re.compile(
-    r"^\s*(?::total:|<a?:total:\d+>|total\s*[:=]|=)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
+    r"^\s*(?::total:|<a?:total:\d+>|total\s*[:=]?|=)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
     re.IGNORECASE,
 )
 GP_BARE_PAIR_PATTERN = re.compile(r"^\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$")
@@ -963,8 +964,30 @@ GP_SIMPLE_PAIR_PATTERN = re.compile(
     re.IGNORECASE,
 )
 GP_NOTES_PATTERN = re.compile(r"^(?:game\s*notes?|notes?)\s*:", re.I)
-GP_ROUND_LABEL_PATTERN = re.compile(r"^\s*(?:Round\s+\d+|Extra\s+mode)\s*[:\-]\s*", re.I)
+GP_ROUND_LABEL_PATTERN = re.compile(r"^\s*(?:Round\s+\d+(?:/\d+)?|Extra\s+mode)\s*[:\-]?\s*$", re.I)
+GP_RESULT_PREFIX_PATTERN = re.compile(r"^\s*(?:ranked(?:\s+.*)?|for ranking)\s*$", re.I)
 
+
+def gp_result_matchup(line):
+    """Return exactly two plausible competitors from one result header."""
+    text = re.sub(r"^\s*ranked\b\s*", "", line.strip(), flags=re.I)
+    match = GP_MATCHUP_PATTERN.fullmatch(text)
+    if not match:
+        return None
+    first, second = (match.group(k).strip() for k in ("first", "second"))
+    # 'DK challenge' is a format descriptor, not part of the competitor name.
+    second = re.sub(r"^(?:DK\s+challenge|DK)\s+(?=@)", "", second, flags=re.I)
+    first = re.sub(r"\s+DK\s+challenge$", "", first, flags=re.I)
+    # Don't promote commentary, results annotations, or lengthy prose to names.
+    for name in (first, second):
+        if len(name) > 60 or re.search(r"[.!?]\s+[a-z]{3,}", name, re.I):
+            return None
+        if re.search(r"\b(?:game notes|total|mushroom|flower|special|ranked|casual)\b", name, re.I):
+            return None
+    p1, p2 = gp_report_player(first), gp_report_player(second)
+    if not p1 or not p2 or p1 == p2 or len(p1) > 32 or len(p2) > 32:
+        return None
+    return p1, p2
 
 def gp_report_player(name):
     name = re.sub(r"<a?:[A-Za-z0-9_~]+:\d+>|:[A-Za-z0-9_~]+:", " ", name).strip()
@@ -974,90 +997,90 @@ def gp_report_player(name):
 
 
 def parse_score_lines(content, message=None, max_score=160):
-    """Recognize GP results without interpreting commentary as scores.
-
-    Cup-by-cup reports need two identifiable @players and four cup rows.
-    Explicit totals are checked against those rows; mismatches are rejected
-    for review, not silently given a winner. Older single-line player/score
-    pairs remain supported. Explicitly casual results are excluded.
-    """
+    """Parse unambiguous two-player GP results; never infer totals or players from prose."""
     raw = html.unescape(replace_discord_mentions(content or "", message))
-    lines = [GP_ROUND_LABEL_PATTERN.sub("", x.strip()) for x in raw.splitlines() if x.strip()]
-    if not lines or re.search(r"\b(?:casual|unranked)\b", raw, re.I):
+    lines = [x.strip() for x in raw.splitlines() if x.strip()]
+    if not lines or re.search(r"\b(?:casual|unranked|exhibition)\b", raw, re.I):
         return {}
 
-    # Only the result section is eligible for parsing; ignore narrative notes.
+    # Scores after a notes block may describe unrelated races; ignore those.
     cutoff = next((i for i, line in enumerate(lines) if GP_NOTES_PATTERN.match(line)), len(lines))
     result_lines = lines[:cutoff]
-    cup_rows = []
-    explicit_totals = []
-    for line in result_lines:
-        cup = GP_CUP_PATTERN.fullmatch(line)
-        total = GP_TOTAL_PATTERN.fullmatch(line)
-        if cup:
-            cup_rows.append(tuple(map(int, cup.groups())))
-        elif total:
-            explicit_totals.append(tuple(map(int, total.groups())))
+    cups, totals, bare = [], [], []
+    first_result_line = len(result_lines)
+    for i, line in enumerate(result_lines):
+        c = GP_CUP_PATTERN.fullmatch(line)
+        t = GP_TOTAL_PATTERN.fullmatch(line)
+        b = GP_BARE_PAIR_PATTERN.fullmatch(line)
+        if c:
+            cups.append(tuple(map(int, c.groups())))
+            first_result_line = min(first_result_line, i)
+        elif t:
+            totals.append(tuple(map(int, t.groups())))
+            first_result_line = min(first_result_line, i)
+        elif b:
+            bare.append(tuple(map(int, b.groups())))
+            first_result_line = min(first_result_line, i)
 
-    # Find the one actual matchup among the header lines. Ignore Ranked.
-    header = []
-    for line in result_lines:
-        if GP_CUP_PATTERN.fullmatch(line) or GP_TOTAL_PATTERN.fullmatch(line):
-            break
-        header.append(line)
-    matchups = [GP_MATCHUP_PATTERN.fullmatch(line) for line in header]
-    matchups = [m for m in matchups if m is not None]
-    if len(matchups) == 1:
-        match = matchups[0]
-        p1, p2 = (gp_report_player(match.group(k)) for k in ('first', 'second'))
-        if not p1 or not p2 or p1 == p2:
-            return {}
+    matchup_candidates = [x for x in (gp_result_matchup(line) for line in result_lines[:first_result_line]) if x]
+    if len(matchup_candidates) != 1:
+        # Preserve the exact historical two-player one-line result format.
+        if len(result_lines) == 1:
+            m = GP_SIMPLE_PAIR_PATTERN.fullmatch(result_lines[0])
+            if m:
+                p1, p2 = gp_report_player(m.group('first')), gp_report_player(m.group('second'))
+                a, b = int(m.group('score1')), int(m.group('score2'))
+                if p1 and p2 and p1 != p2 and max(a, b) <= max_score:
+                    return {p1: a, p2: b}
+        return {}
 
-        if len(cup_rows) == 5 and not explicit_totals:
-            expected = tuple(map(sum, zip(*cup_rows[:4])))
-            if cup_rows[4] == expected:
-                explicit_totals = [expected]
-                cup_rows = cup_rows[:4]
-        # Reports without cup labels use four bare numeric rows + final total.
-        if not cup_rows:
-            numeric = [GP_BARE_PAIR_PATTERN.fullmatch(line) for line in result_lines]
-            numeric = [tuple(map(int, m.groups())) for m in numeric if m]
-            if len(numeric) == 4 and len(explicit_totals) == 1:
-                cup_rows = numeric
-            elif len(numeric) == 5 and not explicit_totals and tuple(map(sum, zip(*numeric[:4]))) == numeric[4]:
-                cup_rows, explicit_totals = numeric[:4], [numeric[4]]
+    p1, p2 = matchup_candidates[0]
+    if not cups and len(bare) == 5 and not totals:
+        cups, totals = bare[:4], bare[4:]
+    elif not cups and len(bare) == 4 and len(totals) == 1:
+        cups = bare
+    elif len(cups) == 4 and len(bare) == 1 and not totals:
+        totals = bare
 
-        if len(cup_rows) != 4 or len(explicit_totals) != 1:
-            return {}
-        computed = tuple(map(sum, zip(*cup_rows)))
-        if computed != explicit_totals[0]:
-            return {}
-        a, b = computed
-        if max(a, b) > max_score:
-            return {}
-        return {p1: a, p2: b}
-
-    # Preserve historic short-form results, without accepting prose or notes.
-    if len(result_lines) == 1:
-        m = GP_SIMPLE_PAIR_PATTERN.fullmatch(result_lines[0])
-        if m:
-            p1, p2 = gp_report_player(m.group('first')), gp_report_player(m.group('second'))
-            a, b = int(m.group('score1')), int(m.group('score2'))
-            if p1 and p2 and p1 != p2 and max(a, b) <= max_score:
-                return {p1: a, p2: b}
-    return {}
+    # No incomplete, mixed or additional score sets may be silently guessed.
+    if len(cups) != 4 or len(totals) != 1:
+        return {}
+    if len(bare) > (5 if not GP_CUP_PATTERN.search(raw) else 1):
+        return {}
+    if tuple(map(sum, zip(*cups))) != totals[0]:
+        return {}
+    a, b = totals[0]
+    if max(a, b) > max_score:
+        return {}
+    return {p1: a, p2: b}
 
 
 def split_gp_score_segments(content, message=None):
-    """Keep Discord line breaks intact; split only explicitly numbered games."""
+    """Split numbered rounds and genuine consecutive match reports, not commentary."""
     raw = html.unescape(replace_discord_mentions(content or "", message))
     if not raw.strip():
         return []
-    parts = list(re.finditer(r"(?im)^\s*(?:Round\s+\d+|Extra\s+mode)\s*[:\-]", raw))
-    if len(parts) > 1:
-        return [raw[m.start():(parts[i+1].start() if i+1 < len(parts) else len(raw))].strip()
-                for i, m in enumerate(parts)]
-    return [raw]
+    lines = raw.splitlines(keepends=True)
+    segments = []
+    current = []
+    has_result = False
+    has_matchup = False
+    for line in lines:
+        stripped = line.strip()
+        is_round = bool(GP_ROUND_LABEL_PATTERN.fullmatch(stripped))
+        is_matchup = gp_result_matchup(stripped) is not None
+        # Start a new result after a completed total, or at an explicit new round.
+        if current and ((is_round and has_result) or (is_matchup and has_result and has_matchup)):
+            segments.append(''.join(current).strip())
+            current = []
+            has_result = False
+            has_matchup = False
+        current.append(line)
+        has_matchup |= is_matchup
+        has_result |= bool(GP_TOTAL_PATTERN.fullmatch(stripped))
+    if current:
+        segments.append(''.join(current).strip())
+    return [segment for segment in segments if segment]
 
 
 def make_gp_score_match(scores, source_type="gp_score_report", submatch_index=None):
@@ -1089,20 +1112,33 @@ def make_gp_score_match(scores, source_type="gp_score_report", submatch_index=No
 
 
 def parse_gp_score_report_messages(content, message=None):
+    """Handle separate rounds; carry a matchup only within a clearly numbered series."""
     matches_found = []
     segments = split_gp_score_segments(content, message)
-
+    series_matchup = None
     for idx, segment in enumerate(segments, 1):
+        lines = [line.strip() for line in segment.splitlines() if line.strip()]
+        found_headers = [pair for pair in (gp_result_matchup(line) for line in lines) if pair]
+        if len(found_headers) == 1:
+            series_matchup = found_headers[0]
+        elif len(found_headers) > 1:
+            series_matchup = None
+
         scores = parse_score_lines(segment, message, GP_MAX_SCORE)
+        # A later round may omit the players when the first round introduced
+        # them. Only inherit within an explicitly numbered, continuous series.
+        if not scores and series_matchup and not found_headers and idx > 1 and re.search(
+            r"(?im)^\s*round\s+\d+(?:/\d+)?\s*[:\-]?\s*$", segment
+        ):
+            first, second = series_matchup
+            scores = parse_score_lines(f"@{first} vs @{second}\n" + segment, message, GP_MAX_SCORE)
         match = make_gp_score_match(
             scores,
             source_type="gp_score_report",
             submatch_index=idx if len(segments) > 1 else None,
         )
-
         if match:
             matches_found.append(match)
-
     return matches_found
 
 
@@ -2323,6 +2359,38 @@ async def import_vs_history():
         await import_vs_history_for_channel(channel_id)
 
 
+def possible_gp_ledger_overlap(match, message, window_seconds=600):
+    """Flag, but do not merge, a GP score possibly represented in the old Elo ledger.
+
+    Ledger embeds use their own Discord IDs, so message-ID deduplication alone
+    cannot detect cross-posts. Within ten minutes, the same two players and
+    winner are a review candidate, NOT proof of duplication.
+    """
+    if message is None or match.get("source_type") != "gp_score_report":
+        return None
+    match_players = set(match.get("players", ()))
+    winner = match.get("winner")
+    if len(match_players) != 2 or winner is None:
+        return None
+    for prior in gp_matches:
+        if prior.get("source_type") != "gp_elo_ledger":
+            continue
+        if set(prior.get("players", ())) != match_players or prior.get("winner") != winner:
+            continue
+        try:
+            stamp = datetime.fromisoformat(prior["created_at"].replace("Z", "+00:00"))
+            if stamp.tzinfo is None:
+                stamp = stamp.replace(tzinfo=timezone.utc)
+            msg_dt = message.created_at
+            if msg_dt.tzinfo is None:
+                msg_dt = msg_dt.replace(tzinfo=timezone.utc)
+            if abs((stamp - msg_dt).total_seconds()) <= window_seconds:
+                return prior
+        except (TypeError, ValueError, KeyError):
+            continue
+    return None
+
+
 async def import_gp_history_for_channel(
     channel_id,
     source_label="supplemental",
@@ -2380,8 +2448,12 @@ async def import_gp_history_for_channel(
             # Historical Elo ledger embeds are handled separately and aren't
             # mistaken for free-text score reports.
             if parse_gp_elo_ledger_message(msg) is None:
+                parsed_indices = {
+                    int(match.get("submatch_index") or 1) for match in parsed_matches
+                    if match.get("source_type") == "gp_score_report"
+                }
                 for segment_idx, segment in enumerate(split_gp_score_segments(msg.content, msg), 1):
-                    if gp_review_candidate(segment, msg) and not parse_score_lines(segment, msg, GP_MAX_SCORE):
+                    if segment_idx not in parsed_indices and gp_review_candidate(segment, msg):
                         review_entries.append(gp_review_entry(
                             msg, segment, channel.name, source_label, segment_idx
                         ))
@@ -2391,6 +2463,21 @@ async def import_gp_history_for_channel(
                 message_recorded = 0
 
                 for match in parsed_matches:
+                    # The historic Elo ledger contains outcome-only cross-posts
+                    # with DIFFERENT Discord IDs. Flag close candidate overlaps
+                    # for review instead of silently double-counting them.
+                    overlap = possible_gp_ledger_overlap(match, msg)
+                    if overlap is not None:
+                        segment_idx = int(match.get("submatch_index") or 1)
+                        segments = split_gp_score_segments(msg.content, msg)
+                        segment = segments[segment_idx - 1] if segment_idx <= len(segments) else msg.content
+                        entry = gp_review_entry(msg, segment, channel.name, source_label, segment_idx)
+                        entry["reason"] = "possible_ledger_duplicate"
+                        entry["possible_ledger_message_id"] = str(overlap.get("message_id", ""))
+                        entry["possible_ledger_jump_url"] = overlap.get("jump_url", "")
+                        review_entries.append(entry)
+                        duplicates += 1
+                        continue
                     recorded = record_gp_match(match, message=msg, save=False)
 
                     if recorded:
