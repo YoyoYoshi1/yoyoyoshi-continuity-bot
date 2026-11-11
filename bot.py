@@ -3091,7 +3091,7 @@ def run_continuity_qa():
 # Slash commands
 # -----------------------------
 
-@tree.command(name="commands", description="List the slash commands available to server members.")
+@tree.command(name="commands", description="Show available bot commands.")
 @app_commands.guild_only()
 async def commands(interaction: discord.Interaction):
     # Read commands from the live guild command tree rather than maintaining a
@@ -3116,8 +3116,8 @@ async def commands(interaction: discord.Interaction):
         return
 
     embed = discord.Embed(
-        title="Available Slash Commands",
-        description="Public commands registered for this server.",
+        title="Bot Commands",
+        description="",
         color=discord.Color.blue(),
     )
     # Discord allows 25 embed fields; a single description fits the current
@@ -3201,25 +3201,25 @@ async def announceelo(interaction: discord.Interaction):
     await interaction.followup.send(f"Published the VS Elo update in {channel.mention}.", ephemeral=True)
 
 
-@tree.command(name="vsleaderboard", description="Show the MK64 VS leaderboard.")
+@tree.command(name="vsleaderboard", description="Show VS standings.")
 @app_commands.describe(limit="Number of players to show, from 1 to 20")
 async def vsleaderboard(interaction: discord.Interaction, limit: int = 10):
     limit = max(1, min(limit, 20))
     await interaction.response.send_message(format_vs_leaderboard(limit))
 
 
-@tree.command(name="vsrank", description="Show an MK64 VS player's rating.")
+@tree.command(name="vsrank", description="Show a player's VS rating and match totals.")
 @app_commands.describe(player="Player name or alias")
 async def vsrank(interaction: discord.Interaction, player: str):
     await interaction.response.send_message(format_vs_rank(player))
 
 
-@tree.command(name="vsstats", description="Show MK64 VS parser stats.")
+@tree.command(name="vsstats", description="Show VS match and player totals.")
 async def vsstats(interaction: discord.Interaction):
     await interaction.response.send_message(format_vs_stats())
 
 
-@tree.command(name="vsquarter", description="Show the MK64 VS quarterly leaderboard.")
+@tree.command(name="vsquarter", description="Show VS standings for a quarter.")
 @app_commands.describe(
     quarter="Quarter in YYYY-Q# format, like 2026-Q2. Leave blank for current quarter.",
     limit="Number of players to show, from 1 to 20"
@@ -3231,25 +3231,25 @@ async def vsquarter(interaction: discord.Interaction, quarter: str = "", limit: 
     )
 
 
-@tree.command(name="gpleaderboard", description="Show the MK64 GP leaderboard.")
+@tree.command(name="gpleaderboard", description="Show GP standings.")
 @app_commands.describe(limit="Number of players to show, from 1 to 20")
 async def gpleaderboard(interaction: discord.Interaction, limit: int = 10):
     limit = max(1, min(limit, 20))
     await interaction.response.send_message(format_gp_leaderboard(limit))
 
 
-@tree.command(name="gprank", description="Show an MK64 GP player's rating.")
+@tree.command(name="gprank", description="Show a player's GP rating and record.")
 @app_commands.describe(player="Player name or alias")
 async def gprank(interaction: discord.Interaction, player: str):
     await interaction.response.send_message(format_gp_rank(player))
 
 
-@tree.command(name="gpstats", description="Show MK64 GP parser stats.")
+@tree.command(name="gpstats", description="Show GP match and player totals.")
 async def gpstats(interaction: discord.Interaction):
     await interaction.response.send_message(format_gp_stats())
 
 
-@tree.command(name="gpquarter", description="Show the MK64 GP quarterly leaderboard.")
+@tree.command(name="gpquarter", description="Show GP standings for a quarter.")
 @app_commands.describe(
     quarter="Quarter in YYYY-Q# format, like 2026-Q2. Leave blank for current quarter.",
     limit="Number of players to show, from 1 to 20"
@@ -3261,13 +3261,13 @@ async def gpquarter(interaction: discord.Interaction, quarter: str = "", limit: 
     )
 
 
-@tree.command(name="playerpage", description="Draft an MK64 continuity profile from bot records.")
+@tree.command(name="playerpage", description="Show a player profile from match records.")
 @app_commands.describe(player="Player name or alias")
 async def playerpage(interaction: discord.Interaction, player: str):
     await interaction.response.send_message(format_player_continuity_profile(player))
 
 
-@tree.command(name="communityhistory", description="Show MK64 community history milestones and bot record totals.")
+@tree.command(name="communityhistory", description="Show community milestones and match totals.")
 async def communityhistory(interaction: discord.Interaction):
     lines = ["**MK64 Switch Community History — Draft Milestones**"]
     for milestone in COMMUNITY_MILESTONES:
@@ -3334,21 +3334,21 @@ async def backfill_stats(interaction: discord.Interaction):
         print("Could not send completion message:", e)
 
 
-@tree.command(name="serverstats", description="Show Discord message stats by channel.")
+@tree.command(name="serverstats", description="Show message counts by channel.")
 @app_commands.describe(limit="Number of channels to show, from 1 to 20")
 async def serverstats(interaction: discord.Interaction, limit: int = 10):
     limit = max(1, min(limit, 20))
     await interaction.response.send_message(format_server_stats(interaction.guild, limit))
 
 
-@tree.command(name="userstats", description="Show Discord message stats by user.")
+@tree.command(name="userstats", description="Show the most active members by message count.")
 @app_commands.describe(limit="Number of users to show, from 1 to 20")
 async def userstats(interaction: discord.Interaction, limit: int = 10):
     limit = max(1, min(limit, 20))
     await interaction.response.send_message(format_user_stats(interaction.guild, limit))
 
 
-@tree.command(name="monthlystats", description="Show Discord message stats by month.")
+@tree.command(name="monthlystats", description="Show monthly message counts.")
 @app_commands.describe(limit="Number of months to show, from 1 to 24")
 async def monthlystats(interaction: discord.Interaction, limit: int = 12):
     limit = max(1, min(limit, 24))
