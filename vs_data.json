@@ -15173,7 +15173,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-1a",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 1A",
+      "round": "Main Seeding \u2014 Match 1A",
       "event_order": 2,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15207,7 +15207,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-1b",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 1B",
+      "round": "Main Seeding \u2014 Match 1B",
       "event_order": 3,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15241,7 +15241,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-2a",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 2A",
+      "round": "Main Seeding \u2014 Match 2A",
       "event_order": 4,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15275,7 +15275,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-2b",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 2B",
+      "round": "Main Seeding \u2014 Match 2B",
       "event_order": 5,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15309,7 +15309,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-3a",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 3A",
+      "round": "Main Seeding \u2014 Match 3A",
       "event_order": 6,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15343,7 +15343,7 @@
       "source_type": "manual_event_vs",
       "source_id": "campkart2026-vs-seed-3b",
       "event": "CampKart 3 / CampKart 2026",
-      "round": "Main Seeding — Match 3B",
+      "round": "Main Seeding \u2014 Match 3B",
       "event_order": 7,
       "created_at": "2026-09-06",
       "date_precision": "day",
@@ -15508,26 +15508,1886 @@
           15
         ]
       ]
+    },
+    {
+      "scores": {
+        "gumby": 25,
+        "wildermk64": 9,
+        "fuzz": 30,
+        "baker": 32
+      },
+      "placements": [
+        [
+          "baker",
+          32
+        ],
+        [
+          "fuzz",
+          30
+        ],
+        [
+          "gumby",
+          25
+        ],
+        [
+          "wildermk64",
+          9
+        ]
+      ],
+      "message_id": 1538635186521120978,
+      "created_at": "2026-08-16T19:46:54.926000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1538635186521120978",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "gumby": 29,
+        "fuzz": 27,
+        "baker": 17,
+        "gg": 23
+      },
+      "placements": [
+        [
+          "gumby",
+          29
+        ],
+        [
+          "fuzz",
+          27
+        ],
+        [
+          "gg",
+          23
+        ],
+        [
+          "baker",
+          17
+        ]
+      ],
+      "message_id": 1538647891298746368,
+      "created_at": "2026-08-16T20:37:23.981000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1538647891298746368",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "martin": 23,
+        "fuzz": 29,
+        "dipthe4man": 19,
+        "fx64": 25
+      },
+      "placements": [
+        [
+          "fuzz",
+          29
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "martin",
+          23
+        ],
+        [
+          "dipthe4man",
+          19
+        ]
+      ],
+      "message_id": 1539820016348700762,
+      "created_at": "2026-08-20T02:15:00.370000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1539820016348700762",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "fuzz": 27,
+        "gg": 22,
+        "dipthe4man": 16
+      },
+      "placements": [
+        [
+          "martin",
+          31
+        ],
+        [
+          "fuzz",
+          27
+        ],
+        [
+          "gg",
+          22
+        ],
+        [
+          "dipthe4man",
+          16
+        ]
+      ],
+      "message_id": 1540537087508488302,
+      "created_at": "2026-08-22T01:44:23.457000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1540537087508488302",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 26,
+        "fuzz": 24,
+        "dipthe4man": 20,
+        "fx64": 28
+      },
+      "placements": [
+        [
+          "fx64",
+          28
+        ],
+        [
+          "martin",
+          26
+        ],
+        [
+          "fuzz",
+          24
+        ],
+        [
+          "dipthe4man",
+          20
+        ]
+      ],
+      "message_id": 1541274202374406204,
+      "created_at": "2026-08-24T02:33:25.336000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1541274202374406204",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 21,
+        "fuzz": 28,
+        "dipthe4man": 20,
+        "fx64": 27
+      },
+      "placements": [
+        [
+          "fuzz",
+          28
+        ],
+        [
+          "fx64",
+          27
+        ],
+        [
+          "martin",
+          21
+        ],
+        [
+          "dipthe4man",
+          20
+        ]
+      ],
+      "message_id": 1542232578646614177,
+      "created_at": "2026-08-26T18:01:40.045000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1542232578646614177",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "gumby": 41,
+        "dipthe4man": 18,
+        "wildermk64": 14,
+        "heroking": 23
+      },
+      "placements": [
+        [
+          "gumby",
+          41
+        ],
+        [
+          "heroking",
+          23
+        ],
+        [
+          "dipthe4man",
+          18
+        ],
+        [
+          "wildermk64",
+          14
+        ]
+      ],
+      "message_id": 1542976388389142750,
+      "created_at": "2026-08-28T19:17:18.107000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1542976388389142750",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "martin": 27,
+        "gg": 29,
+        "dipthe4man": 20,
+        "baker": 20
+      },
+      "placements": [
+        [
+          "gg",
+          29
+        ],
+        [
+          "martin",
+          27
+        ],
+        [
+          "dipthe4man",
+          20
+        ],
+        [
+          "baker",
+          20
+        ]
+      ],
+      "message_id": 1543068209572487188,
+      "created_at": "2026-08-29T01:22:09.983000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1543068209572487188",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 25,
+        "gg": 19,
+        "dipthe4man": 21,
+        "baker": 31
+      },
+      "placements": [
+        [
+          "baker",
+          31
+        ],
+        [
+          "martin",
+          25
+        ],
+        [
+          "dipthe4man",
+          21
+        ],
+        [
+          "gg",
+          19
+        ]
+      ],
+      "message_id": 1543081668003373146,
+      "created_at": "2026-08-29T02:15:38.723000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1543081668003373146",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "fx64": 25,
+        "fuzz": 29,
+        "thecoolex": 18,
+        "baker": 24
+      },
+      "placements": [
+        [
+          "fuzz",
+          29
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "baker",
+          24
+        ],
+        [
+          "thecoolex",
+          18
+        ]
+      ],
+      "message_id": 1543804295370248345,
+      "created_at": "2026-08-31T02:07:06.513000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1543804295370248345",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 34,
+        "dzd2": 19,
+        "heroking": 16,
+        "dipthe4man": 27
+      },
+      "placements": [
+        [
+          "martin",
+          34
+        ],
+        [
+          "dipthe4man",
+          27
+        ],
+        [
+          "dzd2",
+          19
+        ],
+        [
+          "heroking",
+          16
+        ]
+      ],
+      "message_id": 1544547672189313064,
+      "created_at": "2026-09-02T03:21:01.358000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1544547672189313064",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 33,
+        "heroking": 17,
+        "dzd2": 16,
+        "dipthe4man": 33
+      },
+      "placements": [
+        [
+          "martin",
+          33
+        ],
+        [
+          "dipthe4man",
+          33
+        ],
+        [
+          "heroking",
+          17
+        ],
+        [
+          "dzd2",
+          16
+        ]
+      ],
+      "message_id": 1544559992894398464,
+      "created_at": "2026-09-02T04:09:58.843000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1544559992894398464",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "mrpitt": 11,
+        "spacedcowboy": 36,
+        "dipthe4man": 16,
+        "gumby": 33
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          36
+        ],
+        [
+          "gumby",
+          33
+        ],
+        [
+          "dipthe4man",
+          16
+        ],
+        [
+          "mrpitt",
+          11
+        ]
+      ],
+      "message_id": 1545274262317699103,
+      "created_at": "2026-09-04T03:28:13.944000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545274262317699103",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "mrpitt": 12,
+        "spacedcowboy": 35,
+        "dipthe4man": 19,
+        "gumby": 30
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          35
+        ],
+        [
+          "gumby",
+          30
+        ],
+        [
+          "dipthe4man",
+          19
+        ],
+        [
+          "mrpitt",
+          12
+        ]
+      ],
+      "message_id": 1545286618330701884,
+      "created_at": "2026-09-04T04:17:19.847000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545286618330701884",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "fx64": 21,
+        "spacedcowboy": 36,
+        "dipthe4man": 11,
+        "gumby": 28
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          36
+        ],
+        [
+          "gumby",
+          28
+        ],
+        [
+          "fx64",
+          21
+        ],
+        [
+          "dipthe4man",
+          11
+        ]
+      ],
+      "message_id": 1545299248503988284,
+      "created_at": "2026-09-04T05:07:31.115000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545299248503988284",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "fx64": 25,
+        "spacedcowboy": 32,
+        "dipthe4man": 27,
+        "wildermk64": 12
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          32
+        ],
+        [
+          "dipthe4man",
+          27
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "wildermk64",
+          12
+        ]
+      ],
+      "message_id": 1545311688520114176,
+      "created_at": "2026-09-04T05:56:57.046000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545311688520114176",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "mrpitt": 22,
+        "fx64": 18,
+        "gumby": 42,
+        "wildermk64": 14
+      },
+      "placements": [
+        [
+          "gumby",
+          42
+        ],
+        [
+          "mrpitt",
+          22
+        ],
+        [
+          "fx64",
+          18
+        ],
+        [
+          "wildermk64",
+          14
+        ]
+      ],
+      "message_id": 1545447020691464213,
+      "created_at": "2026-09-04T14:54:42.750000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545447020691464213",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "wildermk64": 24,
+        "gg": 32,
+        "martin": 22,
+        "mrpitt": 18
+      },
+      "placements": [
+        [
+          "gg",
+          32
+        ],
+        [
+          "wildermk64",
+          24
+        ],
+        [
+          "martin",
+          22
+        ],
+        [
+          "mrpitt",
+          18
+        ]
+      ],
+      "message_id": 1545489857516675223,
+      "created_at": "2026-09-04T17:44:55.845000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545489857516675223",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "gumby": 37,
+        "dipthe4man": 23,
+        "martin": 12,
+        "fx64": 24
+      },
+      "placements": [
+        [
+          "gumby",
+          37
+        ],
+        [
+          "fx64",
+          24
+        ],
+        [
+          "dipthe4man",
+          23
+        ],
+        [
+          "martin",
+          12
+        ]
+      ],
+      "message_id": 1545677385960136744,
+      "created_at": "2026-09-05T06:10:06.110000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1545677385960136744",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "gumby": 41,
+        "wildermk64": 8,
+        "dipthe4man": 15,
+        "martin": 30
+      },
+      "placements": [
+        [
+          "gumby",
+          41
+        ],
+        [
+          "martin",
+          30
+        ],
+        [
+          "dipthe4man",
+          15
+        ],
+        [
+          "wildermk64",
+          8
+        ]
+      ],
+      "message_id": 1546028767493885973,
+      "created_at": "2026-09-06T05:26:21.996000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546028767493885973",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "gumby": 31,
+        "martin": 25,
+        "dipthe4man": 9,
+        "spacedcowboy": 31
+      },
+      "placements": [
+        [
+          "gumby",
+          31
+        ],
+        [
+          "spacedcowboy",
+          31
+        ],
+        [
+          "martin",
+          25
+        ],
+        [
+          "dipthe4man",
+          9
+        ]
+      ],
+      "message_id": 1546040779296739338,
+      "created_at": "2026-09-06T06:14:05.833000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546040779296739338",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "fx64": 18,
+        "martin": 14,
+        "gumby": 31,
+        "spacedcowboy": 33
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          33
+        ],
+        [
+          "gumby",
+          31
+        ],
+        [
+          "fx64",
+          18
+        ],
+        [
+          "martin",
+          14
+        ]
+      ],
+      "message_id": 1546204685159895040,
+      "created_at": "2026-09-06T17:05:24.036000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546204685159895040",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "gumby": 38,
+        "wildermk64": 19,
+        "fx64": 19,
+        "mrpitt": 20
+      },
+      "placements": [
+        [
+          "gumby",
+          38
+        ],
+        [
+          "mrpitt",
+          20
+        ],
+        [
+          "wildermk64",
+          19
+        ],
+        [
+          "fx64",
+          19
+        ]
+      ],
+      "message_id": 1546392580256825397,
+      "created_at": "2026-09-07T05:32:01.718000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546392580256825397",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "mrpitt": 17,
+        "wildermk64": 14,
+        "fx64": 23,
+        "gumby": 42
+      },
+      "placements": [
+        [
+          "gumby",
+          42
+        ],
+        [
+          "fx64",
+          23
+        ],
+        [
+          "mrpitt",
+          17
+        ],
+        [
+          "wildermk64",
+          14
+        ]
+      ],
+      "message_id": 1546549226513764465,
+      "created_at": "2026-09-07T15:54:29.096000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546549226513764465",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "mrpitt": 17,
+        "wildermk64": 16,
+        "fx64": 24,
+        "gumby": 39
+      },
+      "placements": [
+        [
+          "gumby",
+          39
+        ],
+        [
+          "fx64",
+          24
+        ],
+        [
+          "mrpitt",
+          17
+        ],
+        [
+          "wildermk64",
+          16
+        ]
+      ],
+      "message_id": 1546570828223750277,
+      "created_at": "2026-09-07T17:20:19.345000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1546570828223750277",
+      "author": "twiztidgumby"
+    },
+    {
+      "scores": {
+        "fx64": 31,
+        "heroking": 16,
+        "baker": 29,
+        "dipthe4man": 20
+      },
+      "placements": [
+        [
+          "fx64",
+          31
+        ],
+        [
+          "baker",
+          29
+        ],
+        [
+          "dipthe4man",
+          20
+        ],
+        [
+          "heroking",
+          16
+        ]
+      ],
+      "message_id": 1547397961770729603,
+      "created_at": "2026-09-10T00:07:03.350000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1547397961770729603",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "fx64": 25,
+        "heroking": 16,
+        "spacedcowboy": 33,
+        "dipthe4man": 22
+      },
+      "placements": [
+        [
+          "spacedcowboy",
+          33
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "dipthe4man",
+          22
+        ],
+        [
+          "heroking",
+          16
+        ]
+      ],
+      "message_id": 1547413068487589898,
+      "created_at": "2026-09-10T01:07:05.072000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1547413068487589898",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 29,
+        "fuzz": 31,
+        "dipthe4man": 17,
+        "baker": 19
+      },
+      "placements": [
+        [
+          "fuzz",
+          31
+        ],
+        [
+          "martin",
+          29
+        ],
+        [
+          "baker",
+          19
+        ],
+        [
+          "dipthe4man",
+          17
+        ]
+      ],
+      "message_id": 1549568957793439926,
+      "created_at": "2026-09-15T23:53:49.137000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1549568957793439926",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 34,
+        "thecoolex": 21,
+        "fuzz": 31,
+        "dipthe4man": 10
+      },
+      "placements": [
+        [
+          "martin",
+          34
+        ],
+        [
+          "fuzz",
+          31
+        ],
+        [
+          "thecoolex",
+          21
+        ],
+        [
+          "dipthe4man",
+          10
+        ]
+      ],
+      "message_id": 1549613994304872530,
+      "created_at": "2026-09-16T02:52:46.678000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1549613994304872530",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 33,
+        "thecoolex": 20,
+        "dipthe4man": 15,
+        "fuzz": 28
+      },
+      "placements": [
+        [
+          "martin",
+          33
+        ],
+        [
+          "fuzz",
+          28
+        ],
+        [
+          "thecoolex",
+          20
+        ],
+        [
+          "dipthe4man",
+          15
+        ]
+      ],
+      "message_id": 1549622429377241119,
+      "created_at": "2026-09-16T03:26:17.756000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1549622429377241119",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 24,
+        "thecoolex": 20,
+        "gg": 22,
+        "fuzz": 30
+      },
+      "placements": [
+        [
+          "fuzz",
+          30
+        ],
+        [
+          "martin",
+          24
+        ],
+        [
+          "gg",
+          22
+        ],
+        [
+          "thecoolex",
+          20
+        ]
+      ],
+      "message_id": 1550699807696232508,
+      "created_at": "2026-09-19T02:47:24.764000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1550699807696232508",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 33,
+        "fuzz": 21,
+        "heroking": 12,
+        "n64": 30
+      },
+      "placements": [
+        [
+          "martin",
+          33
+        ],
+        [
+          "n64",
+          30
+        ],
+        [
+          "fuzz",
+          21
+        ],
+        [
+          "heroking",
+          12
+        ]
+      ],
+      "message_id": 1551035340725420162,
+      "created_at": "2026-09-20T01:00:42.072000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1551035340725420162",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 23,
+        "fuzz": 36,
+        "heroking": 9,
+        "fx64": 28
+      },
+      "placements": [
+        [
+          "fuzz",
+          36
+        ],
+        [
+          "fx64",
+          28
+        ],
+        [
+          "martin",
+          23
+        ],
+        [
+          "heroking",
+          9
+        ]
+      ],
+      "message_id": 1551047374829527050,
+      "created_at": "2026-09-20T01:48:31.226000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1551047374829527050",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 26,
+        "fuzz": 23,
+        "fx64": 29,
+        "heroking": 18
+      },
+      "placements": [
+        [
+          "fx64",
+          29
+        ],
+        [
+          "martin",
+          26
+        ],
+        [
+          "fuzz",
+          23
+        ],
+        [
+          "heroking",
+          18
+        ]
+      ],
+      "message_id": 1551047571722477661,
+      "created_at": "2026-09-20T01:49:18.169000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1551047571722477661",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 26,
+        "fuzz": 25,
+        "fx64": 20,
+        "dipthe4man": 25
+      },
+      "placements": [
+        [
+          "martin",
+          26
+        ],
+        [
+          "fuzz",
+          25
+        ],
+        [
+          "dipthe4man",
+          25
+        ],
+        [
+          "fx64",
+          20
+        ]
+      ],
+      "message_id": 1552125045298430033,
+      "created_at": "2026-09-23T01:10:47.888000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552125045298430033",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "heroking": 21,
+        "fx64": 28,
+        "dipthe4man": 16
+      },
+      "placements": [
+        [
+          "martin",
+          31
+        ],
+        [
+          "fx64",
+          28
+        ],
+        [
+          "heroking",
+          21
+        ],
+        [
+          "dipthe4man",
+          16
+        ]
+      ],
+      "message_id": 1552474319530098718,
+      "created_at": "2026-09-24T00:18:41.354000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552474319530098718",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 32,
+        "heroking": 11,
+        "dipthe4man": 22,
+        "fuzz": 31
+      },
+      "placements": [
+        [
+          "martin",
+          32
+        ],
+        [
+          "fuzz",
+          31
+        ],
+        [
+          "dipthe4man",
+          22
+        ],
+        [
+          "heroking",
+          11
+        ]
+      ],
+      "message_id": 1552487412343771188,
+      "created_at": "2026-09-24T01:10:42.924000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552487412343771188",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 33,
+        "heroking": 14,
+        "fuzz": 23,
+        "dipthe4man": 24
+      },
+      "placements": [
+        [
+          "martin",
+          33
+        ],
+        [
+          "dipthe4man",
+          24
+        ],
+        [
+          "fuzz",
+          23
+        ],
+        [
+          "heroking",
+          14
+        ]
+      ],
+      "message_id": 1552501506060583063,
+      "created_at": "2026-09-24T02:06:43.128000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552501506060583063",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "fx64": 39,
+        "heroking": 8,
+        "dipthe4man": 26,
+        "baker": 23
+      },
+      "placements": [
+        [
+          "fx64",
+          39
+        ],
+        [
+          "dipthe4man",
+          26
+        ],
+        [
+          "baker",
+          23
+        ],
+        [
+          "heroking",
+          8
+        ]
+      ],
+      "message_id": 1552832528778268684,
+      "created_at": "2026-09-25T00:02:05.094000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552832528778268684",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 37,
+        "heroking": 18,
+        "fx64": 26,
+        "dipthe4man": 15
+      },
+      "placements": [
+        [
+          "martin",
+          37
+        ],
+        [
+          "fx64",
+          26
+        ],
+        [
+          "heroking",
+          18
+        ],
+        [
+          "dipthe4man",
+          15
+        ]
+      ],
+      "message_id": 1552874445922893835,
+      "created_at": "2026-09-25T02:48:38.920000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1552874445922893835",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 26,
+        "fuzz": 26,
+        "fx64": 28,
+        "gg": 16
+      },
+      "placements": [
+        [
+          "fx64",
+          28
+        ],
+        [
+          "martin",
+          26
+        ],
+        [
+          "fuzz",
+          26
+        ],
+        [
+          "gg",
+          16
+        ]
+      ],
+      "message_id": 1553183464843644939,
+      "created_at": "2026-09-25T23:16:34.772000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1553183464843644939",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 24,
+        "fuzz": 26,
+        "dipthe4man": 20,
+        "gumby": 26
+      },
+      "placements": [
+        [
+          "fuzz",
+          26
+        ],
+        [
+          "gumby",
+          26
+        ],
+        [
+          "martin",
+          24
+        ],
+        [
+          "dipthe4man",
+          20
+        ]
+      ],
+      "message_id": 1553408934306521209,
+      "created_at": "2026-09-26T14:12:30.881000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1553408934306521209",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 29,
+        "heroking": 10,
+        "dipthe4man": 25,
+        "thecoolex": 33
+      },
+      "placements": [
+        [
+          "thecoolex",
+          33
+        ],
+        [
+          "martin",
+          29
+        ],
+        [
+          "dipthe4man",
+          25
+        ],
+        [
+          "heroking",
+          10
+        ]
+      ],
+      "message_id": 1553597276256215073,
+      "created_at": "2026-09-27T02:40:55.101000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1553597276256215073",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "baker": 28,
+        "gg": 23,
+        "fuzz": 23,
+        "fx64": 22
+      },
+      "placements": [
+        [
+          "baker",
+          28
+        ],
+        [
+          "gg",
+          23
+        ],
+        [
+          "fuzz",
+          23
+        ],
+        [
+          "fx64",
+          22
+        ]
+      ],
+      "message_id": 1553924743093026839,
+      "created_at": "2026-09-28T00:22:09.279000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1553924743093026839",
+      "author": "fuzzyfugs"
+    },
+    {
+      "scores": {
+        "martin": 28,
+        "fx64": 32,
+        "heroking": 15,
+        "dipthe4man": 21
+      },
+      "placements": [
+        [
+          "fx64",
+          32
+        ],
+        [
+          "martin",
+          28
+        ],
+        [
+          "dipthe4man",
+          21
+        ],
+        [
+          "heroking",
+          15
+        ]
+      ],
+      "message_id": 1554269405020684289,
+      "created_at": "2026-09-28T23:11:43.086000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1554269405020684289",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 33,
+        "heroking": 10,
+        "dipthe4man": 26,
+        "fx64": 25
+      },
+      "placements": [
+        [
+          "martin",
+          33
+        ],
+        [
+          "dipthe4man",
+          26
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "heroking",
+          10
+        ]
+      ],
+      "message_id": 1554669337330323506,
+      "created_at": "2026-09-30T01:40:54.379000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1554669337330323506",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 34,
+        "dipthe4man": 15,
+        "fx64": 25,
+        "baker": 22
+      },
+      "placements": [
+        [
+          "martin",
+          34
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "baker",
+          22
+        ],
+        [
+          "dipthe4man",
+          15
+        ]
+      ],
+      "message_id": 1555421417497956352,
+      "created_at": "2026-10-02T03:29:24.264000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1555421417497956352",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 29,
+        "gumby": 32,
+        "baker": 18,
+        "dipthe4man": 17
+      },
+      "placements": [
+        [
+          "gumby",
+          32
+        ],
+        [
+          "martin",
+          29
+        ],
+        [
+          "baker",
+          18
+        ],
+        [
+          "dipthe4man",
+          17
+        ]
+      ],
+      "message_id": 1555760607083364375,
+      "created_at": "2026-10-03T01:57:13.363000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1555760607083364375",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "baker": 21,
+        "dipthe4man": 16,
+        "fx64": 28
+      },
+      "placements": [
+        [
+          "martin",
+          31
+        ],
+        [
+          "fx64",
+          28
+        ],
+        [
+          "baker",
+          21
+        ],
+        [
+          "dipthe4man",
+          16
+        ]
+      ],
+      "message_id": 1555772734636560445,
+      "created_at": "2026-10-03T02:45:24.797000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1555772734636560445",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "n64": 26,
+        "dipthe4man": 20,
+        "baker": 19
+      },
+      "placements": [
+        [
+          "martin",
+          31
+        ],
+        [
+          "n64",
+          26
+        ],
+        [
+          "dipthe4man",
+          20
+        ],
+        [
+          "baker",
+          19
+        ]
+      ],
+      "message_id": 1556113574156574831,
+      "created_at": "2026-10-04T01:19:47.271000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1556113574156574831",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 27,
+        "baker": 16,
+        "n64": 30,
+        "dipthe4man": 23
+      },
+      "placements": [
+        [
+          "n64",
+          30
+        ],
+        [
+          "martin",
+          27
+        ],
+        [
+          "dipthe4man",
+          23
+        ],
+        [
+          "baker",
+          16
+        ]
+      ],
+      "message_id": 1556491848611004569,
+      "created_at": "2026-10-05T02:22:54.929000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1556491848611004569",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 25,
+        "dipthe4man": 12,
+        "baker": 30,
+        "fuzz": 29
+      },
+      "placements": [
+        [
+          "baker",
+          30
+        ],
+        [
+          "fuzz",
+          29
+        ],
+        [
+          "martin",
+          25
+        ],
+        [
+          "dipthe4man",
+          12
+        ]
+      ],
+      "message_id": 1559005168165458071,
+      "created_at": "2026-10-12T00:49:57.006000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559005168165458071",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 30,
+        "fuzz": 25,
+        "dipthe4man": 15,
+        "baker": 26
+      },
+      "placements": [
+        [
+          "martin",
+          30
+        ],
+        [
+          "baker",
+          26
+        ],
+        [
+          "fuzz",
+          25
+        ],
+        [
+          "dipthe4man",
+          15
+        ]
+      ],
+      "message_id": 1559324361993748500,
+      "created_at": "2026-10-12T21:58:18.745000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559324361993748500",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 29,
+        "heroking": 15,
+        "dipthe4man": 28,
+        "fx64": 25
+      },
+      "placements": [
+        [
+          "martin",
+          29
+        ],
+        [
+          "dipthe4man",
+          28
+        ],
+        [
+          "fx64",
+          25
+        ],
+        [
+          "heroking",
+          15
+        ]
+      ],
+      "message_id": 1559336466495049769,
+      "created_at": "2026-10-12T22:46:24.683000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559336466495049769",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "heroking": 20,
+        "dipthe4man": 15,
+        "fx64": 30
+      },
+      "placements": [
+        [
+          "martin",
+          31
+        ],
+        [
+          "fx64",
+          30
+        ],
+        [
+          "heroking",
+          20
+        ],
+        [
+          "dipthe4man",
+          15
+        ]
+      ],
+      "message_id": 1559348705398890576,
+      "created_at": "2026-10-12T23:35:02.665000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559348705398890576",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 26,
+        "fx64": 26,
+        "baker": 19,
+        "dipthe4man": 25
+      },
+      "placements": [
+        [
+          "martin",
+          26
+        ],
+        [
+          "fx64",
+          26
+        ],
+        [
+          "dipthe4man",
+          25
+        ],
+        [
+          "baker",
+          19
+        ]
+      ],
+      "message_id": 1559731065642557532,
+      "created_at": "2026-10-14T00:54:24.451000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559731065642557532",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "martin": 34,
+        "fx64": 22,
+        "dipthe4man": 22,
+        "heroking": 18
+      },
+      "placements": [
+        [
+          "martin",
+          34
+        ],
+        [
+          "fx64",
+          22
+        ],
+        [
+          "dipthe4man",
+          22
+        ],
+        [
+          "heroking",
+          18
+        ]
+      ],
+      "message_id": 1559744221098021016,
+      "created_at": "2026-10-14T01:46:40.956000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1559744221098021016",
+      "author": "blazeup2602"
+    },
+    {
+      "scores": {
+        "fx64": 14,
+        "baker": 23,
+        "gg": 28,
+        "dipthe4man": 31
+      },
+      "placements": [
+        [
+          "dipthe4man",
+          31
+        ],
+        [
+          "gg",
+          28
+        ],
+        [
+          "baker",
+          23
+        ],
+        [
+          "fx64",
+          14
+        ]
+      ],
+      "message_id": 1560453329895690322,
+      "created_at": "2026-10-16T00:44:25.668000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1560453329895690322",
+      "author": "ben_baker"
+    },
+    {
+      "scores": {
+        "fx64": 31,
+        "baker": 17,
+        "dipthe4man": 17,
+        "martin": 31
+      },
+      "placements": [
+        [
+          "fx64",
+          31
+        ],
+        [
+          "martin",
+          31
+        ],
+        [
+          "baker",
+          17
+        ],
+        [
+          "dipthe4man",
+          17
+        ]
+      ],
+      "message_id": 1560471957043154954,
+      "created_at": "2026-10-16T01:58:26.726000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1560471957043154954",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "fx64": 35,
+        "baker": 30,
+        "thesis": 4,
+        "dipthe4man": 27
+      },
+      "placements": [
+        [
+          "fx64",
+          35
+        ],
+        [
+          "baker",
+          30
+        ],
+        [
+          "dipthe4man",
+          27
+        ],
+        [
+          "thesis",
+          4
+        ]
+      ],
+      "message_id": 1561203934209646764,
+      "created_at": "2026-10-18T02:27:03.682000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1561203934209646764",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 25,
+        "fx64": 28,
+        "gg": 26,
+        "dipthe4man": 17
+      },
+      "placements": [
+        [
+          "fx64",
+          28
+        ],
+        [
+          "gg",
+          26
+        ],
+        [
+          "martin",
+          25
+        ],
+        [
+          "dipthe4man",
+          17
+        ]
+      ],
+      "message_id": 1561518626559885352,
+      "created_at": "2026-10-18T23:17:32.185000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1561518626559885352",
+      "author": "felixfortin11"
+    },
+    {
+      "scores": {
+        "martin": 31,
+        "dipthe4man": 33,
+        "fx64": 22,
+        "thesis": 10
+      },
+      "placements": [
+        [
+          "dipthe4man",
+          33
+        ],
+        [
+          "martin",
+          31
+        ],
+        [
+          "fx64",
+          22
+        ],
+        [
+          "thesis",
+          10
+        ]
+      ],
+      "message_id": 1561894537230549072,
+      "created_at": "2026-10-20T00:11:16.273000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/997416976051871854/1561894537230549072",
+      "author": "blazeup2602"
     }
   ],
   "ratings": {
     "simon": 1186.8600241710121,
-    "spacedcowboy": 1465.6610818908844,
-    "martin": 1184.5063162314443,
+    "spacedcowboy": 1487.3542201543016,
+    "martin": 1196.8060411399504,
     "noakevbo": 943.9062008647486,
     "siriacus": 971.3539155659759,
-    "gumby": 1357.9695316719344,
+    "gumby": 1374.378241781154,
     "yoyoyoshi": 929.3704625082939,
     "wilder": 916.6714438196101,
     "sp": 984.2778526193323,
     "juggernaut": 1021.4085531153579,
     "dennison": 1007.6756075513807,
     "chef": 983.1339982918869,
-    "gg": 1079.8874732861852,
+    "gg": 1068.1192491218587,
     "stinson": 1013.9053954517397,
     "dexter": 940.1310267597534,
     "tom": 1061.1477660598835,
-    "thecoolex": 1066.2457627751337,
+    "thecoolex": 1040.544798602252,
     "hattok": 1003.4531155313394,
     "brent": 977.9681107242458,
     "rick": 983.4034673768347,
@@ -15537,7 +17397,7 @@
     "kev4300": 985.7608531132929,
     "pitt": 988.3002709287764,
     "cheech": 1105.3834065353813,
-    "fuzz": 1134.7437211050733,
+    "fuzz": 1143.327764808186,
     "angelo": 922.5410620102537,
     "opticon": 987.7463230409475,
     "gumbo": 1016.0,
@@ -15545,7 +17405,7 @@
     "jesso": 994.9977321732583,
     "sswitch64": 972.3795589601935,
     "bumpty": 976.7191773634778,
-    "mrpitt": 939.2026553488387,
+    "mrpitt": 935.8046178772561,
     "patalus": 1099.051090739981,
     "andre": 986.9986123987179,
     "skedar": 1013.3316014520436,
@@ -15567,7 +17427,7 @@
     "babybackbitchbooth": 1000.7052135307197,
     "fome": 988.7891732635467,
     "maddie": 998.8155702432782,
-    "n64": 1129.3132495985772,
+    "n64": 1142.995379559576,
     "tyoshi": 988.3794021019153,
     "countess": 1014.2137107029417,
     "sermartin": 998.172681294522,
@@ -15575,12 +17435,12 @@
     "cptntryhard": 985.6106758182426,
     "dip": 772.3161487731063,
     "round": 956.1039223828899,
-    "dzd2": 1002.7773439333811,
+    "dzd2": 974.3050984902026,
     "chang": 947.772074413458,
     "felix": 989.1930160119962,
     "louise": 983.8151895645349,
     "fx": 969.4354240689033,
-    "fx64": 1039.807680443926,
+    "fx64": 1084.4569909214447,
     "r2dz": 971.2176282492046,
     "ben": 900.1667923957074,
     "benny": 983.796222741379,
@@ -15596,10 +17456,10 @@
     "orli": 960.8071468371256,
     "denvar": 1218.7401996035278,
     "up": 1029.742957395066,
-    "heroking": 723.5721074846856,
+    "heroking": 690.8315849238901,
     "blazeup": 1214.0771685451366,
     "fuzzyfugs": 1119.2027702382338,
-    "baker": 936.9868214707262,
+    "baker": 960.2615309230788,
     "cptntryhardchangloveyaben": 924.6112256854146,
     "dh253": 988.9696390337776,
     "etherealmaddie": 1044.990645678565,
@@ -15617,13 +17477,14 @@
     "nathaniel": 984.3052828166059,
     "derpy": 974.2592821514074,
     "Martin": 1059.6992480809124,
-    "dipthe4man": 805.5336798035908,
+    "dipthe4man": 881.1638946583112,
     "toonkette": 996.5524389083369,
-    "wildermk64": 944.1779010127223,
+    "wildermk64": 882.9838316944858,
     "fx64allstarslayer": 991.8870983545951,
     "samythefoxcow": 984.1393193065483,
     "arkyn": 1003.5592952573462,
-    "hanktrill": 975.3253449912204
+    "hanktrill": 975.3253449912204,
+    "thesis": 969.4925891440869
   },
   "player_stats": {
     "simon": {
@@ -15631,12 +17492,12 @@
       "points": 1342
     },
     "martin": {
-      "matches": 169,
-      "points": 4339
+      "matches": 213,
+      "points": 5577
     },
     "spacedcowboy": {
-      "matches": 170,
-      "points": 5761
+      "matches": 177,
+      "points": 5997
     },
     "siriacus": {
       "matches": 2,
@@ -15647,8 +17508,8 @@
       "points": 864
     },
     "gumby": {
-      "matches": 126,
-      "points": 3910
+      "matches": 142,
+      "points": 4455
     },
     "wilder": {
       "matches": 16,
@@ -15675,8 +17536,8 @@
       "points": 3
     },
     "gg": {
-      "matches": 60,
-      "points": 1532
+      "matches": 70,
+      "points": 1772
     },
     "stinson": {
       "matches": 1,
@@ -15691,8 +17552,8 @@
       "points": 210
     },
     "thecoolex": {
-      "matches": 39,
-      "points": 929
+      "matches": 44,
+      "points": 1041
     },
     "hattok": {
       "matches": 1,
@@ -15731,8 +17592,8 @@
       "points": 315
     },
     "fuzz": {
-      "matches": 103,
-      "points": 2654
+      "matches": 125,
+      "points": 3256
     },
     "angelo": {
       "matches": 11,
@@ -15763,8 +17624,8 @@
       "points": 9
     },
     "mrpitt": {
-      "matches": 12,
-      "points": 230
+      "matches": 19,
+      "points": 347
     },
     "patalus": {
       "matches": 26,
@@ -15851,8 +17712,8 @@
       "points": 16
     },
     "n64": {
-      "matches": 16,
-      "points": 480
+      "matches": 19,
+      "points": 566
     },
     "tyoshi": {
       "matches": 1,
@@ -15883,8 +17744,8 @@
       "points": 6
     },
     "dzd2": {
-      "matches": 4,
-      "points": 72
+      "matches": 6,
+      "points": 107
     },
     "chang": {
       "matches": 21,
@@ -15903,8 +17764,8 @@
       "points": 118
     },
     "fx64": {
-      "matches": 166,
-      "points": 3947
+      "matches": 201,
+      "points": 4843
     },
     "r2dz": {
       "matches": 3,
@@ -15967,8 +17828,8 @@
       "points": 57
     },
     "heroking": {
-      "matches": 39,
-      "points": 528
+      "matches": 58,
+      "points": 815
     },
     "blazeup": {
       "matches": 117,
@@ -15979,8 +17840,8 @@
       "points": 2146
     },
     "baker": {
-      "matches": 110,
-      "points": 2300
+      "matches": 130,
+      "points": 2764
     },
     "cptntryhardchangloveyaben": {
       "matches": 25,
@@ -16051,16 +17912,16 @@
       "points": 330
     },
     "dipthe4man": {
-      "matches": 51,
-      "points": 899
+      "matches": 98,
+      "points": 1850
     },
     "toonkette": {
       "matches": 1,
       "points": 23
     },
     "wildermk64": {
-      "matches": 6,
-      "points": 92
+      "matches": 15,
+      "points": 222
     },
     "fx64allstarslayer": {
       "matches": 21,
@@ -16077,9 +17938,13 @@
     "hanktrill": {
       "matches": 2,
       "points": 10
+    },
+    "thesis": {
+      "matches": 2,
+      "points": 14
     }
   },
-  "last_message_id": 1537270898594418738,
+  "last_message_id": 1562438128537702542,
   "processed_message_ids": [
     "1000084521380749323",
     "1000084659138461786",
@@ -18510,6 +20375,85 @@
     "1536129893077614592",
     "1536129983204958349",
     "1537270898594418738",
+    "1538635186521120978",
+    "1538635233988051144",
+    "1538647891298746368",
+    "1539820016348700762",
+    "1540537087508488302",
+    "1541274202374406204",
+    "1542232578646614177",
+    "1542976388389142750",
+    "1543068209572487188",
+    "1543081668003373146",
+    "1543421012446814219",
+    "1543804295370248345",
+    "1544547672189313064",
+    "1544559992894398464",
+    "1544560264630767657",
+    "1545274262317699103",
+    "1545286618330701884",
+    "1545299248503988284",
+    "1545311688520114176",
+    "1545447020691464213",
+    "1545489857516675223",
+    "1545677385960136744",
+    "1546028767493885973",
+    "1546040779296739338",
+    "1546204685159895040",
+    "1546392580256825397",
+    "1546549226513764465",
+    "1546570828223750277",
+    "1547397961770729603",
+    "1547413068487589898",
+    "1548479430480101376",
+    "1548501278076964977",
+    "1549236512204525739",
+    "1549568957793439926",
+    "1549613994304872530",
+    "1549622429377241119",
+    "1550699807696232508",
+    "1551035340725420162",
+    "1551047374829527050",
+    "1551047571722477661",
+    "1552125045298430033",
+    "1552474319530098718",
+    "1552487412343771188",
+    "1552501506060583063",
+    "1552832528778268684",
+    "1552839822576451614",
+    "1552874445922893835",
+    "1553183464843644939",
+    "1553237699857612840",
+    "1553408934306521209",
+    "1553597276256215073",
+    "1553924743093026839",
+    "1554269405020684289",
+    "1554595857016430614",
+    "1554669337330323506",
+    "1555421417497956352",
+    "1555760607083364375",
+    "1555772734636560445",
+    "1556113574156574831",
+    "1556491848611004569",
+    "1559005168165458071",
+    "1559324361993748500",
+    "1559336466495049769",
+    "1559348705398890576",
+    "1559731065642557532",
+    "1559744221098021016",
+    "1560453329895690322",
+    "1560453430487679038",
+    "1560453555452776541",
+    "1560471957043154954",
+    "1561203934209646764",
+    "1561518626559885352",
+    "1561894537230549072",
+    "1562273865596407808",
+    "1562281954748010527",
+    "1562282750558339075",
+    "1562427280415002647",
+    "1562434169777160257",
+    "1562438128537702542",
     "997726083296264203",
     "997800651578937486",
     "998068825847246900",

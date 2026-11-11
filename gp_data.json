@@ -17554,7 +17554,7 @@
       "message_id": 1081169576282308629,
       "created_at": "2023-03-03T11:01:54.145000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1076081113946128385/1081169576282308629",
-      "author": "prattt21"
+      "author": "dandarkwny3"
     },
     {
       "source_type": "gp_score_report",
@@ -18579,6 +18579,57 @@
       "created_at": "2022-12-14T15:00:43.466000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1052601036428292187",
       "author": "mrpitt"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "gumby": 129,
+        "mrpitt": 90
+      },
+      "players": [
+        "gumby",
+        "mrpitt"
+      ],
+      "winner": "gumby",
+      "submatch_index": 1,
+      "message_id": 1054444510219870258,
+      "created_at": "2022-12-19T17:06:01.868000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1054444510219870258",
+      "author": "twiztidgumby"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "gumby": 132,
+        "mrpitt": 84
+      },
+      "players": [
+        "gumby",
+        "mrpitt"
+      ],
+      "winner": "gumby",
+      "submatch_index": 2,
+      "message_id": 1054444510219870258,
+      "created_at": "2022-12-19T17:06:01.868000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1054444510219870258",
+      "author": "twiztidgumby"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "gumby": 120,
+        "mrpitt": 99
+      },
+      "players": [
+        "gumby",
+        "mrpitt"
+      ],
+      "winner": "gumby",
+      "submatch_index": 3,
+      "message_id": 1054444510219870258,
+      "created_at": "2022-12-19T17:06:01.868000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1054444510219870258",
+      "author": "twiztidgumby"
     },
     {
       "source_type": "gp_score_report",
@@ -20681,14 +20732,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedpokermonknix": 30,
+        "rankedpokermontoadie": 30,
         "welldeservedproprospectrolesandbaggingstratsareonpointimtakingnotesiclutchouta": 1
       },
       "players": [
-        "rankedpokermonknix",
+        "rankedpokermontoadie",
         "welldeservedproprospectrolesandbaggingstratsareonpointimtakingnotesiclutchouta"
       ],
-      "winner": "rankedpokermonknix",
+      "winner": "rankedpokermontoadie",
       "message_id": 1192547927357411479,
       "created_at": "2024-01-04T19:19:42.351000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1192547927357411479",
@@ -20729,14 +20780,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedn64tiesknix": 33,
-        "gamenotesthismatchwasinsanealmosteverysingleracewassupercloseknixhadgreatitemrnganditallcamedowntowariostadiumforknixtouseontherampandsqueezepastmeforididntgetaminiturboandtook": 4
+        "rankedn64tiestoadie": 33,
+        "gamenotesthismatchwasinsanealmosteverysingleracewassuperclosetoadiehadgreatitemrnganditallcamedowntowariostadiumfortoadietouseontherampandsqueezepastmeforididntgetaminiturboandtook": 4
       },
       "players": [
-        "rankedn64tiesknix",
-        "gamenotesthismatchwasinsanealmosteverysingleracewassupercloseknixhadgreatitemrnganditallcamedowntowariostadiumforknixtouseontherampandsqueezepastmeforididntgetaminiturboandtook"
+        "rankedn64tiestoadie",
+        "gamenotesthismatchwasinsanealmosteverysingleracewassuperclosetoadiehadgreatitemrnganditallcamedowntowariostadiumfortoadietouseontherampandsqueezepastmeforididntgetaminiturboandtook"
       ],
-      "winner": "rankedn64tiesknix",
+      "winner": "rankedn64tiestoadie",
       "message_id": 1195612058151043092,
       "created_at": "2024-01-13T06:15:28.061000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1195612058151043092",
@@ -20777,14 +20828,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedn64defeatsknix": 33,
-        "gamenoteslotsandlotsofbackandforthknixsetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": 6
+        "rankedn64defeatstoadie": 33,
+        "gamenoteslotsandlotsofbackandforthtoadiesetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": 6
       },
       "players": [
-        "rankedn64defeatsknix",
-        "gamenoteslotsandlotsofbackandforthknixsetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto"
+        "rankedn64defeatstoadie",
+        "gamenoteslotsandlotsofbackandforthtoadiesetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto"
       ],
-      "winner": "rankedn64defeatsknix",
+      "winner": "rankedn64defeatstoadie",
       "message_id": 1197396140602163220,
       "created_at": "2024-01-18T04:24:46.464000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1197396140602163220",
@@ -20809,14 +20860,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankeddefeatsknix": 30,
-        "gamenotesknixgaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": 2
+        "rankeddefeatstoadie": 30,
+        "gamenotestoadiegaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": 2
       },
       "players": [
-        "rankeddefeatsknix",
-        "gamenotesknixgaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking"
+        "rankeddefeatstoadie",
+        "gamenotestoadiegaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking"
       ],
-      "winner": "rankeddefeatsknix",
+      "winner": "rankeddefeatstoadie",
       "message_id": 1198441184008351957,
       "created_at": "2024-01-21T01:37:24.228000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1198441184008351957",
@@ -20841,14 +20892,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedangelodefeatsr23p0": 30,
-        "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupforr23p0eachplayedaspeachyoshi": 2
+        "rankedangelodefeatsdzd2": 30,
+        "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupfordzd2eachplayedaspeachyoshi": 2
       },
       "players": [
-        "rankedangelodefeatsr23p0",
-        "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupforr23p0eachplayedaspeachyoshi"
+        "rankedangelodefeatsdzd2",
+        "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupfordzd2eachplayedaspeachyoshi"
       ],
-      "winner": "rankedangelodefeatsr23p0",
+      "winner": "rankedangelodefeatsdzd2",
       "message_id": 1205664754430115890,
       "created_at": "2024-02-10T00:01:17.624000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1205664754430115890",
@@ -20857,12 +20908,12 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualdoubleheaderdefeatsknix": 33,
-        "gamenotesknixtriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": 33
+        "casualdoubleheaderdefeatstoadie": 33,
+        "gamenotestoadietriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": 33
       },
       "players": [
-        "casualdoubleheaderdefeatsknix",
-        "gamenotesknixtriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround"
+        "casualdoubleheaderdefeatstoadie",
+        "gamenotestoadietriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround"
       ],
       "winner": null,
       "message_id": 1206716158821142649,
@@ -20937,11 +20988,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualfx64allstarslayerthesis": 25,
+        "casualfx64thesis": 25,
         "gamenotesjustmeagainstmybrotherivowonedayillbeatsomethingcoolhappennedindkjungleparkwayiwillpostitin": 30
       },
       "players": [
-        "casualfx64allstarslayerthesis",
+        "casualfx64thesis",
         "gamenotesjustmeagainstmybrotherivowonedayillbeatsomethingcoolhappennedindkjungleparkwayiwillpostitin"
       ],
       "winner": "gamenotesjustmeagainstmybrotherivowonedayillbeatsomethingcoolhappennedindkjungleparkwayiwillpostitin",
@@ -20953,14 +21004,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualshadow022fx64allstarslayer": 33,
+        "casualshadow022fx64": 33,
         "gamenotesabysmalracingbyfeliximeanthereisalimitwhatyoucanblameonmyinternetlagsbutigottasayiwasevensurprisedathowunluckyhewasoverallfunracingandisaidiwouldbeathimonedayijustdidntthinkitwouldtakeme": 2
       },
       "players": [
-        "casualshadow022fx64allstarslayer",
+        "casualshadow022fx64",
         "gamenotesabysmalracingbyfeliximeanthereisalimitwhatyoucanblameonmyinternetlagsbutigottasayiwasevensurprisedathowunluckyhewasoverallfunracingandisaidiwouldbeathimonedayijustdidntthinkitwouldtakeme"
       ],
-      "winner": "casualshadow022fx64allstarslayer",
+      "winner": "casualshadow022fx64",
       "message_id": 1227085351068110970,
       "created_at": "2024-04-09T02:39:05.838000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1227085351068110970",
@@ -21001,14 +21052,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualdefeatsfx64allstarslayer": 33,
-        "gamenotesfx64allstarslayergotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": 2
+        "casualdefeatsfx64": 33,
+        "gamenotesfx64gotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": 2
       },
       "players": [
-        "casualdefeatsfx64allstarslayer",
-        "gamenotesfx64allstarslayergotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon"
+        "casualdefeatsfx64",
+        "gamenotesfx64gotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon"
       ],
-      "winner": "casualdefeatsfx64allstarslayer",
+      "winner": "casualdefeatsfx64",
       "message_id": 1234932368679112794,
       "created_at": "2024-04-30T18:20:20.627000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1234932368679112794",
@@ -21033,11 +21084,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualtoonkettefx64allstarslayer": 36,
+        "casualtoonkettefx64": 36,
         "notesigotalotofboosandgoldensanditdefinitelyshowsquiteabitalsoihitonecaronttandthatcostmeaperfect": 144
       },
       "players": [
-        "casualtoonkettefx64allstarslayer",
+        "casualtoonkettefx64",
         "notesigotalotofboosandgoldensanditdefinitelyshowsquiteabitalsoihitonecaronttandthatcostmeaperfect"
       ],
       "winner": "notesigotalotofboosandgoldensanditdefinitelyshowsquiteabitalsoihitonecaronttandthatcostmeaperfect",
@@ -21146,11 +21197,11 @@
       "source_type": "gp_score_report",
       "scores": {
         "casualtoonkettebillblood90": 36,
-        "fx64allstarslayerbloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": 2
+        "fx64bloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": 2
       },
       "players": [
         "casualtoonkettebillblood90",
-        "fx64allstarslayerbloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe"
+        "fx64bloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe"
       ],
       "winner": "casualtoonkettebillblood90",
       "message_id": 1264252421434249303,
@@ -21161,11 +21212,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "fx64allstarslayerbillblood90mushroom": 27,
+        "fx64billblood90mushroom": 27,
         "total": 111
       },
       "players": [
-        "fx64allstarslayerbillblood90mushroom",
+        "fx64billblood90mushroom",
         "total"
       ],
       "winner": "total",
@@ -21177,14 +21228,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedurbanoutlawr23p0": 33,
+        "rankedurbanoutlawdzd2": 33,
         "notessaturdaynightdrunkbuzzedkartscoresdontreflecthowclosesomeofthesewerebarelywonkdby": 8
       },
       "players": [
-        "rankedurbanoutlawr23p0",
+        "rankedurbanoutlawdzd2",
         "notessaturdaynightdrunkbuzzedkartscoresdontreflecthowclosesomeofthesewerebarelywonkdby"
       ],
-      "winner": "rankedurbanoutlawr23p0",
+      "winner": "rankedurbanoutlawdzd2",
       "message_id": 1264524000252657664,
       "created_at": "2024-07-21T10:06:55.380000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1264524000252657664",
@@ -21209,14 +21260,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "n64fx64allstarslayer": 33,
+        "n64fx64": 33,
         "gamenotesmushroomcupwasverycloselotsofgoodplaysallarounddkjunglepkwyn64gotaboltinsecondplaceonlap": 1
       },
       "players": [
-        "n64fx64allstarslayer",
+        "n64fx64",
         "gamenotesmushroomcupwasverycloselotsofgoodplaysallarounddkjunglepkwyn64gotaboltinsecondplaceonlap"
       ],
-      "winner": "n64fx64allstarslayer",
+      "winner": "n64fx64",
       "message_id": 1269825933246857287,
       "created_at": "2024-08-05T01:14:54.711000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1269825933246857287",
@@ -21225,11 +21276,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "fx64allstarslayerpotat": 30,
+        "fx64potat": 30,
         "ggssecondroundandhedoubledthepointthisis": 100
       },
       "players": [
-        "fx64allstarslayerpotat",
+        "fx64potat",
         "ggssecondroundandhedoubledthepointthisis"
       ],
       "winner": "ggssecondroundandhedoubledthepointthisis",
@@ -21241,14 +21292,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualtoonkettefx64allstarslayer": 30,
-        "fx64allstarslayeronlylostby": 40
+        "casualtoonkettefx64": 30,
+        "fx64onlylostby": 40
       },
       "players": [
-        "casualtoonkettefx64allstarslayer",
-        "fx64allstarslayeronlylostby"
+        "casualtoonkettefx64",
+        "fx64onlylostby"
       ],
-      "winner": "fx64allstarslayeronlylostby",
+      "winner": "fx64onlylostby",
       "message_id": 1284576911791755275,
       "created_at": "2024-09-14T18:10:02.056000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1284576911791755275",
@@ -21305,14 +21356,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualdefeatsfx64allstarslayer": 36,
-        "gamenotesfx64allstarslayergotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": 64
+        "casualdefeatsfx64": 36,
+        "gamenotesfx64gotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": 64
       },
       "players": [
-        "casualdefeatsfx64allstarslayer",
-        "gamenotesfx64allstarslayergotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby"
+        "casualdefeatsfx64",
+        "gamenotesfx64gotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby"
       ],
-      "winner": "gamenotesfx64allstarslayergotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby",
+      "winner": "gamenotesfx64gotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby",
       "message_id": 1297052925356544020,
       "created_at": "2024-10-19T04:25:15.483000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1297052925356544020",
@@ -21353,11 +21404,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualfx64allstarslayerdip": 27,
+        "casualfx64dip": 27,
         "total": 102
       },
       "players": [
-        "casualfx64allstarslayerdip",
+        "casualfx64dip",
         "total"
       ],
       "winner": "total",
@@ -21369,11 +21420,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualfx64allstarslayerdip": 27,
+        "casualfx64dip": 27,
         "total": 96
       },
       "players": [
-        "casualfx64allstarslayerdip",
+        "casualfx64dip",
         "total"
       ],
       "winner": "total",
@@ -21481,11 +21532,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualkartactionfuzzyfugssweepsfx64allstarslayerindoubleheaderfirstround": 45,
+        "casualkartactionfuzzyfugssweepsfx64indoubleheaderfirstround": 45,
         "secondround": 54
       },
       "players": [
-        "casualkartactionfuzzyfugssweepsfx64allstarslayerindoubleheaderfirstround",
+        "casualkartactionfuzzyfugssweepsfx64indoubleheaderfirstround",
         "secondround"
       ],
       "winner": "secondround",
@@ -21561,11 +21612,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualfuzzyfugsdefeatsfx64allstarslayermushroom": 36,
+        "casualfuzzyfugsdefeatsfx64mushroom": 36,
         "total": 132
       },
       "players": [
-        "casualfuzzyfugsdefeatsfx64allstarslayermushroom",
+        "casualfuzzyfugsdefeatsfx64mushroom",
         "total"
       ],
       "winner": "total",
@@ -21609,11 +21660,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualfuzzyfugsdefeatsfx64allstarslayermushroom": 33,
+        "casualfuzzyfugsdefeatsfx64mushroom": 33,
         "total": 135
       },
       "players": [
-        "casualfuzzyfugsdefeatsfx64allstarslayermushroom",
+        "casualfuzzyfugsdefeatsfx64mushroom",
         "total"
       ],
       "winner": "total",
@@ -21817,14 +21868,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedfx64allstarslayerpokermon": 36,
+        "rankedfx64pokermon": 36,
         "fxwonthefirst": 5
       },
       "players": [
-        "rankedfx64allstarslayerpokermon",
+        "rankedfx64pokermon",
         "fxwonthefirst"
       ],
-      "winner": "rankedfx64allstarslayerpokermon",
+      "winner": "rankedfx64pokermon",
       "message_id": 1327732560146731189,
       "created_at": "2025-01-11T20:15:10.417000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1327732560146731189",
@@ -21833,14 +21884,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedtomfx64allstarslayer": 36,
+        "rankedtomfx64": 36,
         "roughstartforfxbutthelast": 8
       },
       "players": [
-        "rankedtomfx64allstarslayer",
+        "rankedtomfx64",
         "roughstartforfxbutthelast"
       ],
-      "winner": "rankedtomfx64allstarslayer",
+      "winner": "rankedtomfx64",
       "message_id": 1330563514984697856,
       "created_at": "2025-01-19T15:44:22.647000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1330563514984697856",
@@ -22138,11 +22189,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankeddestroysfx64allstarslayer": 36,
+        "rankeddestroysfx64": 36,
         "pointgap": 65
       },
       "players": [
-        "rankeddestroysfx64allstarslayer",
+        "rankeddestroysfx64",
         "pointgap"
       ],
       "winner": "pointgap",
@@ -22154,11 +22205,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedfuzzyfugsdestroysfx64allstarslayer": 30,
+        "rankedfuzzyfugsdestroysfx64": 30,
         "pointgap": 59
       },
       "players": [
-        "rankedfuzzyfugsdestroysfx64allstarslayer",
+        "rankedfuzzyfugsdestroysfx64",
         "pointgap"
       ],
       "winner": "pointgap",
@@ -22170,11 +22221,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankeddefeatsfx64allstarslayer": 36,
+        "rankeddefeatsfx64": 36,
         "gap": 60
       },
       "players": [
-        "rankeddefeatsfx64allstarslayer",
+        "rankeddefeatsfx64",
         "gap"
       ],
       "winner": "gap",
@@ -22186,14 +22237,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "casualinsensefx64allstarslayerwaswreckedwithcasualeaseby": 50,
+        "casualinsensefx64waswreckedwithcasualeaseby": 50,
         "pointsnotesfelixrumoredtobelettinghiskartgolikeacarafter": 10
       },
       "players": [
-        "casualinsensefx64allstarslayerwaswreckedwithcasualeaseby",
+        "casualinsensefx64waswreckedwithcasualeaseby",
         "pointsnotesfelixrumoredtobelettinghiskartgolikeacarafter"
       ],
-      "winner": "casualinsensefx64allstarslayerwaswreckedwithcasualeaseby",
+      "winner": "casualinsensefx64waswreckedwithcasualeaseby",
       "message_id": 1388861785049927701,
       "created_at": "2025-06-29T12:40:53.360000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1388861785049927701",
@@ -22458,14 +22509,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "campkartrankedfx64allstarslayer": 129,
+        "campkartrankedfx64": 129,
         "tdhanktrill": 48
       },
       "players": [
-        "campkartrankedfx64allstarslayer",
+        "campkartrankedfx64",
         "tdhanktrill"
       ],
-      "winner": "campkartrankedfx64allstarslayer",
+      "winner": "campkartrankedfx64",
       "message_id": 1411484417557532712,
       "created_at": "2025-08-30T22:55:09.258000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1411484417557532712",
@@ -22714,14 +22765,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankeddkchallengefx64allstarslayerfuzzyfugs": 30,
+        "rankeddkchallengefx64fuzzyfugs": 30,
         "gamenotesfuzzbroketheluckdispenserandletitalloutigotshockedbycpuoffchocohealsohad": 3
       },
       "players": [
-        "rankeddkchallengefx64allstarslayerfuzzyfugs",
+        "rankeddkchallengefx64fuzzyfugs",
         "gamenotesfuzzbroketheluckdispenserandletitalloutigotshockedbycpuoffchocohealsohad"
       ],
-      "winner": "rankeddkchallengefx64allstarslayerfuzzyfugs",
+      "winner": "rankeddkchallengefx64fuzzyfugs",
       "message_id": 1455281044876955768,
       "created_at": "2025-12-29T19:27:18.913000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1455281044876955768",
@@ -22730,11 +22781,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedblazeupvsfx64allstarslayer": 33,
+        "rankedblazeupvsfx64": 33,
         "total": 120
       },
       "players": [
-        "rankedblazeupvsfx64allstarslayer",
+        "rankedblazeupvsfx64",
         "total"
       ],
       "winner": "total",
@@ -22842,14 +22893,14 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedfx64allstarslayerdip": 30,
-        "fx64allstarslayerdip": 36
+        "rankedfx64dip": 30,
+        "fx64dip": 36
       },
       "players": [
-        "rankedfx64allstarslayerdip",
-        "fx64allstarslayerdip"
+        "rankedfx64dip",
+        "fx64dip"
       ],
-      "winner": "fx64allstarslayerdip",
+      "winner": "fx64dip",
       "message_id": 1500499508897906688,
       "created_at": "2026-05-03T14:09:20.854000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1500499508897906688",
@@ -22890,11 +22941,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "fuzzyfugsdefeatsfx64allstarslayer": 33,
+        "fuzzyfugsdefeatsfx64": 33,
         "notesshowingfelixhowallstarsracealsooutscored": 69
       },
       "players": [
-        "fuzzyfugsdefeatsfx64allstarslayer",
+        "fuzzyfugsdefeatsfx64",
         "notesshowingfelixhowallstarsracealsooutscored"
       ],
       "winner": "notesshowingfelixhowallstarsracealsooutscored",
@@ -23034,11 +23085,11 @@
     {
       "source_type": "gp_score_report",
       "scores": {
-        "rankedfuzzyfugsdefeatedfx64allstarslayer": 33,
+        "rankedfuzzyfugsdefeatedfx64": 33,
         "notes": 41
       },
       "players": [
-        "rankedfuzzyfugsdefeatedfx64allstarslayer",
+        "rankedfuzzyfugsdefeatedfx64",
         "notes"
       ],
       "winner": "notes",
@@ -23046,6 +23097,22 @@
       "created_at": "2026-07-18T18:32:36.532000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1528107238558793897",
       "author": "fuzzyfugs"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "ranked": 8,
+        "gumbydefeatsdip": 36
+      },
+      "players": [
+        "ranked",
+        "gumbydefeatsdip"
+      ],
+      "winner": "gumbydefeatsdip",
+      "message_id": 1543644073678741617,
+      "created_at": "2026-08-30T15:30:26.685000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1543644073678741617",
+      "author": "twiztidgumby"
     },
     {
       "source_type": "gp_score_report",
@@ -24181,7 +24248,7 @@
       "message_id": 1191828743799447592,
       "created_at": "2024-01-02T19:41:55.629000+00:00",
       "jump_url": "https://discord.com/channels/997413340991205436/1040839082248503358/1191828743799447592",
-      "author": "nocturne_of_chellie"
+      "author": "snaillie_"
     },
     {
       "source_type": "gp_score_report",
@@ -25038,6 +25105,70 @@
         "gumby"
       ],
       "winner": "thecoolex"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "rankedmrpittdefeatsfx64": 27,
+        "gamenotes": 1
+      },
+      "players": [
+        "rankedmrpittdefeatsfx64",
+        "gamenotes"
+      ],
+      "winner": "rankedmrpittdefeatsfx64",
+      "message_id": 1546159989331075213,
+      "created_at": "2026-09-06T14:07:47.720000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1546159989331075213",
+      "author": "mrpitt"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "rankedmrpittdefeatswildermk64": 27,
+        "gamenoteswildermk64willbeproinnotimeamazingtoseethisskillfroma": 10
+      },
+      "players": [
+        "rankedmrpittdefeatswildermk64",
+        "gamenoteswildermk64willbeproinnotimeamazingtoseethisskillfroma"
+      ],
+      "winner": "rankedmrpittdefeatswildermk64",
+      "message_id": 1546415399845761114,
+      "created_at": "2026-09-07T07:02:42.332000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1546415399845761114",
+      "author": "twiztidgumby"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "rankedn64defeatswildermk64": 30,
+        "gamenotesimproudofthiskidheputupadamngoodfightlap": 1
+      },
+      "players": [
+        "rankedn64defeatswildermk64",
+        "gamenotesimproudofthiskidheputupadamngoodfightlap"
+      ],
+      "winner": "rankedn64defeatswildermk64",
+      "message_id": 1547122369359904849,
+      "created_at": "2026-09-09T05:51:56.999000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1547122369359904849",
+      "author": "n64_3350"
+    },
+    {
+      "source_type": "gp_score_report",
+      "scores": {
+        "rankedfx64dip": 33,
+        "gamenotesgoodthingdipwasseriousimagineifhewasnthegotbeatbycpuson": 3
+      },
+      "players": [
+        "rankedfx64dip",
+        "gamenotesgoodthingdipwasseriousimagineifhewasnthegotbeatbycpuson"
+      ],
+      "winner": "rankedfx64dip",
+      "message_id": 1547765695775907862,
+      "created_at": "2026-09-11T00:28:17.969000+00:00",
+      "jump_url": "https://discord.com/channels/997413340991205436/1012093550449655878/1547765695775907862",
+      "author": "felixfortin11"
     }
   ],
   "ratings": {
@@ -25196,7 +25327,7 @@
     "rankedpatalusdefeatsfuzzyfugs": 1016.0,
     "gamenotespatalustakes": 984.0,
     "rankedgumbydefeatswahchamp": 1016.0,
-    "gamenotes": 954.1721796717983,
+    "gamenotes": 940.2704738806459,
     "forrankingangeloandremush": 984.0,
     "flow2221spec1918star3612total": 1016.0,
     "rankedurbanoutlawpokermon": 1016.0,
@@ -25304,26 +25435,26 @@
     "gamenotesfuzzandijusttryingtoharmeachothertheentiretimesomuchfuntiedupgoingintothe": 984.0,
     "casualdefeatsthecountess": 1031.263693206478,
     "gamenotessomuchfunsomeprettycoolstuffhappenedigothitbacktobacklike": 984.0,
-    "rankedpokermonknix": 1016.0,
+    "rankedpokermontoadie": 1016.0,
     "welldeservedproprospectrolesandbaggingstratsareonpointimtakingnotesiclutchouta": 984.0,
     "acoupleoflastsecondwallbonksonfsandmrgivemetwoclosewinsbutthismatchwasmostlydecidedbybbwhereigained": 984.736306793522,
     "rankedggdefeatsandre": 994.0793946405323,
-    "rankedn64tiesknix": 1016.0,
-    "gamenotesthismatchwasinsanealmosteverysingleracewassupercloseknixhadgreatitemrnganditallcamedowntowariostadiumforknixtouseontherampandsqueezepastmeforididntgetaminiturboandtook": 984.0,
+    "rankedn64tiestoadie": 1016.0,
+    "gamenotesthismatchwasinsanealmosteverysingleracewassuperclosetoadiehadgreatitemrnganditallcamedowntowariostadiumfortoadietouseontherampandsqueezepastmeforididntgetaminiturboandtook": 984.0,
     "rankedpatalusbeatssonicboom": 1016.0,
     "notesgreatitemstrategyandexecutionbypataswellasflawlessdrivinghappyicouldscratchacoupleof": 984.0,
     "notesfuzzwasonly": 985.4358728782763,
-    "rankedn64defeatsknix": 1016.0,
-    "gamenoteslotsandlotsofbackandforthknixsetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": 984.0,
+    "rankedn64defeatstoadie": 1016.0,
+    "gamenoteslotsandlotsofbackandforthtoadiesetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": 984.0,
     "rankeddoubleheaderdefeatsn64x2": 1016.0,
     "gamenotescrazygooddrivingfromn64dudeissuperconsistentthereweretimeswheniwasdrivingonpointandicouldntcatchhimhestoppedapepelepewonbcwhenhegot": 984.0,
-    "rankeddefeatsknix": 1016.0,
-    "gamenotesknixgaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": 984.0,
+    "rankeddefeatstoadie": 1016.0,
+    "gamenotestoadiegaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": 984.0,
     "notesurbanuseseverythinghelearnedfromfuzzonfilthyitemusageandturnsitagainsthimwhileracingcleanthefirst": 984.736306793522,
-    "rankedangelodefeatsr23p0": 1016.0,
-    "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupforr23p0eachplayedaspeachyoshi": 984.0,
-    "casualdoubleheaderdefeatsknix": 1000.0,
-    "gamenotesknixtriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": 1000.0,
+    "rankedangelodefeatsdzd2": 1016.0,
+    "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupfordzd2eachplayedaspeachyoshi": 984.0,
+    "casualdoubleheaderdefeatstoadie": 1000.0,
+    "gamenotestoadietriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": 1000.0,
     "rankedurbanoutlawdefeatspokermon": 1016.0,
     "notesmybuzzwasgoodpokermononmytaileveryraceofcoursebutatleast": 984.0,
     "rankedurbanoutlawdefeatsn64": 1016.0,
@@ -25331,19 +25462,19 @@
     "rankedpokermondefeats": 984.0,
     "gamenotesholyhellpokermonspankedmeharderthaniveeverbeenspankedkeepingmeunder": 1016.0,
     "rankedurbanoutlawdefeatskazn": 1014.5641271217237,
-    "casualfx64allstarslayerthesis": 984.0,
+    "casualfx64thesis": 984.0,
     "gamenotesjustmeagainstmybrotherivowonedayillbeatsomethingcoolhappennedindkjungleparkwayiwillpostitin": 1016.0,
-    "casualshadow022fx64allstarslayer": 1016.0,
+    "casualshadow022fx64": 1016.0,
     "gamenotesabysmalracingbyfeliximeanthereisalimitwhatyoucanblameonmyinternetlagsbutigottasayiwasevensurprisedathowunluckyhewasoverallfunracingandisaidiwouldbeathimonedayijustdidntthinkitwouldtakeme": 984.0,
     "rankedmrpittgumby": 1016.0,
     "notesonly": 984.0,
     "rankeddrunkkartdoubleheaderurbanoutlawlosestospacedcowboy": 1016.0,
     "notesdrunkkartbrainmakesurbanforgetthescoreonthelastcupmakingunnecessaryrisksonbbandgooseeggsalsokilledbylastseconditemonlastturnofttjessekhasabuzzycupurbanmissesoutonthehalloffameachievementby": 984.0,
-    "casualdefeatsfx64allstarslayer": 999.263693206478,
-    "gamenotesfx64allstarslayergotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": 984.0,
+    "casualdefeatsfx64": 999.263693206478,
+    "gamenotesfx64gotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": 984.0,
     "casualtoonketten64": 984.0,
     "justkickedsome": 1016.0,
-    "casualtoonkettefx64allstarslayer": 968.736306793522,
+    "casualtoonkettefx64": 968.736306793522,
     "notesigotalotofboosandgoldensanditdefinitelyshowsquiteabitalsoihitonecaronttandthatcostmeaperfect": 1016.0,
     "rankedtoonkettecontrebillblood90": 984.0,
     "totale": 1031.263693206478,
@@ -25355,27 +25486,27 @@
     "fx64billblood90casualmushroom": 994.2420830129153,
     "fx64cptntryhardmushroom": 994.3969334654662,
     "casualtoonkettebillblood90": 1016.0,
-    "fx64allstarslayerbloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": 984.0,
-    "fx64allstarslayerbillblood90mushroom": 994.5444518102539,
-    "rankedurbanoutlawr23p0": 1016.0,
+    "fx64bloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": 984.0,
+    "fx64billblood90mushroom": 994.5444518102539,
+    "rankedurbanoutlawdzd2": 1016.0,
     "notessaturdaynightdrunkbuzzedkartscoresdontreflecthowclosesomeofthesewerebarelywonkdby": 984.0,
     "n64": 989.8458160199048,
-    "n64fx64allstarslayer": 1016.0,
+    "n64fx64": 1016.0,
     "gamenotesmushroomcupwasverycloselotsofgoodplaysallarounddkjunglepkwyn64gotaboltinsecondplaceonlap": 984.0,
-    "fx64allstarslayerpotat": 984.0,
+    "fx64potat": 984.0,
     "ggssecondroundandhedoubledthepointthisis": 1016.0,
-    "fx64allstarslayeronlylostby": 1015.263693206478,
+    "fx64onlylostby": 1015.263693206478,
     "rankedjessek": 1056.4121204770486,
     "rankedfx64baker": 1031.263693206478,
     "gamenotesbenistrashrightnowbuthehaseverythingtokickmyassin": 984.0,
     "fx64": 1059.0930071580267,
     "robertrj": 984.0,
-    "gamenotesfx64allstarslayergotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": 1016.736306793522,
+    "gamenotesfx64gotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": 1016.736306793522,
     "casualdefeatscptntryhard": 1016.0,
     "gamenotescptntryhardowesme": 984.0,
     "casualactionfuzzyfugsdefeatsthesis": 1016.0,
     "gamenotesthesisterfoilsfuzzperfectionintheirsecondraceovercomingsustainedadversityfromcpuplayersthroughoutandnotchingavictoryonwariostadiumafterfuzzfellinthepitalsocamewithin": 984.0,
-    "casualfx64allstarslayerdip": 989.635901380453,
+    "casualfx64dip": 989.635901380453,
     "casualdipbaker": 994.9442889400503,
     "rankedurbanoutlawdefeats": 1016.0,
     "gamenotesitlookslikethesisisnttheonlyonegettingdemotedafterthisperformanceimgoingtobethe": 984.0,
@@ -25385,14 +25516,14 @@
     "ahmatch": 1016.0,
     "fx64gg": 1016.0,
     "luigiminus": 984.0,
-    "casualkartactionfuzzyfugssweepsfx64allstarslayerindoubleheaderfirstround": 984.0,
+    "casualkartactionfuzzyfugssweepsfx64indoubleheaderfirstround": 984.0,
     "secondround": 1016.0,
     "fx64espaghetti": 984.0,
     "gamenotesespaghettididbettertheniexpectedigotscaredatsomepointwith": 1016.0,
     "gamenoteswasgoingforthemessedup": 984.736306793522,
     "fx64billblood90": 1016.0,
     "gamenotesrough": 984.0,
-    "casualfuzzyfugsdefeatsfx64allstarslayermushroom": 990.3662499030742,
+    "casualfuzzyfugsdefeatsfx64mushroom": 990.3662499030742,
     "lastnightrankedurbanoutlawdefeatedfuzzyfugsmushroom": 984.0,
     "ithinktotal": 1016.0,
     "rankeddoubleheaderpokermonfuzzyfugs": 1016.0,
@@ -25416,16 +25547,15 @@
     "rankedfx64fuzzyfugs": 1016.0,
     "gamenotesepicroundiwonmorecupsbutstillcame": 984.0,
     "casualtolle": 1023.1663685651309,
-    "rankedfx64allstarslayerpokermon": 1016.0,
+    "rankedfx64pokermon": 1031.263693206478,
     "fxwonthefirst": 984.0,
-    "rankedtomfx64allstarslayer": 1016.0,
+    "rankedtomfx64": 1016.0,
     "roughstartforfxbutthelast": 984.0,
     "fuzzfelltwiceonwsjumpfromthatweirdglitchthatdropsyourrdfinishedwithin": 984.736306793522,
     "rankedpokermonbaker": 984.0,
     "completedestructionfromstarttofinishihad": 1016.0,
     "rankedbakerpatalus": 995.2939341016977,
-    "rankedfx64pokermon": 1016.0,
-    "gamenotespokermonwasonly": 984.0,
+    "gamenotespokermonwasonly": 984.736306793522,
     "rankeddoubleheaderfuzzyfugssonicboomgame": 984.0,
     "game": 1016.0,
     "rankedpokermongg": 1016.0,
@@ -25452,12 +25582,12 @@
     "gamenotesawsomeroundeveryracesupercloseandinterestingdespisefuzzsbestefforthecouldnotgetasinglewinonstarcupimata": 984.0,
     "casualdefeatsbaker": 1000.736306793522,
     "gamenotesthiswasabattlewhileracing": 1016.0,
-    "rankeddestroysfx64allstarslayer": 984.0,
+    "rankeddestroysfx64": 984.0,
     "pointgap": 1059.729526119354,
-    "rankedfuzzyfugsdestroysfx64allstarslayer": 984.736306793522,
-    "rankeddefeatsfx64allstarslayer": 984.0,
+    "rankedfuzzyfugsdestroysfx64": 984.736306793522,
+    "rankeddefeatsfx64": 984.0,
     "gap": 1016.0,
-    "casualinsensefx64allstarslayerwaswreckedwithcasualeaseby": 1016.0,
+    "casualinsensefx64waswreckedwithcasualeaseby": 1016.0,
     "pointsnotesfelixrumoredtobelettinghiskartgolikeacarafter": 984.0,
     "casualdefeatsorli": 954.1721796717983,
     "gamenotesorliisntusedto": 1016.0,
@@ -25481,7 +25611,7 @@
     "campkartrankedarkyn": 1015.263693206478,
     "tdhanktrill": 956.716736944272,
     "wilder": 962.784882004221,
-    "campkartrankedfx64allstarslayer": 1015.392176590293,
+    "campkartrankedfx64": 1015.392176590293,
     "campkartrankedmrpitt": 1016.0,
     "devilbird79": 984.0,
     "shadow": 983.2975328274754,
@@ -25501,9 +25631,9 @@
     "gamenoteswilderplayedbetterthaniexpectedcouldofbeatenmeifbrowsersdidntgosobadforwildernottomentionitwasonlya": 984.0,
     "casualdkchallengefuzzyfugsdefeatsdip": 1016.0,
     "notesdipwithstiffeggplantactioninmushroomcupwasfuzz": 984.0,
-    "rankeddkchallengefx64allstarslayerfuzzyfugs": 1016.0,
+    "rankeddkchallengefx64fuzzyfugs": 1016.0,
     "gamenotesfuzzbroketheluckdispenserandletitalloutigotshockedbycpuoffchocohealsohad": 984.0,
-    "rankedblazeupvsfx64allstarslayer": 995.7903632043558,
+    "rankedblazeupvsfx64": 995.7903632043558,
     "fuzzyfugsdefeatsbaker": 1016.0,
     "notesbensupercompetitiveicanttaketheseforgrantedfuzzonly": 984.0,
     "doubleheaderfuzzyfugsdefeatssonicboom": 984.736306793522,
@@ -25513,13 +25643,13 @@
     "gamenotesggandiwithaclassicneckandneckgpbattleggwouldhavewonhaditnotbeenfor": 984.0,
     "casualdefeatssonicboom": 1016.0,
     "gamenotessonicboomhadagoodshotattakingmeouthewas": 984.0,
-    "rankedfx64allstarslayerdip": 984.0,
-    "fx64allstarslayerdip": 1016.0,
+    "rankedfx64dip": 1000.736306793522,
+    "fx64dip": 1016.0,
     "urbanoutlawspacedcowboy": 1016.0,
     "gamenotesup": 984.0,
     "rankedforgpseason": 984.0,
     "blazeupgibrias": 1016.0,
-    "fuzzyfugsdefeatsfx64allstarslayer": 984.0,
+    "fuzzyfugsdefeatsfx64": 984.0,
     "notesshowingfelixhowallstarsracealsooutscored": 1016.0,
     "gamenotesorliisamazingiwishhewouldactuallyfuckingplaymoreoftenandturnhisnotificationsonandorcheckthediscordserveralthoughwedidplayon": 1014.5641271217237,
     "rankednaleagueroundweek": 984.0,
@@ -25532,8 +25662,10 @@
     "gamenotesoneofthemostfunroundseverithoughtcoolexwonuntiladdingthescoresipulledahailmarylikeggdidtomeatcampkartandiguessitieditwitha": 984.0,
     "rankedround": 956.2528663663891,
     "coolexgg": 1043.747133633611,
-    "rankedfuzzyfugsdefeatedfx64allstarslayer": 984.0,
+    "rankedfuzzyfugsdefeatedfx64": 984.0,
     "notes": 1016.0,
+    "ranked": 984.0,
+    "gumbydefeatsdip": 1016.0,
     "gumbyifyouregoingbytheoneracetetrislinkhad": 1016.0,
     "pointsinthesecondraceandihad": 984.0,
     "skedar": 995.4794474930895,
@@ -25638,7 +25770,13 @@
     "tsunamiwins": 1014.5641271217237,
     "btwtheresultofmymatchwithhattokisincorrectitsayshewon": 1000.0,
     "butiwon": 1000.0,
-    "devilbird": 970.2324920060086
+    "devilbird": 970.2324920060086,
+    "rankedmrpittdefeatsfx64": 1013.9017057911524,
+    "rankedmrpittdefeatswildermk64": 1016.0,
+    "gamenoteswildermk64willbeproinnotimeamazingtoseethisskillfroma": 984.0,
+    "rankedn64defeatswildermk64": 1016.0,
+    "gamenotesimproudofthiskidheputupadamngoodfightlap": 984.0,
+    "gamenotesgoodthingdipwasseriousimagineifhewasnthegotbeatbycpuson": 983.263693206478
   },
   "player_stats": {
     "patalus": {
@@ -26882,12 +27020,12 @@
       "points_against": 14
     },
     "gamenotes": {
-      "matches": 3,
+      "matches": 4,
       "wins": 0,
-      "losses": 3,
+      "losses": 4,
       "ties": 0,
-      "points_for": 20,
-      "points_against": 91
+      "points_for": 21,
+      "points_against": 118
     },
     "forrankingangeloandremush": {
       "matches": 1,
@@ -27745,7 +27883,7 @@
       "points_for": 7,
       "points_against": 36
     },
-    "rankedpokermonknix": {
+    "rankedpokermontoadie": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -27777,7 +27915,7 @@
       "points_for": 36,
       "points_against": 132
     },
-    "rankedn64tiesknix": {
+    "rankedn64tiestoadie": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -27785,7 +27923,7 @@
       "points_for": 33,
       "points_against": 4
     },
-    "gamenotesthismatchwasinsanealmosteverysingleracewassupercloseknixhadgreatitemrnganditallcamedowntowariostadiumforknixtouseontherampandsqueezepastmeforididntgetaminiturboandtook": {
+    "gamenotesthismatchwasinsanealmosteverysingleracewassuperclosetoadiehadgreatitemrnganditallcamedowntowariostadiumfortoadietouseontherampandsqueezepastmeforididntgetaminiturboandtook": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -27817,7 +27955,7 @@
       "points_for": 3,
       "points_against": 33
     },
-    "rankedn64defeatsknix": {
+    "rankedn64defeatstoadie": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -27825,7 +27963,7 @@
       "points_for": 33,
       "points_against": 6
     },
-    "gamenoteslotsandlotsofbackandforthknixsetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": {
+    "gamenoteslotsandlotsofbackandforthtoadiesetupsomegoodtrapsformebutsadlyitemrngwasnotgoinghiswaytoadsturnpikewasdevastatingfortipshiashewasinfirstthelastlapanditookhimovertheguardrailbyaredshellandhegotknockeddownbycpusallthewayto": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -27849,7 +27987,7 @@
       "points_for": 1,
       "points_against": 36
     },
-    "rankeddefeatsknix": {
+    "rankeddefeatstoadie": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -27857,7 +27995,7 @@
       "points_for": 30,
       "points_against": 2
     },
-    "gamenotesknixgaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": {
+    "gamenotestoadiegaveupsometimeduringspecialcupdecidedtoquitdriftingaroundcornershealsopickedbowseronthefinalcupanddecidedtodriveoffthewsrampinsteadoftaking": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -27873,7 +28011,7 @@
       "points_for": 3,
       "points_against": 30
     },
-    "rankedangelodefeatsr23p0": {
+    "rankedangelodefeatsdzd2": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -27881,7 +28019,7 @@
       "points_for": 30,
       "points_against": 2
     },
-    "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupforr23p0eachplayedaspeachyoshi": {
+    "notesaclosematchthroughoutangeloouttoaconsistentleadandmostofthegroundmadeupinthefinalcupfordzd2eachplayedaspeachyoshi": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -27889,7 +28027,7 @@
       "points_for": 2,
       "points_against": 30
     },
-    "casualdoubleheaderdefeatsknix": {
+    "casualdoubleheaderdefeatstoadie": {
       "matches": 1,
       "wins": 0,
       "losses": 0,
@@ -27897,7 +28035,7 @@
       "points_for": 33,
       "points_against": 33
     },
-    "gamenotesknixtriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": {
+    "gamenotestoadietriedthejuggernautachievementitappearedwhenhechosetoswapbetweenwariomarioluigianddklotsofsabotageinthisround": {
       "matches": 1,
       "wins": 0,
       "losses": 0,
@@ -27961,7 +28099,7 @@
       "points_for": 33,
       "points_against": 3
     },
-    "casualfx64allstarslayerthesis": {
+    "casualfx64thesis": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -27977,7 +28115,7 @@
       "points_for": 30,
       "points_against": 25
     },
-    "casualshadow022fx64allstarslayer": {
+    "casualshadow022fx64": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28025,7 +28163,7 @@
       "points_for": 1,
       "points_against": 33
     },
-    "casualdefeatsfx64allstarslayer": {
+    "casualdefeatsfx64": {
       "matches": 2,
       "wins": 1,
       "losses": 1,
@@ -28033,7 +28171,7 @@
       "points_for": 69,
       "points_against": 66
     },
-    "gamenotesfx64allstarslayergotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": {
+    "gamenotesfx64gotalifelessontodayinmk64hissisterthesiswillbeproudthatheactuallyandlegitimatelywonmeon": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28057,7 +28195,7 @@
       "points_for": 64,
       "points_against": 33
     },
-    "casualtoonkettefx64allstarslayer": {
+    "casualtoonkettefx64": {
       "matches": 2,
       "wins": 0,
       "losses": 2,
@@ -28153,7 +28291,7 @@
       "points_for": 36,
       "points_against": 2
     },
-    "fx64allstarslayerbloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": {
+    "fx64bloodjustbeatyouifyoucountthelastscoremeandyougottogetheriwouldliketoseeagprematchbetweenthe": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28161,7 +28299,7 @@
       "points_for": 2,
       "points_against": 36
     },
-    "fx64allstarslayerbillblood90mushroom": {
+    "fx64billblood90mushroom": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28169,7 +28307,7 @@
       "points_for": 27,
       "points_against": 111
     },
-    "rankedurbanoutlawr23p0": {
+    "rankedurbanoutlawdzd2": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28193,7 +28331,7 @@
       "points_for": 91,
       "points_against": 124
     },
-    "n64fx64allstarslayer": {
+    "n64fx64": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28209,7 +28347,7 @@
       "points_for": 1,
       "points_against": 33
     },
-    "fx64allstarslayerpotat": {
+    "fx64potat": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28225,7 +28363,7 @@
       "points_for": 100,
       "points_against": 30
     },
-    "fx64allstarslayeronlylostby": {
+    "fx64onlylostby": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28273,7 +28411,7 @@
       "points_for": 12,
       "points_against": 64
     },
-    "gamenotesfx64allstarslayergotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": {
+    "gamenotesfx64gotdestroyedsobadthatheleftthevcwithoutsayinganythingitstheonlytimehewasspeechlesstherewasacliportwoimightpostjusttomakehimupsetonecoolthingthoughididntskunkhimthistimehebeatmeonfsohandibeathimby": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28313,7 +28451,7 @@
       "points_for": 2,
       "points_against": 36
     },
-    "casualfx64allstarslayerdip": {
+    "casualfx64dip": {
       "matches": 2,
       "wins": 0,
       "losses": 2,
@@ -28393,7 +28531,7 @@
       "points_for": 1,
       "points_against": 24
     },
-    "casualkartactionfuzzyfugssweepsfx64allstarslayerindoubleheaderfirstround": {
+    "casualkartactionfuzzyfugssweepsfx64indoubleheaderfirstround": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28449,7 +28587,7 @@
       "points_for": 2,
       "points_against": 33
     },
-    "casualfuzzyfugsdefeatsfx64allstarslayermushroom": {
+    "casualfuzzyfugsdefeatsfx64mushroom": {
       "matches": 2,
       "wins": 0,
       "losses": 2,
@@ -28641,13 +28779,13 @@
       "points_for": 117,
       "points_against": 114
     },
-    "rankedfx64allstarslayerpokermon": {
-      "matches": 1,
-      "wins": 1,
+    "rankedfx64pokermon": {
+      "matches": 2,
+      "wins": 2,
       "losses": 0,
       "ties": 0,
-      "points_for": 36,
-      "points_against": 5
+      "points_for": 72,
+      "points_against": 7
     },
     "fxwonthefirst": {
       "matches": 1,
@@ -28657,7 +28795,7 @@
       "points_for": 5,
       "points_against": 36
     },
-    "rankedtomfx64allstarslayer": {
+    "rankedtomfx64": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -28704,14 +28842,6 @@
       "ties": 0,
       "points_for": 21,
       "points_against": 67
-    },
-    "rankedfx64pokermon": {
-      "matches": 1,
-      "wins": 1,
-      "losses": 0,
-      "ties": 0,
-      "points_for": 36,
-      "points_against": 2
     },
     "gamenotespokermonwasonly": {
       "matches": 1,
@@ -28929,7 +29059,7 @@
       "points_for": 50,
       "points_against": 33
     },
-    "rankeddestroysfx64allstarslayer": {
+    "rankeddestroysfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28945,7 +29075,7 @@
       "points_for": 281,
       "points_against": 132
     },
-    "rankedfuzzyfugsdestroysfx64allstarslayer": {
+    "rankedfuzzyfugsdestroysfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28953,7 +29083,7 @@
       "points_for": 30,
       "points_against": 59
     },
-    "rankeddefeatsfx64allstarslayer": {
+    "rankeddefeatsfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -28969,7 +29099,7 @@
       "points_for": 60,
       "points_against": 36
     },
-    "casualinsensefx64allstarslayerwaswreckedwithcasualeaseby": {
+    "casualinsensefx64waswreckedwithcasualeaseby": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -29161,7 +29291,7 @@
       "points_for": 240,
       "points_against": 300
     },
-    "campkartrankedfx64allstarslayer": {
+    "campkartrankedfx64": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -29321,7 +29451,7 @@
       "points_for": 6,
       "points_against": 16
     },
-    "rankeddkchallengefx64allstarslayerfuzzyfugs": {
+    "rankeddkchallengefx64fuzzyfugs": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -29337,7 +29467,7 @@
       "points_for": 3,
       "points_against": 30
     },
-    "rankedblazeupvsfx64allstarslayer": {
+    "rankedblazeupvsfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -29417,15 +29547,15 @@
       "points_for": 2,
       "points_against": 25
     },
-    "rankedfx64allstarslayerdip": {
-      "matches": 1,
-      "wins": 0,
+    "rankedfx64dip": {
+      "matches": 2,
+      "wins": 1,
       "losses": 1,
       "ties": 0,
-      "points_for": 30,
-      "points_against": 36
+      "points_for": 63,
+      "points_against": 39
     },
-    "fx64allstarslayerdip": {
+    "fx64dip": {
       "matches": 1,
       "wins": 1,
       "losses": 0,
@@ -29465,7 +29595,7 @@
       "points_for": 36,
       "points_against": 3
     },
-    "fuzzyfugsdefeatsfx64allstarslayer": {
+    "fuzzyfugsdefeatsfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -29569,7 +29699,7 @@
       "points_for": 87,
       "points_against": 6
     },
-    "rankedfuzzyfugsdefeatedfx64allstarslayer": {
+    "rankedfuzzyfugsdefeatedfx64": {
       "matches": 1,
       "wins": 0,
       "losses": 1,
@@ -29584,6 +29714,22 @@
       "ties": 0,
       "points_for": 41,
       "points_against": 33
+    },
+    "ranked": {
+      "matches": 1,
+      "wins": 0,
+      "losses": 1,
+      "ties": 0,
+      "points_for": 8,
+      "points_against": 36
+    },
+    "gumbydefeatsdip": {
+      "matches": 1,
+      "wins": 1,
+      "losses": 0,
+      "ties": 0,
+      "points_for": 36,
+      "points_against": 8
     },
     "gumbyifyouregoingbytheoneracetetrislinkhad": {
       "matches": 1,
@@ -30424,6 +30570,54 @@
       "ties": 0,
       "points_for": 0,
       "points_against": 0
+    },
+    "rankedmrpittdefeatsfx64": {
+      "matches": 1,
+      "wins": 1,
+      "losses": 0,
+      "ties": 0,
+      "points_for": 27,
+      "points_against": 1
+    },
+    "rankedmrpittdefeatswildermk64": {
+      "matches": 1,
+      "wins": 1,
+      "losses": 0,
+      "ties": 0,
+      "points_for": 27,
+      "points_against": 10
+    },
+    "gamenoteswildermk64willbeproinnotimeamazingtoseethisskillfroma": {
+      "matches": 1,
+      "wins": 0,
+      "losses": 1,
+      "ties": 0,
+      "points_for": 10,
+      "points_against": 27
+    },
+    "rankedn64defeatswildermk64": {
+      "matches": 1,
+      "wins": 1,
+      "losses": 0,
+      "ties": 0,
+      "points_for": 30,
+      "points_against": 1
+    },
+    "gamenotesimproudofthiskidheputupadamngoodfightlap": {
+      "matches": 1,
+      "wins": 0,
+      "losses": 1,
+      "ties": 0,
+      "points_for": 1,
+      "points_against": 30
+    },
+    "gamenotesgoodthingdipwasseriousimagineifhewasnthegotbeatbycpuson": {
+      "matches": 1,
+      "wins": 0,
+      "losses": 1,
+      "ties": 0,
+      "points_for": 3,
+      "points_against": 33
     }
   },
   "processed_message_ids": [
@@ -31743,7 +31937,12 @@
     "1523462646198960369",
     "1523478282618536016",
     "1523506927663976598",
-    "1528107238558793897"
+    "1528107238558793897",
+    "1543644073678741617",
+    "1546159989331075213",
+    "1546415399845761114",
+    "1547122369359904849",
+    "1547765695775907862"
   ],
   "match_keys": [
     "('1012133677121155173', '1')",
@@ -31807,6 +32006,9 @@
     "('1054091648205860904', '1')",
     "('1054124485336367294', '1')",
     "('1054141367053467708', '1')",
+    "('1054444510219870258', '1')",
+    "('1054444510219870258', '2')",
+    "('1054444510219870258', '3')",
     "('1054444510219870258', '4')",
     "('1055494591631077438', '1')",
     "('1056568264072892457', '1')",
@@ -33063,6 +33265,11 @@
     "('1523478282618536016', '1')",
     "('1523506927663976598', '1')",
     "('1528107238558793897', '1')",
+    "('1543644073678741617', '1')",
+    "('1546159989331075213', '1')",
+    "('1546415399845761114', '1')",
+    "('1547122369359904849', '1')",
+    "('1547765695775907862', '1')",
     "('source_id', 'campkart2026-gp-final-coolex-gumby')",
     "('source_id', 'campkart2026-gp-pr1-dexter-devilbird')",
     "('source_id', 'campkart2026-gp-pr1-hank-arkyn')",
