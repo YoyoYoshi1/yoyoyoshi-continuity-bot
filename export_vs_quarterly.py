@@ -2,13 +2,13 @@ import json
 import os
 import statistics
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 DATA_FILE = "vs_data.json"
 OUTPUT_DIR = "public/mk64/vs/data/quarters"
 
 K_FACTOR = 32
-MIN_MATCHES = 5
+MIN_MATCHES = 0  # No minimum for quarterly leaderboards
 
 ALIASES = {
     "jesse": "spacedcowboy",
@@ -40,8 +40,13 @@ def parse_date(value):
         return None
 
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except Exception:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        # Discord timestamps are UTC; legacy timestamps without an offset
+        # are interpreted as UTC so sorting never mixes naive/aware datetimes.
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (TypeError, ValueError, AttributeError):
         return None
 
 
@@ -113,7 +118,14 @@ def replay_elo(matches):
                 if i == j:
                     continue
 
-                actual = 1 if i < j else 0
+                # Match the bot's score-aware Elo rule: equal totals are ties,
+                # regardless of how the placements array orders the players.
+                if scores[p1] > scores[p2]:
+                    actual = 1.0
+                elif scores[p1] < scores[p2]:
+                    actual = 0.0
+                else:
+                    actual = 0.5
                 expected = expected_score(old_ratings[p1], old_ratings[p2])
                 total_delta += actual - expected
 

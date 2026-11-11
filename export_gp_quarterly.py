@@ -2,13 +2,13 @@ import json
 import os
 import statistics
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 DATA_FILE = "gp_data.json"
 OUTPUT_DIR = "public/mk64/gp/data/quarters"
 
 K_FACTOR = 32
-MIN_MATCHES = 3
+MIN_MATCHES = 0  # No minimum for quarterly leaderboards
 
 ALIASES = {
     "jesse": "spacedcowboy",
@@ -39,8 +39,13 @@ def parse_date(value):
     if not value:
         return None
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except Exception:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        # Discord timestamps are UTC; legacy timestamps without an offset
+        # are interpreted as UTC so sorting never mixes naive/aware datetimes.
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (TypeError, ValueError, AttributeError):
         return None
 
 

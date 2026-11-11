@@ -372,6 +372,7 @@ ALIASES = {
     "blazeup": "martin",
     "fx": "fx64",
     "urbanoutlaw": "urban",
+    "wildermk64": "wilder",
 }
 
 
@@ -844,89 +845,114 @@ def clean_gp_score_segment(segment):
     return text
 
 
-def extract_alternating_gp_pairs(text, max_score=160):
-    """Extract NAME SCORE NAME SCORE without letting one pair swallow the next."""
-    blocked_names = {
-        "round", "score", "scores", "points", "point", "cup", "match", "gp", "mode", "extra",
-        "him", "me", "one", "on", "of", "place", "thats", "that", "mushroom", "flower",
-        "star", "special", "friend", "code",
-    }
+# GP reports must contain an identifiable matchup and an unambiguous final result.
+# Never infer player names from arbitrary words preceding numbers in conversation.
+GP_MATCHUP_PATTERN = re.compile(
+    r"^\s*(?:ranked\s+|casual\s+)?"
+    r"(?P<first>@[\w][^\n]*?)\s+"
+    r"(?:vs\.?|versus|defeats?|beats?|barely\s+beats?|and)\s+"
+    r"(?P<second>@[\w][^\n]*?)\s*(?:tie|tied)?\s*$",
+    re.IGNORECASE,
+)
+GP_CUP_PATTERN = re.compile(
+    r"^\s*(?:<a?:(?:mushroomcup|flowercup|starcup|specialcup):\d+>|:(?:mushroomcup|flowercup|starcup|specialcup):)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
+    re.IGNORECASE,
+)
+GP_TOTAL_PATTERN = re.compile(
+    r"^\s*(?::total:|<a?:total:\d+>|total\s*[:=]|=)\s*(\d{1,3})\s*[-–—]\s*(\d{1,3})\s*$",
+    re.IGNORECASE,
+)
+GP_SIMPLE_PAIR_PATTERN = re.compile(
+    r"^\s*@?(?P<first>[A-Za-z][\w.-]{1,31})\)?\s*"
+    r"(?P<score1>\d{1,3})(?:/\d{1,2})?\s+"
+    r"@?(?P<second>[A-Za-z][\w.-]{1,31})\)?\s*"
+    r"(?P<score2>\d{1,3})(?:/\d{1,2})?\s*"
+    r"(?:\([^\n]{0,65}\))?\s*$",
+    re.IGNORECASE,
+)
 
-    token_pattern = re.compile(r"\(?\d{1,3}(?:\s*/\s*\d{1,2})?\)?|@?[A-Za-z][A-Za-z0-9_#.'\-]*\)?")
-    tokens = token_pattern.findall(text)
 
-    pairs = []
-    name_tokens = []
-
-    for token in tokens:
-        token_clean = token.strip()
-        score_match = re.fullmatch(r"\(?(\d{1,3})(?:\s*/\s*\d{1,2})?\)?", token_clean)
-
-        if score_match:
-            score = int(score_match.group(1))
-
-            if not name_tokens or score > max_score:
-                name_tokens = []
-                continue
-
-            raw_name = " ".join(name_tokens)
-            clean = clean_score_name(raw_name)
-            name_tokens = []
-
-            if not clean or clean in blocked_names or re.fullmatch(r"\d+", clean):
-                continue
-
-            pairs.append((clean, score))
-            continue
-
-        name_tokens.append(token_clean)
-
-    return pairs
+def gp_report_player(name):
+    name = re.sub(r"\s*<:[^>]+>", "", name).strip()
+    name = re.sub(r"\s*\([^)]*\)\s*$", "", name).strip()
+    name = re.sub(r"\s+a\s*/?\s*k\s*/?\s*a\s+", " a/k/a ", name, flags=re.I)
+    return clean_score_name(name)
 
 
 def parse_score_lines(content, message=None, max_score=160):
+    """Parse only structured GP reports; return {} for ambiguous or casual posts.
+
+    Supported: two mentioned players with four labeled cups and a total,
+    or a standalone legacy `Player 110 Player 100` result. All other text is
+    deliberately rejected rather than treated as Elo evidence.
     """
-    Parse conservative two-player GP score reports.
-
-    Supported rejected-example families:
-    - Booth 111 Simon 111 (Simon won tiebreaker)
-    - Tom) 110/9 Gumby) 100/7
-    - Gumby) 117/10 Martin) 97/6
-    - Round 1: Gumby) 129 <@id>) 90
-    - <@id> - 100 / <@id> - 120 when mentions resolve on Discord
-
-    The parser intentionally returns {} unless it finds exactly two distinct
-    player/score pairs. Chatter and partial/non-numeric score messages stay out.
-    """
-    original_text = normalize_gp_score_text(content, message)
-
-    if reject_gp_score_reason(original_text) in {
-        "empty_or_attachment_only",
-        "no_numeric_score",
-        "conversation_or_scheduling",
-        "score_request_not_result",
-        "non_numeric_score",
-    }:
+    raw = replace_discord_mentions(content or "", message)
+    raw = html.unescape(raw)
+    lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    if not lines:
         return {}
 
-    text = clean_gp_score_segment(original_text)
-
-    # Separators often appear between player-score pairs.
-    text = re.sub(r"\s+(?:vs\.?|versus)\s+", " ", text, flags=re.IGNORECASE)
-    text = text.replace("–", "-").replace("—", "-")
-
-    pairs = extract_alternating_gp_pairs(text, max_score=max_score)
-
-    if len(pairs) != 2:
+    # Explicitly unranked/casual posts must never affect the ranked GP Elo.
+    if re.search(r"\b(?:casual|unranked)\b", raw, flags=re.I):
         return {}
 
-    scores = {}
-    for player, score in pairs:
-        if player in scores:
+    header = []
+    for line in lines:
+        if GP_CUP_PATTERN.fullmatch(line) or GP_TOTAL_PATTERN.fullmatch(line):
+            break
+        if re.match(r"^(?:game\s*notes?|notes?)\s*:", line, flags=re.I):
+            break
+        header.append(line)
+
+    # Recognize one clear matchup, not arbitrary @mentions in game notes.
+    matchup_lines = [line for line in header if re.search(r"\b(?:vs\.?|versus|defeats?|beats?|and)\b", line, re.I)]
+    if matchup_lines:
+        if len(matchup_lines) != 1:
             return {}
-        scores[player] = score
+        found = GP_MATCHUP_PATTERN.fullmatch(matchup_lines[0])
+        if not found:
+            return {}
+        p1 = gp_report_player(found.group("first"))
+        p2 = gp_report_player(found.group("second"))
+        if not p1 or not p2 or p1 == p2:
+            return {}
+        cups = []
+        totals = []
+        for line in lines:
+            cup = GP_CUP_PATTERN.fullmatch(line)
+            total = GP_TOTAL_PATTERN.fullmatch(line)
+            if cup:
+                cups.append(tuple(map(int, cup.groups())))
+            elif total:
+                totals.append(tuple(map(int, total.groups())))
+        if len(cups) != 4 or len(totals) != 1:
+            # Some reports accidentally label the final total as a fifth cup.
+            # Accept only when the fifth row equals the sum of the first four.
+            if len(cups) == 5 and not totals:
+                candidate = tuple(map(sum, zip(*cups[:4])))
+                if cups[4] == candidate:
+                    cups, totals = cups[:4], [candidate]
+            if len(cups) != 4 or len(totals) != 1:
+                return {}
+        summed = tuple(map(sum, zip(*cups)))
+        if summed != totals[0]:
+            return {}
+        a, b = totals[0]
+        if a > max_score or b > max_score:
+            return {}
+        return {p1: a, p2: b}
 
-    return scores
+    # Historic short-form reports: whole segment must be the score line.
+    # The pattern is intentionally anchored to exclude explanatory prose.
+    if len(lines) == 1:
+        m = GP_SIMPLE_PAIR_PATTERN.fullmatch(lines[0])
+        if m:
+            p1, p2 = gp_report_player(m.group("first")), gp_report_player(m.group("second"))
+            a, b = int(m.group("score1")), int(m.group("score2"))
+            if p1 and p2 and p1 != p2 and a <= max_score and b <= max_score:
+                return {p1: a, p2: b}
+    return {}
+
 
 def split_gp_score_segments(content, message=None):
     """
@@ -2287,6 +2313,9 @@ async def import_gp_history_for_channel(
             else:
                 rejected += 1
                 latest_rejected = msg.created_at
+                # Surface possible result reports without contaminating Elo.
+                if re.search(r"\b(?:ranked|total)\b|:total:", msg.content or "", re.I):
+                    print(f"GP REVIEW (not imported): {msg.jump_url}")
 
     except discord.Forbidden:
         print(f"SKIPPING GP channel #{channel.name}: missing access.")
