@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
-SOURCE = Path(__file__).with_name('bot_gp_audit_revised.py')
+SOURCE = Path(__file__).with_name('bot.py')
 NAMES = {
     'normalize_name', 'display_name_for_mention', 'replace_discord_mentions',
     'clean_score_name', 'gp_report_player', 'parse_score_lines',
