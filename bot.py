@@ -447,7 +447,24 @@ def clean_score_name(name):
     return normalize_name(name)
 
 
+# A qualifying VS scoreboard is ranked by default, regardless of date.
+# Explicit noncompetitive labels always take precedence over a "Ranked" word.
+VS_NONCOMPETITIVE_PATTERN = re.compile(
+    r"\b(?:unranked|casual|exhibition|unrated|friendly|for\s+fun|"
+    r"not\s+(?:for\s+)?rank(?:ed|ing)|not\s+posted\s+on\s+kaillera)\b",
+    re.IGNORECASE,
+)
+
+
+def is_excluded_vs_result(content):
+    return bool(VS_NONCOMPETITIVE_PATTERN.search(content or ""))
+
+
 def parse_vs_message(content, message=None):
+    # Retain the original ranked-mention extraction, but do not import an
+    # explicitly noncompetitive result even when it contains "Ranked".
+    if is_excluded_vs_result(content):
+        return None
     text = content.replace("\n", " ")
 
     if "ranked" not in text.lower():
@@ -495,6 +512,98 @@ def parse_vs_message(content, message=None):
         "placements": placements
     }
 
+
+
+# Conservative legacy VS recovery: plain-text scoreboards, 2022 onward.
+# Keep the original ranked-mention parser as the first-pass parser.
+VS_LEGACY_NAME_ALIASES = {
+    "clapdaddyakafuzz": "fuzz", "clapdaddy": "fuzz",
+    "cptntryhardchangloveyaben": "chang", "cptntryhard": "chang",
+    "captn": "chang", "captain": "chang", "chang": "chang",
+    "dipthe4man": "dip", "dip": "dip", "thecountess": "countess",
+    "juggernautlasbest": "juggernaut", "juggernut": "juggernaut",
+    "fx": "fx64", "fx64": "fx64",
+    "gg": "gg", "jesses": "spacedcowboy",
+}
+VS_LEGACY_ROW = re.compile(
+    r"^\s*(?:[-*]\s*)?(?P<name>.+?)\s*(?:\s+-\s*|\s+)(?P<score>\d{1,2})(?=\s|$|[:!]|\\)",
+    re.IGNORECASE,
+)
+VS_LEGACY_SCORE_SUFFIX = re.compile(r"^\s*(?:[:][a-z0-9_~]+[:]\s*)?", re.IGNORECASE)
+
+
+def vs_legacy_name(raw):
+    raw = str(raw or "").strip()
+    # Discord emotes that precede a player's name (e.g. :Gumby: 36).
+    emoji_only = re.fullmatch(r":([A-Za-z][A-Za-z0-9_~]*):", raw)
+    if emoji_only:
+        raw = emoji_only.group(1)
+    else:
+        raw = re.sub(r":(?:[A-Za-z][A-Za-z0-9_~]*):", " ", raw)
+    raw = raw.lstrip("@ ").strip()
+    raw = re.sub(r"\s+a\s*/?\s*k\s*/?\s*a\s+", " a/k/a ", raw, flags=re.I)
+    if re.search(r"\ba/k/a\b", raw, flags=re.I):
+        raw = re.split(r"\ba/k/a\b", raw, flags=re.I)[-1].strip()
+    normal = normalize_name(raw)
+    return VS_LEGACY_NAME_ALIASES.get(normal, normal)
+
+
+def parse_vs_legacy_message(content, message=None):
+    """Parse 3-/4-player, 16-race plain-text VS scoreboards with total 96.
+
+    Requiring exactly 96 points and a full, consecutive set of player rows
+    prevents chat messages and GP cup scores from becoming VS matches.
+    Two-player and nonstandard scoreboards stay manual-review only.
+    """
+    if is_excluded_vs_result(content):
+        return None
+    text = replace_discord_mentions(content, message)
+    rows = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            if rows:
+                # Allow blank lines, but not other commentary inside a scoreboard.
+                continue
+            continue
+        # Match a player and their score at the start of the line. Names may
+        # include Discord @mentions, slashes, punctuation, and spaces.
+        m = re.match(r"^(?:[-*]\s*)?(?P<name>@?[^\n]+?)\s*(?:\s-\s*|\s+|-(?=\d))(?P<score>\d{1,2})(?=\s|$|[!:])", line)
+        if not m:
+            if rows and len(rows) < 4:
+                rows = []
+            continue
+        name = m.group("name").strip()
+        # Never parse game notes, headings, track/cup rows, or standings commentary.
+        if re.search(r"\b(?:mush(?:room)?|flow(?:er)?|spec(?:ial)?|star|total|ranked|round|notes?|score|result|winner)\b", name, re.I):
+            if rows and len(rows) < 4:
+                rows = []
+            continue
+        name = vs_legacy_name(name)
+        if not name or name.startswith("user_") or name in {"deleteduser", "image"} or len(name) > 36:
+            rows = []
+            continue
+        score = int(m.group("score"))
+        if score > MAX_SCORE:
+            rows = []
+            continue
+        rows.append((name, score))
+        if len(rows) == 4:
+            if len({p for p, _ in rows}) == 4 and sum(v for _, v in rows) == 96:
+                scores = dict(rows)
+                return {"scores": scores, "placements": sorted(scores.items(), key=lambda x: -x[1])}
+            rows = []
+    if len(rows) == 3 and len({p for p, _ in rows}) == 3 and sum(v for _, v in rows) == 96:
+        scores = dict(rows)
+        return {"scores": scores, "placements": sorted(scores.items(), key=lambda x: -x[1])}
+    return None
+
+
+def parse_vs_message_with_legacy(content, message=None):
+    """Rank qualifying VS scoreboards by default; explicit exclusions win."""
+    if is_excluded_vs_result(content):
+        return None
+    return parse_vs_message(content, message) or parse_vs_legacy_message(content, message)
 
 def expected_score(r1, r2):
     return 1 / (1 + 10 ** ((r2 - r1) / 400))
@@ -597,6 +706,7 @@ def rebuild_vs_state_from_matches(save=True):
         "points": 0
     })
 
+    matches.sort(key=lambda m: (str(m.get("created_at", "")), int(m.get("event_order") or 0)))
     for match in matches:
         update_ratings(match)
         for player, score in match.get("scores", {}).items():
@@ -2322,6 +2432,7 @@ async def import_vs_history_for_channel(channel_id):
     scanned = 0
     parsed = 0
     rejected = 0
+    existing_match_ids = {str(m.get("message_id")) for m in matches if m.get("message_id")}
 
     print(f"Scanning VS history in #{channel.name}...")
 
@@ -2334,12 +2445,17 @@ async def import_vs_history_for_channel(channel_id):
 
         scanned += 1
 
-        if str(msg.id) in processed_message_ids:
+        # Older rejected messages must be reconsidered after parser upgrades.
+        # Existing imported matches remain protected from duplicate import.
+        if str(msg.id) in existing_match_ids:
             continue
 
-        match = parse_vs_message(msg.content, msg)
+        match = parse_vs_message_with_legacy(msg.content, msg)
 
         if match:
+            # Existing rejected IDs were marked processed by older bot versions.
+            # Unmark only the current message after successfully parsing it.
+            processed_message_ids.discard(str(msg.id))
             if record_vs_match(match, message=msg, save=False):
                 parsed += 1
         else:
@@ -2723,6 +2839,17 @@ async def on_ready():
         except Exception as e:
             print("FETCH CHANNEL ERROR:", repr(e))
 
+        # Keep an untouched backup before the first historical VS recovery scan.
+        # Existing manual/event data and GP records remain unchanged.
+        vs_backup_file = os.path.join(
+            os.path.dirname(os.path.abspath(DATA_FILE)),
+            "vs_data.pre_legacy_recovery.json",
+        )
+        if os.path.isfile(DATA_FILE) and not os.path.exists(vs_backup_file):
+            import shutil
+            shutil.copy2(DATA_FILE, vs_backup_file)
+            print(f"Saved VS pre-recovery backup: {vs_backup_file}")
+
         await import_vs_history()
         import_manual_vs_results(save=False)
 
@@ -2788,7 +2915,7 @@ async def on_message(message):
             await message.channel.send(format_vs_stats())
             return
 
-        match = parse_vs_message(content, message)
+        match = parse_vs_message_with_legacy(content, message)
 
         if match:
             recorded = record_vs_match(match, message=message)
