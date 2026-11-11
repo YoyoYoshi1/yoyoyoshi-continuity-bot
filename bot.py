@@ -360,8 +360,10 @@ processed_gp_message_ids = set()
 gp_match_keys = set()
 
 ALIASES = {
+    "1035953951499104306": "gumby",  # Gumby Discord user ID in historical VS reports
     "jesse": "spacedcowboy",
     "jessek": "spacedcowboy",
+    "jessek13": "spacedcowboy",
     "spaced": "spacedcowboy",
     "socal": "juggernaut",
     "coolex": "thecoolex",
@@ -386,6 +388,23 @@ def normalize_name(name):
     name = name.lower().strip()
     name = re.sub(r"[^a-z0-9_]", "", name)
     return ALIASES.get(name, name)
+
+
+def normalize_vs_match_players(match):
+    """Canonicalize stored/new VS identities before Elo and statistics updates."""
+    scores = match.get("scores", {})
+    normalized = {}
+    for player, score in scores.items():
+        canonical = normalize_name(str(player))
+        if not canonical or canonical in normalized:
+            raise ValueError(f"VS identity collision in match {match.get('message_id') or match.get('source_id')}: {player}")
+        normalized[canonical] = score
+    if len(normalized) != len(scores):
+        raise ValueError("VS normalization changed the number of players")
+    match["scores"] = normalized
+    # Reconstruct placements from canonical scores to avoid stale raw-ID keys.
+    match["placements"] = sorted(normalized.items(), key=lambda item: -item[1])
+    return match
 
 
 VS_MENTION_PATTERN = re.compile(r"<@!?(\d+)>")
@@ -418,7 +437,7 @@ def replace_discord_mentions(content, message=None):
 
     def repl(match):
         user_id = match.group(1)
-        name = mention_names.get(user_id)
+        name = ALIASES.get(user_id) or mention_names.get(user_id)
 
         if not name:
             return match.group(0)
@@ -489,7 +508,7 @@ def parse_vs_message(content, message=None):
         if score > MAX_SCORE:
             return None
 
-        player_name = mention_names.get(
+        player_name = normalize_name(user_id) if user_id in ALIASES else mention_names.get(
             user_id,
             f"user_{user_id}"
         )
@@ -681,6 +700,10 @@ def load_vs_data():
         data = json.load(f)
 
     matches = data.get("matches", [])
+    # Existing records may predate identity aliases; normalize before rebuilding
+    # their Elo and per-player totals, without discarding any match history.
+    for match in matches:
+        normalize_vs_match_players(match)
     last_message_id = data.get("last_message_id")
     processed_message_ids = set(data.get("processed_message_ids", []))
 
@@ -708,6 +731,7 @@ def rebuild_vs_state_from_matches(save=True):
 
     matches.sort(key=lambda m: (str(m.get("created_at", "")), int(m.get("event_order") or 0)))
     for match in matches:
+        normalize_vs_match_players(match)
         update_ratings(match)
         for player, score in match.get("scores", {}).items():
             player_stats[player]["matches"] += 1
@@ -739,6 +763,7 @@ def record_vs_match(match, message=None, message_id=None, save=True):
         match["message_id"] = message_id
         last_message_id = message_id
 
+    normalize_vs_match_players(match)
     matches.append(match)
     update_ratings(match)
 
@@ -1474,6 +1499,8 @@ def load_gp_data():
         data = json.load(f)
 
     gp_matches = data.get("matches", [])
+    for match in gp_matches:
+        normalize_gp_match_players(match)
     processed_gp_message_ids = set(data.get("processed_message_ids", []))
 
     for player, rating in data.get("ratings", {}).items():
@@ -1483,6 +1510,23 @@ def load_gp_data():
         gp_player_stats[player] = stats
 
     rebuild_gp_match_keys()
+
+
+def normalize_gp_match_players(match):
+    """Apply canonical aliases to all GP match fields without changing results."""
+    scores = match.get("scores", {})
+    canonical_scores = {}
+    for player, score in scores.items():
+        canonical = normalize_name(str(player))
+        if not canonical or canonical in canonical_scores:
+            raise ValueError(f"GP identity collision in match {match.get('message_id') or match.get('source_id')}: {player}")
+        canonical_scores[canonical] = score
+    match["scores"] = canonical_scores
+    if "players" in match:
+        match["players"] = [normalize_name(str(player)) for player in match["players"]]
+    if "winner" in match and match["winner"] is not None:
+        match["winner"] = normalize_name(str(match["winner"]))
+    return match
 
 
 def record_gp_match(match, message=None, save=True, allow_duplicate_key=False):
@@ -1496,6 +1540,7 @@ def record_gp_match(match, message=None, save=True, allow_duplicate_key=False):
         # submatch is deduped below by message_id + submatch_index.
         match = attach_metadata(match, message)
 
+    normalize_gp_match_players(match)
     key = gp_match_key(match)
 
     if not allow_duplicate_key and key in gp_match_keys:
@@ -3187,6 +3232,59 @@ def run_continuity_qa():
 # -----------------------------
 # Slash commands
 # -----------------------------
+
+@tree.command(name="commands", description="List the slash commands available to server members.")
+@app_commands.guild_only()
+async def commands(interaction: discord.Interaction):
+    # Read commands from the live guild command tree rather than maintaining a
+    # separate list. on_ready copies global definitions into the guild tree.
+    registered = tree.get_commands(guild=MY_GUILD)
+    public_commands = []
+    for command in registered:
+        # A default permission restriction (e.g., administrator=True) or an
+        # explicitly admin-only description keeps the command off the member list.
+        # The latter also covers existing commands with runtime admin checks.
+        permissions = getattr(command, "default_permissions", None)
+        description = (getattr(command, "description", "") or "").strip()
+        if permissions is not None or description.lower().startswith("admin-only:"):
+            continue
+        public_commands.append(command)
+
+    public_commands.sort(key=lambda command: command.name)
+    if not public_commands:
+        await interaction.response.send_message(
+            "No public slash commands are currently registered.", ephemeral=True
+        )
+        return
+
+    embed = discord.Embed(
+        title="Available Slash Commands",
+        description="Public commands registered for this server.",
+        color=discord.Color.blue(),
+    )
+    # Discord allows 25 embed fields; a single description fits the current
+    # command set, with a safe fallback if more commands are added later.
+    lines = [
+        f"**/{command.name}** — {command.description or 'No description available.'}"
+        for command in public_commands
+    ]
+    chunks = []
+    current = ""
+    for line in lines:
+        if current and len(current) + len(line) + 1 > 3900:
+            chunks.append(current)
+            current = ""
+        current += ("\n" if current else "") + line
+    if current:
+        chunks.append(current)
+
+    embed.description = chunks[0]
+    await interaction.response.send_message(embed=embed)
+    for chunk in chunks[1:]:
+        await interaction.followup.send(embed=discord.Embed(
+            description=chunk, color=discord.Color.blue()
+        ))
+
 
 @tree.command(name="mk64", description="Ask the MK64 Switch Guide a Mario Kart 64 question.")
 @app_commands.describe(question="Ask about MK64 tracks, strategy, mechanics, modes, or MK64 Switch history")
